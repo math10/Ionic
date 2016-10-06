@@ -5,6 +5,13 @@ var global$1 = typeof global !== "undefined" ? global :
             typeof self !== "undefined" ? self :
             typeof window !== "undefined" ? window : {}
 
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 var globalScope;
 if (typeof window === 'undefined') {
     if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
@@ -541,6 +548,12 @@ function makePropDecorator(name, props, parentClass) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Inject decorator and metadata.
+ *
+ * @stable
+ * @Annotation
+ */
 var Inject = makeParamDecorator('Inject', [['token', undefined]]);
 /**
  * Optional decorator and metadata.
@@ -585,6 +598,29 @@ var Host = makeParamDecorator('Host', []);
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Creates a token that can be used in a DI Provider.
+ *
+ * ### Example ([live demo](http://plnkr.co/edit/Ys9ezXpj2Mnoy3Uc8KBp?p=preview))
+ *
+ * ```typescript
+ * var t = new OpaqueToken("value");
+ *
+ * var injector = Injector.resolveAndCreate([
+ *   {provide: t, useValue: "bindingValue"}
+ * ]);
+ *
+ * expect(injector.get(t)).toEqual("bindingValue");
+ * ```
+ *
+ * Using an `OpaqueToken` is preferable to using strings as tokens because of possible collisions
+ * caused by multiple providers using the same string as two different tokens.
+ *
+ * Using an `OpaqueToken` is preferable to using an `Object` as tokens because it provides better
+ * error messages.
+ * @stable
+ */
+// so that metadata is gathered for this class
 var OpaqueToken = (function () {
     function OpaqueToken(_desc) {
         this._desc = _desc;
@@ -606,6 +642,40 @@ var OpaqueToken = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * This token can be used to create a virtual provider that will populate the
+ * `entryComponents` fields of components and ng modules based on its `useValue`.
+ * All components that are referenced in the `useValue` value (either directly
+ * or in a nested array or map) will be added to the `entryComponents` property.
+ *
+ * ### Example
+ * The following example shows how the router can populate the `entryComponents`
+ * field of an NgModule based on the router configuration which refers
+ * to components.
+ *
+ * ```typescript
+ * // helper function inside the router
+ * function provideRoutes(routes) {
+ *   return [
+ *     {provide: ROUTES, useValue: routes},
+ *     {provide: ANALYZE_FOR_ENTRY_COMPONENTS, useValue: routes, multi: true}
+ *   ];
+ * }
+ *
+ * // user code
+ * let routes = [
+ *   {path: '/root', component: RootComp},
+ *   {path: '/teams', component: TeamsComp}
+ * ];
+ *
+ * @NgModule({
+ *   providers: [provideRoutes(routes)]
+ * })
+ * class ModuleWithRoutes {}
+ * ```
+ *
+ * @experimental
  */
 var ANALYZE_FOR_ENTRY_COMPONENTS = new OpaqueToken('AnalyzeForEntryComponents');
 /**
@@ -738,6 +808,11 @@ var ViewChild = makePropDecorator('ViewChild', [
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Describes within the change detector which strategy will be used the next time change
+ * detection is triggered.
+ * @stable
+ */
 var ChangeDetectionStrategy;
 (function (ChangeDetectionStrategy) {
     /**
@@ -807,6 +882,12 @@ function isDefaultChangeDetectionStrategy(changeDetectionStrategy) {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * Directive decorator and metadata.
+ *
+ * @stable
+ * @Annotation
  */
 var Directive = makeDecorator('Directive', {
     selector: undefined,
@@ -1062,6 +1143,14 @@ var AfterViewChecked = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Defines a schema that will allow:
+ * - any non-angular elements with a `-` in their name,
+ * - any properties on elements with a `-` in their name which is the common rule for custom
+ * elements.
+ *
+ * @stable
+ */
 var CUSTOM_ELEMENTS_SCHEMA = {
     name: 'custom-elements'
 };
@@ -1189,6 +1278,18 @@ var ViewMetadata = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * Allows to refer to references which are not yet defined.
+ *
+ * For instance, `forwardRef` is used when the `token` which we need to refer to for the purposes of
+ * DI is declared,
+ * but not yet defined. It is also used when the `token` which we use when creating a query is not
+ * yet defined.
+ *
+ * ### Example
+ * {@example core/di/ts/forward_ref/forward_ref_spec.ts region='forward_ref'}
+ * @experimental
  */
 function forwardRef(forwardRefFn) {
     forwardRefFn.__forward_ref__ = forwardRef;
@@ -1347,6 +1448,8 @@ var Injector = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Map constructor.  We work around that by manually adding the items.
 var createMapFromPairs = (function () {
     try {
         if (new Map([[1, 2]]).size === 1) {
@@ -1958,6 +2061,22 @@ var MixingMultiProvidersWithRegularProvidersError = (function (_super) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A unique object used for retrieving items from the {@link ReflectiveInjector}.
+ *
+ * Keys have:
+ * - a system-wide unique `id`.
+ * - a `token`.
+ *
+ * `Key` is used internally by {@link ReflectiveInjector} because its system-wide unique `id` allows
+ * the
+ * injector to store created objects in a more efficient way.
+ *
+ * `Key` should not be created directly. {@link ReflectiveInjector} creates keys automatically when
+ * resolving
+ * providers.
+ * @experimental
+ */
 var ReflectiveKey = (function () {
     /**
      * Private
@@ -2236,6 +2355,9 @@ var __extends$2 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Reflective information about a symbol, including annotations, interfaces, and other metadata.
+ */
 
 /**
  * Provides access to reflection data about symbols. Used internally by Angular
@@ -2393,6 +2515,10 @@ function _mergeMaps(target, config) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * The {@link Reflector} used internally in Angular to access metadata
+ * about symbols.
+ */
 var reflector = new Reflector(new ReflectionCapabilities());
 
 /**
@@ -2401,6 +2527,10 @@ var reflector = new Reflector(new ReflectionCapabilities());
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * `Dependency` is used by the framework to extend DI.
+ * This is internal to Angular and should not be used directly.
  */
 var ReflectiveDependency = (function () {
     function ReflectiveDependency(key, optional, lowerBoundVisibility, upperBoundVisibility, properties) {
@@ -2615,6 +2745,7 @@ function _createDependency(token /** TODO #9100 */, optional /** TODO #9100 */, 
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// Threshold for the dynamic version
 var _MAX_CONSTRUCTION_COUNTER = 10;
 var UNDEFINED = new Object();
 var ReflectiveProtoInjectorInlineStrategy = (function () {
@@ -3544,6 +3675,10 @@ function isPromise(obj) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A function that will be executed when an application is initialized.
+ * @experimental
+ */
 var APP_INITIALIZER = new OpaqueToken('Application Initializer');
 /**
  * A class that reflects the state of running {@link APP_INITIALIZER}s.
@@ -3594,6 +3729,16 @@ var ApplicationInitStatus = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * A DI Token representing a unique string id assigned to the application by Angular and used
+ * primarily for prefixing application attributes and CSS styles when
+ * {@link ViewEncapsulation#Emulated} is being used.
+ *
+ * If you need to avoid randomly generated value to be used as an application id, you can provide
+ * a custom value via a DI provider <!-- TODO: provider --> configuring the root {@link Injector}
+ * using this token.
+ * @experimental
  */
 var APP_ID = new OpaqueToken('AppId');
 function _appIdRandomProviderFactory() {
@@ -3664,6 +3809,11 @@ var __extends$4 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Indicates that a component is still being loaded in a synchronous compile.
+ *
+ * @stable
+ */
 var ComponentStillLoadingError = (function (_super) {
     __extends$4(ComponentStillLoadingError, _super);
     function ComponentStillLoadingError(compType) {
@@ -4777,6 +4927,10 @@ var KeyValueChangeRecord = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A repository of different iterable diffing strategies used by NgFor, NgClass, and others.
+ * @stable
+ */
 var IterableDiffers = (function () {
     function IterableDiffers(factories) {
         this.factories = factories;
@@ -4844,6 +4998,10 @@ var IterableDiffers = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * A repository of different Map diffing strategies used by NgClass, NgStyle, and others.
+ * @stable
  */
 var KeyValueDiffers = (function () {
     function KeyValueDiffers(factories) {
@@ -5009,6 +5167,9 @@ var ChangeDetectorRef = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Structural diffing for `Object`s and `Map`s.
+ */
 var keyValDiff = [new DefaultKeyValueDifferFactory()];
 /**
  * Structural diffing for `Iterable` types such as `Array`s.
@@ -5024,6 +5185,10 @@ var defaultKeyValueDiffers = new KeyValueDiffers(keyValDiff);
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @experimental
+ */
+// TODO (matsko): add typing for the animation function
 var RenderComponentType = (function () {
     function RenderComponentType(id, templateUrl, slotCount, encapsulation, styles, animations) {
         this.id = id;
@@ -5198,6 +5363,9 @@ function leave(scope, returnValue) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * True if WTF is enabled.
+ */
 var wtfEnabled = detectWTF();
 function noopScope(arg0, arg1) {
     return null;
@@ -5270,6 +5438,24 @@ var wtfLeave = wtfEnabled ? leave : function (s, r) { return r; };
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * Represents a container where one or more Views can be attached.
+ *
+ * The container can contain two kinds of Views. Host Views, created by instantiating a
+ * {@link Component} via {@link #createComponent}, and Embedded Views, created by instantiating an
+ * {@link TemplateRef Embedded Template} via {@link #createEmbeddedView}.
+ *
+ * The location of the View Container within the containing View is specified by the Anchor
+ * `element`. Each View Container can have only one Anchor Element and each Anchor Element can only
+ * have a single View Container.
+ *
+ * Root elements of Views attached to this container become siblings of the Anchor Element in
+ * the Rendered View.
+ *
+ * To access a `ViewContainerRef` of an Element, you can either place a {@link Directive} injected
+ * with `ViewContainerRef` on the Element, or you obtain it via a {@link ViewChild} query.
+ * @stable
  */
 var ViewContainerRef = (function () {
     function ViewContainerRef() {
@@ -5435,6 +5621,11 @@ var ViewType;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * An AppElement is created for elements that have a ViewContainerRef,
+ * a nested component or a <template> element to keep data around
+ * that is needed for later instantiations.
+ */
 var AppElement = (function () {
     function AppElement(index, parentIndex, parentView, nativeElement) {
         this.index = index;
@@ -5552,6 +5743,40 @@ var __extends$6 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * An error thrown if application changes model breaking the top-down data flow.
+ *
+ * This exception is only thrown in dev mode.
+ *
+ * <!-- TODO: Add a link once the dev mode option is configurable -->
+ *
+ * ### Example
+ *
+ * ```typescript
+ * @Component({
+ *   selector: 'parent',
+ *   template: `
+ *     <child [prop]="parentProp"></child>
+ *   `,
+ *   directives: [forwardRef(() => Child)]
+ * })
+ * class Parent {
+ *   parentProp = "init";
+ * }
+ *
+ * @Directive({selector: 'child', inputs: ['prop']})
+ * class Child {
+ *   constructor(public parent: Parent) {}
+ *
+ *   set prop(v) {
+ *     // this updates the parent property, which is disallowed during change detection
+ *     // this will result in ExpressionChangedAfterItHasBeenCheckedError
+ *     this.parent.parentProp = "updated";
+ *   }
+ * }
+ * ```
+ * @stable
+ */
 var ExpressionChangedAfterItHasBeenCheckedError = (function (_super) {
     __extends$6(ExpressionChangedAfterItHasBeenCheckedError, _super);
     function ExpressionChangedAfterItHasBeenCheckedError(oldValue, currValue) {
@@ -5915,6 +6140,14 @@ var __extends$5 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Represents an instance of a Component created via a {@link ComponentFactory}.
+ *
+ * `ComponentRef` provides access to the Component Instance as well other objects related to this
+ * Component Instance and allows you to destroy the Component Instance via the {@link #destroy}
+ * method.
+ * @stable
+ */
 var ComponentRef = (function () {
     function ComponentRef() {
     }
@@ -6062,6 +6295,9 @@ var __extends$7 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * @stable
+ */
 var NoComponentFactoryError = (function (_super) {
     __extends$7(NoComponentFactoryError, _super);
     function NoComponentFactoryError(component) {
@@ -6157,6 +6393,7 @@ var isObject_1$1 = {
 	isObject: isObject_2
 };
 
+// typeof any so that it we don't have to cast when comparing a result to the error object
 var errorObject_1$2 = { e: {} };
 
 var errorObject = {
@@ -6927,6 +7164,9 @@ var SubjectSubscriber = (function (_super) {
     }
     return SubjectSubscriber;
 }(Subscriber_1.Subscriber));
+/**
+ * @class Subject<T>
+ */
 var Subject = (function (_super) {
     __extends$9(Subject, _super);
     function Subject() {
@@ -7071,6 +7311,53 @@ var __extends$8 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Use by directives and components to emit custom Events.
+ *
+ * ### Examples
+ *
+ * In the following example, `Zippy` alternatively emits `open` and `close` events when its
+ * title gets clicked:
+ *
+ * ```
+ * @Component({
+ *   selector: 'zippy',
+ *   template: `
+ *   <div class="zippy">
+ *     <div (click)="toggle()">Toggle</div>
+ *     <div [hidden]="!visible">
+ *       <ng-content></ng-content>
+ *     </div>
+ *  </div>`})
+ * export class Zippy {
+ *   visible: boolean = true;
+ *   @Output() open: EventEmitter<any> = new EventEmitter();
+ *   @Output() close: EventEmitter<any> = new EventEmitter();
+ *
+ *   toggle() {
+ *     this.visible = !this.visible;
+ *     if (this.visible) {
+ *       this.open.emit(null);
+ *     } else {
+ *       this.close.emit(null);
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * The events payload can be accessed by the parameter `$event` on the components output event
+ * handler:
+ *
+ * ```
+ * <zippy (open)="onOpen($event)" (close)="onClose($event)"></zippy>
+ * ```
+ *
+ * Uses Rx.Observable but provides an adapter to make it work as specified here:
+ * https://github.com/jhusain/observable-spec
+ *
+ * Once a reference implementation of the spec is available, switch to it.
+ * @stable
+ */
 var EventEmitter = (function (_super) {
     __extends$8(EventEmitter, _super);
     /**
@@ -7202,6 +7489,78 @@ var NgZoneImpl = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * An injectable service for executing work inside or outside of the Angular zone.
+ *
+ * The most common use of this service is to optimize performance when starting a work consisting of
+ * one or more asynchronous tasks that don't require UI updates or error handling to be handled by
+ * Angular. Such tasks can be kicked off via {@link #runOutsideAngular} and if needed, these tasks
+ * can reenter the Angular zone via {@link #run}.
+ *
+ * <!-- TODO: add/fix links to:
+ *   - docs explaining zones and the use of zones in Angular and change-detection
+ *   - link to runOutsideAngular/run (throughout this file!)
+ *   -->
+ *
+ * ### Example ([live demo](http://plnkr.co/edit/lY9m8HLy7z06vDoUaSN2?p=preview))
+ * ```
+ * import {Component, View, NgZone} from '@angular/core';
+ * import {NgIf} from '@angular/common';
+ *
+ * @Component({
+ *   selector: 'ng-zone-demo'.
+ *   template: `
+ *     <h2>Demo: NgZone</h2>
+ *
+ *     <p>Progress: {{progress}}%</p>
+ *     <p *ngIf="progress >= 100">Done processing {{label}} of Angular zone!</p>
+ *
+ *     <button (click)="processWithinAngularZone()">Process within Angular zone</button>
+ *     <button (click)="processOutsideOfAngularZone()">Process outside of Angular zone</button>
+ *   `,
+ *   directives: [NgIf]
+ * })
+ * export class NgZoneDemo {
+ *   progress: number = 0;
+ *   label: string;
+ *
+ *   constructor(private _ngZone: NgZone) {}
+ *
+ *   // Loop inside the Angular zone
+ *   // so the UI DOES refresh after each setTimeout cycle
+ *   processWithinAngularZone() {
+ *     this.label = 'inside';
+ *     this.progress = 0;
+ *     this._increaseProgress(() => console.log('Inside Done!'));
+ *   }
+ *
+ *   // Loop outside of the Angular zone
+ *   // so the UI DOES NOT refresh after each setTimeout cycle
+ *   processOutsideOfAngularZone() {
+ *     this.label = 'outside';
+ *     this.progress = 0;
+ *     this._ngZone.runOutsideAngular(() => {
+ *       this._increaseProgress(() => {
+ *       // reenter the Angular zone and display done
+ *       this._ngZone.run(() => {console.log('Outside Done!') });
+ *     }}));
+ *   }
+ *
+ *
+ *   _increaseProgress(doneCallback: () => void) {
+ *     this.progress += 1;
+ *     console.log(`Current progress: ${this.progress}%`);
+ *
+ *     if (this.progress < 100) {
+ *       window.setTimeout(() => this._increaseProgress(doneCallback)), 10)
+ *     } else {
+ *       doneCallback();
+ *     }
+ *   }
+ * }
+ * ```
+ * @experimental
  */
 var NgZone = (function () {
     function NgZone(_a) {
@@ -7380,6 +7739,12 @@ var NgZone = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * The Testability service provides testing hooks that can be accessed from
+ * the browser and by services such as Protractor. Each bootstrapped Angular
+ * application on the page will have an instance of Testability.
+ * @experimental
  */
 var Testability = (function () {
     function Testability(_ngZone) {
@@ -8011,6 +8376,14 @@ var __extends$14 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Represents an instance of an NgModule created via a {@link NgModuleFactory}.
+ *
+ * `NgModuleRef` provides access to the NgModule Instance as well other objects related to this
+ * NgModule Instance.
+ *
+ * @stable
+ */
 var NgModuleRef = (function () {
     function NgModuleRef() {
     }
@@ -8143,6 +8516,29 @@ function registerModuleFactory(id, factory) {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * An unmodifiable list of items that Angular keeps up to date when the state
+ * of the application changes.
+ *
+ * The type of object that {@link Query} and {@link ViewQueryMetadata} provide.
+ *
+ * Implements an iterable interface, therefore it can be used in both ES6
+ * javascript `for (var i of items)` loops as well as in Angular templates with
+ * `*ngFor="let i of myList"`.
+ *
+ * Changes can be observed by subscribing to the changes `Observable`.
+ *
+ * NOTE: In the future this class will implement an `Observable` interface.
+ *
+ * ### Example ([live demo](http://plnkr.co/edit/RX8sJnQYl9FWuSCWme5z?p=preview))
+ * ```typescript
+ * @Component({...})
+ * class Container {
+ *   @ViewChildren(Item) items:QueryList<Item>;
+ * }
+ * ```
+ * @stable
  */
 var QueryList = (function () {
     function QueryList() {
@@ -8352,6 +8748,9 @@ var __extends$16 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * @stable
+ */
 var ViewRef = (function () {
     function ViewRef() {
     }
@@ -8724,6 +9123,9 @@ var platformCore = createPlatformFactory(null, 'core', _CORE_PLATFORM_PROVIDERS)
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @experimental i18n support is experimental.
+ */
 var LOCALE_ID = new OpaqueToken('LocaleId');
 /**
  * @experimental i18n support is experimental.
@@ -8917,6 +9319,9 @@ var AnimationOutput = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @experimental Animation support is experimental.
+ */
 var AnimationPlayer = (function () {
     function AnimationPlayer() {
     }
@@ -9062,6 +9467,9 @@ var __extends$18 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * @experimental Animation support is experimental.
+ */
 var AUTO_STYLE = '*';
 /**
  * Metadata representing the entry of animations.
@@ -10675,6 +11083,13 @@ var __core_private__ = {
  * Entry point for all public APIs of the core package.
  */
 
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 var globalScope$1;
 if (typeof window === 'undefined') {
     if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
@@ -10933,6 +11348,9 @@ function escapeRegExp$1(s) {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * A segment of text within the template.
  */
 var TextAst = (function () {
     function TextAst(value, ngContentIndex, sourceSpan) {
@@ -11204,6 +11622,8 @@ function templateVisitAll(visitor, asts, context) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Map constructor.  We work around that by manually adding the items.
 var createMapFromPairs$1 = (function () {
     try {
         if (new Map([[1, 2]]).size === 1) {
@@ -12268,6 +12688,7 @@ var __extends$23 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+//// Types
 var TypeModifier;
 (function (TypeModifier) {
     TypeModifier[TypeModifier["Const"] = 0] = "Const";
@@ -17039,6 +17460,9 @@ var __extends$27 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * An i18n error.
+ */
 var I18nError = (function (_super) {
     __extends$27(I18nError, _super);
     function I18nError(span, msg) {
@@ -17460,6 +17884,9 @@ function _splitMeaningAndDesc(i18n) {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * A container for message extracted from the templates.
  */
 var MessageBundle = (function () {
     function MessageBundle(_htmlParser, _implicitTags, _implicitAttrs) {
@@ -18572,6 +18999,7 @@ var __extends$30 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+// http://cldr.unicode.org/index/cldr-spec/plural-rules
 var PLURAL_CASES = ['zero', 'one', 'two', 'few', 'many', 'other'];
 /**
  * Expands special forms into elements.
@@ -19295,6 +19723,16 @@ var __extends$21 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+// Group 1 = "bind-"
+// Group 2 = "let-"
+// Group 3 = "ref-/#"
+// Group 4 = "on-"
+// Group 5 = "bindon-"
+// Group 6 = "@"
+// Group 7 = the identifier after "bind-", "let-", "ref-/#", "on-", "bindon-" or "@"
+// Group 8 = identifier inside [()]
+// Group 9 = identifier inside []
+// Group 10 = identifier inside ()
 var BIND_NAME_REGEXP = /^(?:(?:(?:(bind-)|(let-)|(ref-|#)|(on-)|(bindon-)|(@))(.+))|\[\(([^\)]+)\)\]|\[([^\]]+)\]|\(([^\)]+)\))$/;
 var KW_BIND_IDX = 1;
 var KW_LET_IDX = 2;
@@ -26981,6 +27419,130 @@ var JitEmitterVisitor = (function (_super) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * This file is a port of shadowCSS from webcomponents.js to TypeScript.
+ *
+ * Please make sure to keep to edits in sync with the source file.
+ *
+ * Source:
+ * https://github.com/webcomponents/webcomponentsjs/blob/4efecd7e0e/src/ShadowCSS/ShadowCSS.js
+ *
+ * The original file level comment is reproduced below
+ */
+/*
+  This is a limited shim for ShadowDOM css styling.
+  https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/shadow/index.html#styles
+
+  The intention here is to support only the styling features which can be
+  relatively simply implemented. The goal is to allow users to avoid the
+  most obvious pitfalls and do so without compromising performance significantly.
+  For ShadowDOM styling that's not covered here, a set of best practices
+  can be provided that should allow users to accomplish more complex styling.
+
+  The following is a list of specific ShadowDOM styling features and a brief
+  discussion of the approach used to shim.
+
+  Shimmed features:
+
+  * :host, :host-context: ShadowDOM allows styling of the shadowRoot's host
+  element using the :host rule. To shim this feature, the :host styles are
+  reformatted and prefixed with a given scope name and promoted to a
+  document level stylesheet.
+  For example, given a scope name of .foo, a rule like this:
+
+    :host {
+        background: red;
+      }
+    }
+
+  becomes:
+
+    .foo {
+      background: red;
+    }
+
+  * encapsulation: Styles defined within ShadowDOM, apply only to
+  dom inside the ShadowDOM. Polymer uses one of two techniques to implement
+  this feature.
+
+  By default, rules are prefixed with the host element tag name
+  as a descendant selector. This ensures styling does not leak out of the 'top'
+  of the element's ShadowDOM. For example,
+
+  div {
+      font-weight: bold;
+    }
+
+  becomes:
+
+  x-foo div {
+      font-weight: bold;
+    }
+
+  becomes:
+
+
+  Alternatively, if WebComponents.ShadowCSS.strictStyling is set to true then
+  selectors are scoped by adding an attribute selector suffix to each
+  simple selector that contains the host element tag name. Each element
+  in the element's ShadowDOM template is also given the scope attribute.
+  Thus, these rules match only elements that have the scope attribute.
+  For example, given a scope name of x-foo, a rule like this:
+
+    div {
+      font-weight: bold;
+    }
+
+  becomes:
+
+    div[x-foo] {
+      font-weight: bold;
+    }
+
+  Note that elements that are dynamically added to a scope must have the scope
+  selector added to them manually.
+
+  * upper/lower bound encapsulation: Styles which are defined outside a
+  shadowRoot should not cross the ShadowDOM boundary and should not apply
+  inside a shadowRoot.
+
+  This styling behavior is not emulated. Some possible ways to do this that
+  were rejected due to complexity and/or performance concerns include: (1) reset
+  every possible property for every possible selector for a given scope name;
+  (2) re-implement css in javascript.
+
+  As an alternative, users should make sure to use selectors
+  specific to the scope in which they are working.
+
+  * ::distributed: This behavior is not emulated. It's often not necessary
+  to style the contents of a specific insertion point and instead, descendants
+  of the host element can be styled selectively. Users can also create an
+  extra node around an insertion point and style that node's contents
+  via descendent selectors. For example, with a shadowRoot like this:
+
+    <style>
+      ::content(div) {
+        background: red;
+      }
+    </style>
+    <content></content>
+
+  could become:
+
+    <style>
+      / *@polyfill .content-container div * /
+      ::content(div) {
+        background: red;
+      }
+    </style>
+    <div class="content-container">
+      <content></content>
+    </div>
+
+  Note the use of @polyfill in the comment above a ShadowDOM specific style
+  declaration. This is a directive to the styling shim to use the selector
+  in comments in lieu of the next selector when running under polyfill.
+*/
 var ShadowCss = (function () {
     function ShadowCss() {
         this.strictStyling = true;
@@ -27480,6 +28042,15 @@ function getStylesVarName(component) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * An internal module of the Angular compiler that begins with component types,
+ * extracts templates, and eventually produces a compiled version of the component
+ * ready for linking into an application.
+ *
+ * @security  When compiling templates at runtime, you must ensure that the entire template comes
+ * from a trusted source. Attacker-controlled data introduced by a template could expose your
+ * application to XSS risks.  For more detail, see the [Security Guide](http://g.co/ng/security).
+ */
 var RuntimeCompiler = (function () {
     function RuntimeCompiler(_injector, _metadataResolver, _templateNormalizer, _templateParser, _styleCompiler, _viewCompiler, _ngModuleCompiler, _compilerConfig) {
         this._injector = _injector;
@@ -27847,6 +28418,17 @@ var ModuleBoundCompiler = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// =================================================================================================
+// =================================================================================================
+// =========== S T O P   -  S T O P   -  S T O P   -  S T O P   -  S T O P   -  S T O P  ===========
+// =================================================================================================
+// =================================================================================================
+//
+//        DO NOT EDIT THIS LIST OF SECURITY SENSITIVE PROPERTIES WITHOUT A SECURITY REVIEW!
+//                               Reach out to mprobst for details.
+//
+// =================================================================================================
+/** Map from tagName|propertyName SecurityContext. Properties applying to all tags use '*'. */
 var SECURITY_SCHEMA = {};
 function registerContext(ctx, specs) {
     for (var _i = 0, specs_1 = specs; _i < specs_1.length; _i++) {
@@ -28495,6 +29077,24 @@ var PlatformLocation = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * `LocationStrategy` is responsible for representing and reading route state
+ * from the browser's URL. Angular provides two strategies:
+ * {@link HashLocationStrategy} and {@link PathLocationStrategy} (default).
+ *
+ * This is used under the hood of the {@link Location} service.
+ *
+ * Applications should use the {@link Router} or {@link Location} services to
+ * interact with application route state.
+ *
+ * For instance, {@link HashLocationStrategy} produces URLs like
+ * `http://example.com#/foo`, and {@link PathLocationStrategy} produces
+ * `http://example.com/foo` as an equivalent URL.
+ *
+ * See these two classes for more.
+ *
+ * @stable
+ */
 var LocationStrategy = (function () {
     function LocationStrategy() {
     }
@@ -28524,6 +29124,13 @@ var LocationStrategy = (function () {
  */
 var APP_BASE_HREF = new OpaqueToken('appBaseHref');
 
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 var globalScope$2;
 if (typeof window === 'undefined') {
     if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
@@ -28697,6 +29304,38 @@ function getSymbolIterator$2() {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * `Location` is a service that applications can use to interact with a browser's URL.
+ * Depending on which {@link LocationStrategy} is used, `Location` will either persist
+ * to the URL's path or the URL's hash segment.
+ *
+ * Note: it's better to use {@link Router#navigate} service to trigger route changes. Use
+ * `Location` only if you need to interact with or create normalized URLs outside of
+ * routing.
+ *
+ * `Location` is responsible for normalizing the URL against the application's base href.
+ * A normalized URL is absolute from the URL host, includes the application's base href, and has no
+ * trailing slash:
+ * - `/my/app/user/123` is normalized
+ * - `my/app/user/123` **is not** normalized
+ * - `/my/app/user/123/` **is not** normalized
+ *
+ * ### Example
+ *
+ * ```
+ * import {Component} from '@angular/core';
+ * import {Location} from '@angular/common';
+ *
+ * @Component({selector: 'app-component'})
+ * class AppCmp {
+ *   constructor(location: Location) {
+ *     location.go('/foo');
+ *   }
+ * }
+ * ```
+ *
+ * @stable
+ */
 var Location = (function () {
     function Location(platformStrategy) {
         var _this = this;
@@ -28857,6 +29496,32 @@ var __extends$40 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * `HashLocationStrategy` is a {@link LocationStrategy} used to configure the
+ * {@link Location} service to represent its state in the
+ * [hash fragment](https://en.wikipedia.org/wiki/Uniform_Resource_Locator#Syntax)
+ * of the browser's URL.
+ *
+ * For instance, if you call `location.go('/foo')`, the browser's URL will become
+ * `example.com#/foo`.
+ *
+ * ### Example
+ *
+ * ```
+ * import {Component, NgModule} from '@angular/core';
+ * import {
+ *   LocationStrategy,
+ *   HashLocationStrategy
+ * } from '@angular/common';
+ *
+ * @NgModule({
+ *   providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}]
+ * })
+ * class AppModule {}
+ * ```
+ *
+ * @stable
+ */
 var HashLocationStrategy = (function (_super) {
     __extends$40(HashLocationStrategy, _super);
     function HashLocationStrategy(_platformLocation, _baseHref) {
@@ -28924,6 +29589,29 @@ var __extends$41 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * `PathLocationStrategy` is a {@link LocationStrategy} used to configure the
+ * {@link Location} service to represent its state in the
+ * [path](https://en.wikipedia.org/wiki/Uniform_Resource_Locator#Syntax) of the
+ * browser's URL.
+ *
+ * `PathLocationStrategy` is the default binding for {@link LocationStrategy}
+ * provided in {@link ROUTER_PROVIDERS}.
+ *
+ * If you're using `PathLocationStrategy`, you must provide a {@link APP_BASE_HREF}
+ * or add a base element to the document. This URL prefix that will be preserved
+ * when generating and recognizing URLs.
+ *
+ * For instance, if you provide an `APP_BASE_HREF` of `'/my/app'` and call
+ * `location.go('/foo')`, the browser's URL will become
+ * `example.com/my/app/foo`.
+ *
+ * Similarly, if you add `<base href='/my/app'/>` to the document and call
+ * `location.go('/foo')`, the browser's URL will become
+ * `example.com/my/app/foo`.
+ *
+ * @stable
+ */
 var PathLocationStrategy = (function (_super) {
     __extends$41(PathLocationStrategy, _super);
     function PathLocationStrategy(_platformLocation, href) {
@@ -28993,6 +29681,9 @@ var __extends$42 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * @experimental
+ */
 var NgLocalization = (function () {
     function NgLocalization() {
     }
@@ -29471,6 +30162,8 @@ function getPluralCase(locale, nLike) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Map constructor.  We work around that by manually adding the items.
 var createMapFromPairs$2 = (function () {
     try {
         if (new Map([[1, 2]]).size === 1) {
@@ -29709,6 +30402,32 @@ var createSetFromList$2 = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * @ngModule CommonModule
+ *
+ * @whatItDoes Adds and removes CSS classes on an HTML element.
+ *
+ * @howToUse
+ * ```
+ *     <some-element [ngClass]="'first second'">...</some-element>
+ *
+ *     <some-element [ngClass]="['first', 'second']">...</some-element>
+ *
+ *     <some-element [ngClass]="{'first': true, 'second': true, 'third': false}">...</some-element>
+ *
+ *     <some-element [ngClass]="stringExp|arrayExp|objExp">...</some-element>
+ * ```
+ *
+ * @description
+ *
+ * The CSS classes are updated as follow depending on the type of the expression evaluation:
+ * - `string` - the CSS classes listed in a string (space delimited) are added,
+ * - `Array` - the CSS classes (Array elements) are added,
+ * - `Object` - keys are CSS class names that get added when the expression given in the value
+ *              evaluates to a truthy value, otherwise class are removed.
+ *
+ * @stable
  */
 var NgClass = (function () {
     function NgClass(_iterableDiffers, _keyValueDiffers, _ngEl, _renderer) {
@@ -30025,6 +30744,30 @@ var RecordViewTuple = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Removes or recreates a portion of the DOM tree based on an {expression}.
+ *
+ * If the expression assigned to `ngIf` evaluates to a false value then the element
+ * is removed from the DOM, otherwise a clone of the element is reinserted into the DOM.
+ *
+ * ### Example ([live demo](http://plnkr.co/edit/fe0kgemFBtmQOY31b4tw?p=preview)):
+ *
+ * ```
+ * <div *ngIf="errorCount > 0" class="error">
+ *   <!-- Error message displayed when the errorCount property on the current context is greater
+ * than 0. -->
+ *   {{errorCount}} errors detected
+ * </div>
+ * ```
+ *
+ * ### Syntax
+ *
+ * - `<div *ngIf="condition">...</div>`
+ * - `<div template="ngIf condition">...</div>`
+ * - `<template [ngIf]="condition"><div>...</div></template>`
+ *
+ * @stable
+ */
 var NgIf = (function () {
     function NgIf(_viewContainer, _template) {
         this._viewContainer = _viewContainer;
@@ -30308,6 +31051,38 @@ var NgSwitchDefault = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ *
+ * @whatItDoes Adds / removes DOM sub-trees based on a numeric value. Tailored for pluralization.
+ *
+ * @howToUse
+ * ```
+ * <some-element [ngPlural]="value">
+ *   <ng-container *ngPluralCase="'=0'">there is nothing</ng-container>
+ *   <ng-container *ngPluralCase="'=1'">there is one</ng-container>
+ *   <ng-container *ngPluralCase="'few'">there are a few</ng-container>
+ *   <ng-container *ngPluralCase="'other'">there are exactly #</ng-container>
+ * </some-element>
+ * ```
+ *
+ * @description
+ *
+ * Displays DOM sub-trees that match the switch expression value, or failing that, DOM sub-trees
+ * that match the switch expression's pluralization category.
+ *
+ * To use this directive you must provide a container element that sets the `[ngPlural]` attribute
+ * to a switch expression. Inner elements with a `[ngPluralCase]` will display based on their
+ * expression:
+ * - if `[ngPluralCase]` is set to a value starting with `=`, it will only display if the value
+ *   matches the switch expression exactly,
+ * - otherwise, the view will be treated as a "category match", and will only display if exact
+ *   value matches aren't found and the value maps to its category for the defined locale.
+ *
+ * See http://cldr.unicode.org/index/cldr-spec/plural-rules
+ *
+ * @experimental
+ */
 var NgPlural = (function () {
     function NgPlural(_localization) {
         this._localization = _localization;
@@ -30393,6 +31168,28 @@ var NgPluralCase = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ *
+ * @whatItDoes Update an HTML element styles.
+ *
+ * @howToUse
+ * ```
+ * <some-element [ngStyle]="{'font-style': styleExp}">...</some-element>
+ *
+ * <some-element [ngStyle]="{'max-width.px': widthExp}">...</some-element>
+ *
+ * <some-element [ngStyle]="objExp">...</some-element>
+ * ```
+ *
+ * @description
+ *
+ * The styles are updated according to the value of the expression evaluation:
+ * - keys are style names with an option `.<unit>` suffix (ie 'top.px', 'font-style.em'),
+ * - values are the values assigned to those properties (expressed in the given unit).
+ *
+ * @stable
+ */
 var NgStyle = (function () {
     function NgStyle(_differs, _ngEl, _renderer) {
         this._differs = _differs;
@@ -30450,6 +31247,28 @@ var NgStyle = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ *
+ * @whatItDoes Inserts an embedded view from a prepared `TemplateRef`
+ *
+ * @howToUse
+ * ```
+ * <template [ngTemplateOutlet]="templateRefExpression"
+ *           [ngOutletContext]="objectExpression">
+ * </template>
+ * ```
+ *
+ * @description
+ *
+ * You can attach a context object to the `EmbeddedViewRef` by setting `[ngOutletContext]`.
+ * `[ngOutletContext]` should be an object, the object's keys will be the local template variables
+ * available within the `TemplateRef`.
+ *
+ * Note: using the key `$implicit` in the context object will set it's value as default.
+ *
+ * @experimental
+ */
 var NgTemplateOutlet = (function () {
     function NgTemplateOutlet(_viewContainerRef) {
         this._viewContainerRef = _viewContainerRef;
@@ -30492,6 +31311,10 @@ var NgTemplateOutlet = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * A collection of Angular directives that are likely to be used in each and every Angular
+ * application.
  */
 var COMMON_DIRECTIVES = [
     NgClass,
@@ -30926,6 +31749,72 @@ var DateFormatter = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ * @whatItDoes Formats a date according to locale rules.
+ * @howToUse `date_expression | date[:format]`
+ * @description
+ *
+ * Where:
+ * - `expression` is a date object or a number (milliseconds since UTC epoch) or an ISO string
+ * (https://www.w3.org/TR/NOTE-datetime).
+ * - `format` indicates which date/time components to include. The format can be predifined as
+ *   shown below or custom as shown in the table.
+ *   - `'medium'`: equivalent to `'yMMMdjms'` (e.g. `Sep 3, 2010, 12:05:08 PM` for `en-US`)
+ *   - `'short'`: equivalent to `'yMdjm'` (e.g. `9/3/2010, 12:05 PM` for `en-US`)
+ *   - `'fullDate'`: equivalent to `'yMMMMEEEEd'` (e.g. `Friday, September 3, 2010` for `en-US`)
+ *   - `'longDate'`: equivalent to `'yMMMMd'` (e.g. `September 3, 2010` for `en-US`)
+ *   - `'mediumDate'`: equivalent to `'yMMMd'` (e.g. `Sep 3, 2010` for `en-US`)
+ *   - `'shortDate'`: equivalent to `'yMd'` (e.g. `9/3/2010` for `en-US`)
+ *   - `'mediumTime'`: equivalent to `'jms'` (e.g. `12:05:08 PM` for `en-US`)
+ *   - `'shortTime'`: equivalent to `'jm'` (e.g. `12:05 PM` for `en-US`)
+ *
+ *
+ *  | Component | Symbol | Short Form   | Long Form         | Numeric   | 2-digit   |
+ *  |-----------|:------:|--------------|-------------------|-----------|-----------|
+ *  | era       |   G    | G (AD)       | GGGG (Anno Domini)| -         | -         |
+ *  | year      |   y    | -            | -                 | y (2015)  | yy (15)   |
+ *  | month     |   M    | MMM (Sep)    | MMMM (September)  | M (9)     | MM (09)   |
+ *  | day       |   d    | -            | -                 | d (3)     | dd (03)   |
+ *  | weekday   |   E    | EEE (Sun)    | EEEE (Sunday)     | -         | -         |
+ *  | hour      |   j    | -            | -                 | j (13)    | jj (13)   |
+ *  | hour12    |   h    | -            | -                 | h (1 PM)  | hh (01 PM)|
+ *  | hour24    |   H    | -            | -                 | H (13)    | HH (13)   |
+ *  | minute    |   m    | -            | -                 | m (5)     | mm (05)   |
+ *  | second    |   s    | -            | -                 | s (9)     | ss (09)   |
+ *  | timezone  |   z    | -            | z (Pacific Standard Time)| -  | -         |
+ *  | timezone  |   Z    | Z (GMT-8:00) | -                 | -         | -         |
+ *  | timezone  |   a    | a (PM)       | -                 | -         | -         |
+ *
+ * In javascript, only the components specified will be respected (not the ordering,
+ * punctuations, ...) and details of the formatting will be dependent on the locale.
+ *
+ * Timezone of the formatted text will be the local system timezone of the end-user's machine.
+ *
+ * WARNINGS:
+ * - this pipe is marked as pure hence it will not be re-evaluated when the input is mutated.
+ *   Instead users should treat the date as an immutable object and change the reference when the
+ *   pipe needs to re-run (this is to avoid reformatting the date on every change detection run
+ *   which would be an expensive operation).
+ * - this pipe uses the Internationalization API. Therefore it is only reliable in Chrome and Opera
+ *   browsers.
+ *
+ * ### Examples
+ *
+ * Assuming `dateObj` is (year: 2015, month: 6, day: 15, hour: 21, minute: 43, second: 11)
+ * in the _local_ time and locale is 'en-US':
+ *
+ * ```
+ *     {{ dateObj | date }}               // output is 'Jun 15, 2015'
+ *     {{ dateObj | date:'medium' }}      // output is 'Jun 15, 2015, 9:43:11 PM'
+ *     {{ dateObj | date:'shortTime' }}   // output is '9:43 PM'
+ *     {{ dateObj | date:'mmss' }}        // output is '43:11'
+ * ```
+ *
+ * {@example common/pipes/ts/date_pipe.ts region='DatePipe'}
+ *
+ * @stable
+ */
 var DatePipe = (function () {
     function DatePipe(_locale) {
         this._locale = _locale;
@@ -31022,6 +31911,22 @@ var I18nPluralPipe = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ * @whatItDoes Generic selector that displays the string that matches the current value.
+ * @howToUse `expression | i18nSelect:mapping`
+ * @description
+ *
+ *  Where:
+ *  - `mapping`: is an object that indicates the text that should be displayed
+ *  for different values of the provided `expression`.
+ *
+ *  ## Example
+ *
+ * {@example common/pipes/ts/i18n_pipe.ts region='I18nSelectPipeComponent'}
+ *
+ *  @experimental
+ */
 var I18nSelectPipe = (function () {
     function I18nSelectPipe() {
     }
@@ -31048,6 +31953,19 @@ var I18nSelectPipe = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ * @whatItDoes Converts value into JSON string.
+ * @howToUse `expression | json`
+ * @description
+ *
+ * Converts value into string using `JSON.stringify`. Useful for debugging.
+ *
+ * ### Example
+ * {@example common/pipes/ts/json_pipe.ts region='JsonPipe'}
+ *
+ * @stable
+ */
 var JsonPipe = (function () {
     function JsonPipe() {
     }
@@ -31066,6 +31984,20 @@ var JsonPipe = (function () {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * @ngModule CommonModule
+ * @whatItDoes Transforms string to lowercase.
+ * @howToUse `expression | lowercase`
+ * @description
+ *
+ * Converts value into lowercase string using `String.prototype.toLowerCase()`.
+ *
+ * ### Example
+ *
+ * {@example common/pipes/ts/lowerupper_pipe.ts region='LowerUpperPipe'}
+ *
+ * @stable
  */
 var LowerCasePipe = (function () {
     function LowerCasePipe() {
@@ -31268,6 +32200,50 @@ var CurrencyPipe = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ * @whatItDoes Creates a new List or String containing a subset (slice) of the elements.
+ * @howToUse `array_or_string_expression | slice:start[:end]`
+ * @description
+ *
+ * Where the input expression is a `List` or `String`, and:
+ * - `start`: The starting index of the subset to return.
+ *   - **a positive integer**: return the item at `start` index and all items after
+ *     in the list or string expression.
+ *   - **a negative integer**: return the item at `start` index from the end and all items after
+ *     in the list or string expression.
+ *   - **if positive and greater than the size of the expression**: return an empty list or string.
+ *   - **if negative and greater than the size of the expression**: return entire list or string.
+ * - `end`: The ending index of the subset to return.
+ *   - **omitted**: return all items until the end.
+ *   - **if positive**: return all items before `end` index of the list or string.
+ *   - **if negative**: return all items before `end` index from the end of the list or string.
+ *
+ * All behavior is based on the expected behavior of the JavaScript API `Array.prototype.slice()`
+ * and `String.prototype.slice()`.
+ *
+ * When operating on a [List], the returned list is always a copy even when all
+ * the elements are being returned.
+ *
+ * When operating on a blank value, the pipe returns the blank value.
+ *
+ * ## List Example
+ *
+ * This `ngFor` example:
+ *
+ * {@example common/pipes/ts/slice_pipe.ts region='SlicePipe_list'}
+ *
+ * produces the following:
+ *
+ *     <li>b</li>
+ *     <li>c</li>
+ *
+ * ## String Examples
+ *
+ * {@example common/pipes/ts/slice_pipe.ts region='SlicePipe_string'}
+ *
+ * @stable
+ */
 var SlicePipe = (function () {
     function SlicePipe() {
     }
@@ -31295,6 +32271,20 @@ var SlicePipe = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @ngModule CommonModule
+ * @whatItDoes Transforms string to uppercase.
+ * @howToUse `expression | uppercase`
+ * @description
+ *
+ * Converts value into lowercase string using `String.prototype.toUpperCase()`.
+ *
+ * ### Example
+ *
+ * {@example common/pipes/ts/lowerupper_pipe.ts region='LowerUpperPipe'}
+ *
+ * @stable
+ */
 var UpperCasePipe = (function () {
     function UpperCasePipe() {
     }
@@ -31321,6 +32311,9 @@ var UpperCasePipe = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A collection of Angular pipes that are likely to be used in each and every application.
+ */
 var COMMON_PIPES = [
     AsyncPipe,
     UpperCasePipe,
@@ -31341,6 +32334,13 @@ var COMMON_PIPES = [
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+// Note: This does not contain the location providers,
+// as they need some platform specific implementations to work.
+/**
+ * The module that includes all the basic Angular directives like {@link NgIf}, {@link NgFor}, ...
+ *
+ * @stable
  */
 var CommonModule = (function () {
     function CommonModule() {
@@ -31411,6 +32411,13 @@ var AnimationDriver = (function () {
     return AnimationDriver;
 }());
 
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 var globalScope$3;
 if (typeof window === 'undefined') {
     if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
@@ -31682,6 +32689,8 @@ function getSymbolIterator$3() {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Map constructor.  We work around that by manually adding the items.
 var createMapFromPairs$3 = (function () {
     try {
         if (new Map([[1, 2]]).size === 1) {
@@ -32245,6 +33254,12 @@ var __extends$46 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Provides DOM operations in any browser environment.
+ *
+ * @security Tread carefully! Interacting with the DOM directly is dangerous and
+ * can introduce XSS risks.
+ */
 var GenericBrowserDomAdapter = (function (_super) {
     __extends$46(GenericBrowserDomAdapter, _super);
     function GenericBrowserDomAdapter() {
@@ -32785,6 +33800,11 @@ var __extends$47 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * `PlatformLocation` encapsulates all of the direct calls to platform APIs.
+ * This class should not be used directly by an application developer. Instead, use
+ * {@link Location}.
+ */
 var BrowserPlatformLocation = (function (_super) {
     __extends$47(BrowserPlatformLocation, _super);
     function BrowserPlatformLocation() {
@@ -32919,6 +33939,16 @@ var BrowserGetTestability = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A service that can be used to get and set the title of a current HTML document.
+ *
+ * Since an Angular 2 application can't be bootstrapped on the entire HTML document (`<html>` tag)
+ * it is not possible to bind to the `text` property of the `HTMLTitleElement` elements
+ * (representing the `<title>` tag). Instead, this service can be used to set and get the current
+ * title value.
+ *
+ * @experimental
+ */
 var Title = (function () {
     function Title() {
     }
@@ -32942,6 +33972,14 @@ var Title = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A DI Token representing the main rendering context. In a browser this is the DOM Document.
+ *
+ * Note: Document might not be available in the Application Context when Application and Rendering
+ * Contexts are not the same (e.g. when running the application into a Web Worker).
+ *
+ * @stable
+ */
 var DOCUMENT = new OpaqueToken('DocumentToken');
 
 /**
@@ -32950,6 +33988,9 @@ var DOCUMENT = new OpaqueToken('DocumentToken');
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * @stable
  */
 var EVENT_MANAGER_PLUGINS = new OpaqueToken('EventManagerPlugins');
 /**
@@ -33528,6 +34569,12 @@ var __extends$51 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * A DI token that you can use to provide{@link HammerGestureConfig} to Angular. Use it to configure
+ * Hammer gestures.
+ *
+ * @experimental
+ */
 var HAMMER_GESTURE_CONFIG = new OpaqueToken('HammerGestureConfig');
 /**
  * @experimental
@@ -33708,8 +34755,34 @@ var KeyEventsPlugin = (function (_super) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A pattern that recognizes a commonly useful subset of URLs that are safe.
+ *
+ * This regular expression matches a subset of URLs that will not cause script
+ * execution if used in URL context within a HTML document. Specifically, this
+ * regular expression matches if (comment from here on and regex copied from
+ * Soy's EscapingConventions):
+ * (1) Either a protocol in a whitelist (http, https, mailto or ftp).
+ * (2) or no protocol.  A protocol must be followed by a colon. The below
+ *     allows that by allowing colons only after one of the characters [/?#].
+ *     A colon after a hash (#) must be in the fragment.
+ *     Otherwise, a colon after a (?) must be in a query.
+ *     Otherwise, a colon after a single solidus (/) must be in a path.
+ *     Otherwise, a colon after a double solidus (//) must be in the authority
+ *     (before port).
+ *
+ * The pattern disallows &, used in HTML entity declarations before
+ * one of the characters in [/?#]. This disallows HTML entities used in the
+ * protocol name, which should never happen, e.g. "h&#116;tp" for "http".
+ * It also disallows HTML entities in the first path part of a relative path,
+ * e.g. "foo&lt;bar/baz".  Our existing escaping functions should not produce
+ * that. More importantly, it disallows masking of a colon,
+ * e.g. "javascript&#58;...".
+ *
+ * This regular expression was taken from the Closure sanitization library.
+ */
 var SAFE_URL_PATTERN = /^(?:(?:https?|mailto|ftp|tel|file):|[^&:/?#]*(?:[/?#]|$))/gi;
-/* A pattern that matches safe srcset values */
+/** A pattern that matches safe data URLs. Only matches image, video and audio types. */
 var DATA_URL_PATTERN = /^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[a-z0-9+\/]+=*$/i;
 function sanitizeUrl(url) {
     url = String(url);
@@ -33732,6 +34805,7 @@ function sanitizeSrcset(srcset) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/** A <body> element that can be safely used to parse untrusted HTML. Lazily initialized below. */
 var inertElement = null;
 /** Lazily initialized to make sure the DOM adapter gets set before use. */
 var DOM = null;
@@ -33993,6 +35067,20 @@ function sanitizeHtml(unsafeHtmlInput) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Regular expression for safe style values.
+ *
+ * Quotes (" and ') are allowed, but a check must be done elsewhere to ensure they're balanced.
+ *
+ * ',' allows multiple values to be assigned to the same property (e.g. background-attachment or
+ * font-family) and hence could allow multiple values to get injected, but that should pose no risk
+ * of XSS.
+ *
+ * The function expression checks only for XSS safety, not for CSS validity.
+ *
+ * This regular expression was taken from the Closure sanitization library, and augmented for
+ * transformation values.
+ */
 var VALUES = '[-,."\'%_!# a-zA-Z0-9]+';
 var TRANSFORMATION_FNS = '(?:matrix|translate|scale|rotate|skew|perspective)(?:X|Y|3d)?';
 var COLOR_FNS = '(?:rgb|hsl)a?';
@@ -34072,6 +35160,37 @@ var __extends$54 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * DomSanitizer helps preventing Cross Site Scripting Security bugs (XSS) by sanitizing
+ * values to be safe to use in the different DOM contexts.
+ *
+ * For example, when binding a URL in an `<a [href]="someValue">` hyperlink, `someValue` will be
+ * sanitized so that an attacker cannot inject e.g. a `javascript:` URL that would execute code on
+ * the website.
+ *
+ * In specific situations, it might be necessary to disable sanitization, for example if the
+ * application genuinely needs to produce a `javascript:` style link with a dynamic value in it.
+ * Users can bypass security by constructing a value with one of the `bypassSecurityTrust...`
+ * methods, and then binding to that value from the template.
+ *
+ * These situations should be very rare, and extraordinary care must be taken to avoid creating a
+ * Cross Site Scripting (XSS) security bug!
+ *
+ * When using `bypassSecurityTrust...`, make sure to call the method as early as possible and as
+ * close as possible to the source of the value, to make it easy to verify no security bug is
+ * created by its use.
+ *
+ * It is not required (and not recommended) to bypass security if the value is safe, e.g. a URL that
+ * does not start with a suspicious protocol, or an HTML snippet that does not contain dangerous
+ * code. The sanitizer leaves safe values intact.
+ *
+ * @security Calling any of the `bypassSecurityTrust...` APIs disables Angular's built-in
+ * sanitization for the value passed in. Carefully check and audit all values and code paths going
+ * into this call. Make sure any user data is appropriately escaped for this security context.
+ * For more detail, see the [Security Guide](http://g.co/ng/security).
+ *
+ * @stable
+ */
 var DomSanitizer = (function () {
     function DomSanitizer() {
     }
@@ -34394,6 +35513,11 @@ var context = _global$3;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Predicates for use with {@link DebugElement}'s query functions.
+ *
+ * @experimental All debugging apis are currently experimental.
+ */
 
 var __platform_browser_private__ = {
     BrowserPlatformLocation: BrowserPlatformLocation,
@@ -34445,6 +35569,13 @@ var __platform_browser_private__ = {
  */
 var INTERNAL_BROWSER_PLATFORM_PROVIDERS = __platform_browser_private__.INTERNAL_BROWSER_PLATFORM_PROVIDERS;
 
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 var globalScope$4;
 if (typeof window === 'undefined') {
     if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
@@ -34634,6 +35765,13 @@ var __extends$56 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * An implementation of ResourceLoader that uses a template cache to avoid doing an actual
+ * ResourceLoader.
+ *
+ * The template cache needs to be built and loaded into window.$templateCache
+ * via a separate mechanism.
+ */
 var CachedResourceLoader = (function (_super) {
     __extends$56(CachedResourceLoader, _super);
     function CachedResourceLoader() {
@@ -34661,6 +35799,9 @@ var CachedResourceLoader = (function (_super) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @experimental
+ */
 
 /**
  * @experimental API related to bootstrapping are still under review.
@@ -34680,6 +35821,13 @@ var platformBrowserDynamic = createPlatformFactory(platformCoreDynamic, 'browser
  * Entry point for all public APIs of the platform-browser-dynamic package.
  */
 
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 var globalScope$5;
 if (typeof window === 'undefined') {
     if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
@@ -34901,6 +36049,13 @@ function hasConstructor$5(value, type) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Base class for control directives.
+ *
+ * Only used internally in the forms module.
+ *
+ * @stable
+ */
 var AbstractControlDirective = (function () {
     function AbstractControlDirective() {
     }
@@ -35005,6 +36160,13 @@ var __extends$58 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * A directive that contains multiple {@link NgControl}s.
+ *
+ * Only used by the forms module.
+ *
+ * @stable
+ */
 var ControlContainer = (function (_super) {
     __extends$58(ControlContainer, _super);
     function ControlContainer() {
@@ -35036,6 +36198,8 @@ var ControlContainer = (function (_super) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Map constructor.  We work around that by manually adding the items.
 var createMapFromPairs$4 = (function () {
     try {
         if (new Map([[1, 2]]).size === 1) {
@@ -35375,6 +36539,16 @@ var isPromise$2 = __core_private__.isPromise;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Providers for validators to be used for {@link FormControl}s in a form.
+ *
+ * Provide this using `multi: true` to add validators.
+ *
+ * ### Example
+ *
+ * {@example core/forms/ts/ng_validators/ng_validators.ts region='ng_validators'}
+ * @stable
+ */
 var NG_VALIDATORS = new OpaqueToken('NgValidators');
 /**
  * Providers for asynchronous validators to be used for {@link FormControl}s
@@ -35504,6 +36678,12 @@ function _mergeErrors(arrayOfErrors) {
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * Used to provide a {@link ControlValueAccessor} for form controls.
+ *
+ * See {@link DefaultValueAccessor} for how to implement one.
+ * @stable
  */
 var NG_VALUE_ACCESSOR = new OpaqueToken('NgValueAccessor');
 
@@ -36097,7 +37277,11 @@ function _buildValueString$1(id, value) {
 function _extractId$1(valueString) {
     return valueString.split(':')[0];
 }
-/** Mock interface for HTMLCollection */
+/**
+ * The accessor for writing a value and listening to changes on a select element.
+ *
+ * @stable
+ */
 var SelectMultipleControlValueAccessor = (function () {
     function SelectMultipleControlValueAccessor(_renderer, _elementRef) {
         this._renderer = _renderer;
@@ -36401,6 +37585,11 @@ var __extends$57 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * This is a base class for code shared between {@link NgModelGroup} and {@link FormGroupName}.
+ *
+ * @stable
+ */
 var AbstractFormGroupDirective = (function (_super) {
     __extends$57(AbstractFormGroupDirective, _super);
     function AbstractFormGroupDirective() {
@@ -36578,6 +37767,53 @@ var __extends$62 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Use by directives and components to emit custom Events.
+ *
+ * ### Examples
+ *
+ * In the following example, `Zippy` alternatively emits `open` and `close` events when its
+ * title gets clicked:
+ *
+ * ```
+ * @Component({
+ *   selector: 'zippy',
+ *   template: `
+ *   <div class="zippy">
+ *     <div (click)="toggle()">Toggle</div>
+ *     <div [hidden]="!visible">
+ *       <ng-content></ng-content>
+ *     </div>
+ *  </div>`})
+ * export class Zippy {
+ *   visible: boolean = true;
+ *   @Output() open: EventEmitter<any> = new EventEmitter();
+ *   @Output() close: EventEmitter<any> = new EventEmitter();
+ *
+ *   toggle() {
+ *     this.visible = !this.visible;
+ *     if (this.visible) {
+ *       this.open.emit(null);
+ *     } else {
+ *       this.close.emit(null);
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * The events payload can be accessed by the parameter `$event` on the components output event
+ * handler:
+ *
+ * ```
+ * <zippy (open)="onOpen($event)" (close)="onClose($event)"></zippy>
+ * ```
+ *
+ * Uses Rx.Observable but provides an adapter to make it work as specified here:
+ * https://github.com/jhusain/observable-spec
+ *
+ * Once a reference implementation of the spec is available, switch to it.
+ * @stable
+ */
 var EventEmitter$1 = (function (_super) {
     __extends$62(EventEmitter, _super);
     /**
@@ -36764,6 +38000,9 @@ var __extends$63 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Indicates that a FormControl is valid, i.e. that no errors exist in the input value.
+ */
 var VALID = 'VALID';
 /**
  * Indicates that a FormControl is invalid, i.e. that an error exists in the input value.
@@ -39458,6 +40697,26 @@ var PatternValidator = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * @whatItDoes Creates an {@link AbstractControl} from a user-specified configuration.
+ *
+ * It is essentially syntactic sugar that shortens the `new FormGroup()`,
+ * `new FormControl()`, and `new FormArray()` boilerplate that can build up in larger
+ * forms.
+ *
+ * @howToUse
+ *
+ * To use, inject `FormBuilder` into your component class. You can then call its methods
+ * directly.
+ *
+ * {@example forms/ts/formBuilder/form_builder_example.ts region='Component'}
+ *
+ *  * **npm package**: `@angular/forms`
+ *
+ *  * **NgModule**: {@link ReactiveFormsModule}
+ *
+ * @stable
+ */
 var FormBuilder = (function () {
     function FormBuilder() {
     }
@@ -39589,6 +40848,10 @@ var InternalFormsSharedModule = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * The ng module for forms.
+ * @stable
+ */
 var FormsModule = (function () {
     function FormsModule() {
     }
@@ -39660,6 +40923,13 @@ var ReactiveFormsModule = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * A backend for http that uses the `XMLHttpRequest` browser API.
+ *
+ * Take care not to evaluate this in non-browser contexts.
+ *
+ * @experimental
+ */
 var BrowserXhr = (function () {
     function BrowserXhr() {
     }
@@ -39672,6 +40942,13 @@ var BrowserXhr = (function () {
     return BrowserXhr;
 }());
 
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 var globalScope$6;
 if (typeof window === 'undefined') {
     if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
@@ -39964,6 +41241,8 @@ var ResponseContentType;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Map constructor.  We work around that by manually adding the items.
 var createMapFromPairs$5 = (function () {
     try {
         if (new Map([[1, 2]]).size === 1) {
@@ -40286,6 +41565,34 @@ var createSetFromList$5 = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * Polyfill for [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers/Headers), as
+ * specified in the [Fetch Spec](https://fetch.spec.whatwg.org/#headers-class).
+ *
+ * The only known difference between this `Headers` implementation and the spec is the
+ * lack of an `entries` method.
+ *
+ * ### Example ([live demo](http://plnkr.co/edit/MTdwT6?p=preview))
+ *
+ * ```
+ * import {Headers} from '@angular/http';
+ *
+ * var firstHeaders = new Headers();
+ * firstHeaders.append('Content-Type', 'image/jpeg');
+ * console.log(firstHeaders.get('Content-Type')) //'image/jpeg'
+ *
+ * // Create headers from Plain Old JavaScript Object
+ * var secondHeaders = new Headers({
+ *   'X-My-Custom-Header': 'Angular'
+ * });
+ * console.log(secondHeaders.get('X-My-Custom-Header')); //'Angular'
+ *
+ * var thirdHeaders = new Headers(secondHeaders);
+ * console.log(thirdHeaders.get('X-My-Custom-Header')); //'Angular'
+ * ```
+ *
+ * @experimental
+ */
 var Headers = (function () {
     function Headers(headers) {
         var _this = this;
@@ -40409,6 +41716,34 @@ var __extends$72 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Creates a response options object to be optionally provided when instantiating a
+ * {@link Response}.
+ *
+ * This class is based on the `ResponseInit` description in the [Fetch
+ * Spec](https://fetch.spec.whatwg.org/#responseinit).
+ *
+ * All values are null by default. Typical defaults can be found in the
+ * {@link BaseResponseOptions} class, which sub-classes `ResponseOptions`.
+ *
+ * This class may be used in tests to build {@link Response Responses} for
+ * mock responses (see {@link MockBackend}).
+ *
+ * ### Example ([live demo](http://plnkr.co/edit/P9Jkk8e8cz6NVzbcxEsD?p=preview))
+ *
+ * ```typescript
+ * import {ResponseOptions, Response} from '@angular/http';
+ *
+ * var options = new ResponseOptions({
+ *   body: '{"name":"Jeff"}'
+ * });
+ * var res = new Response(options);
+ *
+ * console.log('res.json():', res.json()); // Object {name: "Jeff"}
+ * ```
+ *
+ * @experimental
+ */
 var ResponseOptions = (function () {
     function ResponseOptions(_a) {
         var _b = _a === void 0 ? {} : _a, body = _b.body, status = _b.status, headers = _b.headers, statusText = _b.statusText, type = _b.type, url = _b.url;
@@ -40767,6 +42102,10 @@ var URLSearchParams = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/**
+ * HTTP request body used by both {@link Request} and {@link Response}
+ * https://fetch.spec.whatwg.org/#body
+ */
 var Body = (function () {
     function Body() {
     }
@@ -40836,6 +42175,26 @@ var __extends$73 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Creates `Response` instances from provided values.
+ *
+ * Though this object isn't
+ * usually instantiated by end-users, it is the primary object interacted with when it comes time to
+ * add data to a view.
+ *
+ * ### Example
+ *
+ * ```
+ * http.request('my-friends.txt').subscribe(response => this.friends = response.text());
+ * ```
+ *
+ * The Response's interface is inspired by the Response constructor defined in the [Fetch
+ * Spec](https://fetch.spec.whatwg.org/#response-class), but is considered a static value whose body
+ * can be accessed many times. There are other differences in the implementation, but this is the
+ * most significant.
+ *
+ * @experimental
+ */
 var Response = (function (_super) {
     __extends$73(Response, _super);
     function Response(responseOptions) {
@@ -41267,6 +42626,32 @@ var __extends$74 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Creates a request options object to be optionally provided when instantiating a
+ * {@link Request}.
+ *
+ * This class is based on the `RequestInit` description in the [Fetch
+ * Spec](https://fetch.spec.whatwg.org/#requestinit).
+ *
+ * All values are null by default. Typical defaults can be found in the {@link BaseRequestOptions}
+ * class, which sub-classes `RequestOptions`.
+ *
+ * ### Example ([live demo](http://plnkr.co/edit/7Wvi3lfLq41aQPKlxB4O?p=preview))
+ *
+ * ```typescript
+ * import {RequestOptions, Request, RequestMethod} from '@angular/http';
+ *
+ * var options = new RequestOptions({
+ *   method: RequestMethod.Post,
+ *   url: 'https://google.com'
+ * });
+ * var req = new Request(options);
+ * console.log('req.method:', RequestMethod[req.method]); // Post
+ * console.log('options.url:', options.url); // https://google.com
+ * ```
+ *
+ * @experimental
+ */
 var RequestOptions = (function () {
     function RequestOptions(_a) {
         var _b = _a === void 0 ? {} : _a, method = _b.method, headers = _b.headers, body = _b.body, url = _b.url, search = _b.search, withCredentials = _b.withCredentials, responseType = _b.responseType;
@@ -41395,6 +42780,46 @@ var __extends$76 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+// TODO(jeffbcross): properly implement body accessors
+/**
+ * Creates `Request` instances from provided values.
+ *
+ * The Request's interface is inspired by the Request constructor defined in the [Fetch
+ * Spec](https://fetch.spec.whatwg.org/#request-class),
+ * but is considered a static value whose body can be accessed many times. There are other
+ * differences in the implementation, but this is the most significant.
+ *
+ * `Request` instances are typically created by higher-level classes, like {@link Http} and
+ * {@link Jsonp}, but it may occasionally be useful to explicitly create `Request` instances.
+ * One such example is when creating services that wrap higher-level services, like {@link Http},
+ * where it may be useful to generate a `Request` with arbitrary headers and search params.
+ *
+ * ```typescript
+ * import {Injectable, Injector} from '@angular/core';
+ * import {HTTP_PROVIDERS, Http, Request, RequestMethod} from '@angular/http';
+ *
+ * @Injectable()
+ * class AutoAuthenticator {
+ *   constructor(public http:Http) {}
+ *   request(url:string) {
+ *     return this.http.request(new Request({
+ *       method: RequestMethod.Get,
+ *       url: url,
+ *       search: 'password=123'
+ *     }));
+ *   }
+ * }
+ *
+ * var injector = Injector.resolveAndCreate([HTTP_PROVIDERS, AutoAuthenticator]);
+ * var authenticator = injector.get(AutoAuthenticator);
+ * authenticator.request('people.json').subscribe(res => {
+ *   //URL should have included '?password=123'
+ *   console.log('people', res.json());
+ * });
+ * ```
+ *
+ * @experimental
+ */
 var Request = (function (_super) {
     __extends$76(Request, _super);
     function Request(requestOptions) {
@@ -64009,11934 +65434,7 @@ var ClickBlock = (function () {
     return ClickBlock;
 }());
 
-/**
- * Initialize the ionic.native Angular module if we're running in ng1.
- * This iterates through the list of registered plugins and dynamically
- * creates Angular 1 services of the form $cordovaSERVICE, ex: $cordovaStatusBar.
- */
-function initAngular1(plugins) {
-    if (window.angular) {
-        var ngModule_1 = window.angular.module('ionic.native', []);
-        for (var name in plugins) {
-            var serviceName = '$cordova' + name;
-            var cls = plugins[name];
-            (function (serviceName, cls, name) {
-                ngModule_1.service(serviceName, [function () {
-                        var funcs = window.angular.copy(cls);
-                        funcs.prototype['name'] = name;
-                        return funcs;
-                    }]);
-            })(serviceName, cls, name);
-        }
-    }
-}
-
-function get(obj, path) {
-    for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
-        if (!obj) {
-            return null;
-        }
-        obj = obj[path[i]];
-    }
-    return obj;
-}
-
-var getPlugin = function (pluginRef) {
-    return get(window, pluginRef);
-};
-/**
- * @private
- * @param pluginObj
- * @param method
- */
-var pluginWarn = function (pluginObj, method) {
-    var pluginName = pluginObj.name, plugin = pluginObj.plugin;
-    if (method) {
-        console.warn('Native: tried calling ' + pluginName + '.' + method + ', but the ' + pluginName + ' plugin is not installed.');
-    }
-    else {
-        console.warn('Native: tried accessing the ' + pluginName + ' plugin but it\'s not installed.');
-    }
-    console.warn('Install the ' + pluginName + ' plugin: \'ionic plugin add ' + plugin + '\'');
-};
-/**
- * @private
- * @param pluginName
- * @param method
- */
-var cordovaWarn = function (pluginName, method) {
-    if (method) {
-        console.warn('Native: tried calling ' + pluginName + '.' + method + ', but Cordova is not available. Make sure to include cordova.js or run in a device/simulator');
-    }
-    else {
-        console.warn('Native: tried accessing the ' + pluginName + ' plugin but Cordova is not available. Make sure to include cordova.js or run in a device/simulator');
-    }
-};
-function setIndex(args, opts, resolve, reject) {
-    if (opts === void 0) { opts = {}; }
-    // If the plugin method expects myMethod(success, err, options)
-    if (opts.callbackOrder === 'reverse') {
-        // Get those arguments in the order [resolve, reject, ...restOfArgs]
-        args.unshift(reject);
-        args.unshift(resolve);
-    }
-    else if (opts.callbackStyle === 'node') {
-        args.push(function (err, result) {
-            if (err) {
-                reject(err);
-            }
-            else {
-                resolve(result);
-            }
-        });
-    }
-    else if (opts.callbackStyle === 'object' && opts.successName && opts.errorName) {
-        var obj = {};
-        obj[opts.successName] = resolve;
-        obj[opts.errorName] = reject;
-        args.push(obj);
-    }
-    else if (typeof opts.successIndex !== 'undefined' || typeof opts.errorIndex !== 'undefined') {
-        // If we've specified a success/error index
-        args.splice(opts.successIndex, 0, resolve);
-        // We don't want that the reject cb gets spliced into the position of an optional argument that has not been defined and thus causing non expected behaviour.
-        if (opts.errorIndex > args.length) {
-            args[opts.errorIndex] = reject; // insert the reject fn at the correct specific index
-        }
-        else {
-            args.splice(opts.errorIndex, 0, reject); // otherwise just splice it into the array
-        }
-    }
-    else {
-        // Otherwise, let's tack them on to the end of the argument list
-        // which is 90% of cases
-        args.push(resolve);
-        args.push(reject);
-    }
-    return args;
-}
-function callCordovaPlugin(pluginObj, methodName, args, opts, resolve, reject) {
-    if (opts === void 0) { opts = {}; }
-    // Try to figure out where the success/error callbacks need to be bound
-    // to our promise resolve/reject handlers.
-    args = setIndex(args, opts, resolve, reject);
-    var pluginInstance = getPlugin(pluginObj.pluginRef);
-    if (!pluginInstance) {
-        // Do this check in here in the case that the Web API for this plugin is available (for example, Geolocation).
-        if (!window.cordova) {
-            cordovaWarn(pluginObj.name, methodName);
-            return {
-                error: 'cordova_not_available'
-            };
-        }
-        pluginWarn(pluginObj, methodName);
-        return {
-            error: 'plugin_not_installed'
-        };
-    }
-    // TODO: Illegal invocation needs window context
-    return get(window, pluginObj.pluginRef)[methodName].apply(pluginInstance, args);
-}
-function getPromise(cb) {
-    var tryNativePromise = function () {
-        if (window.Promise) {
-            return new Promise(function (resolve, reject) {
-                cb(resolve, reject);
-            });
-        }
-        else {
-            console.error('No Promise support or polyfill found. To enable Ionic Native support, please add the es6-promise polyfill before this script, or run with a library like Angular 1/2 or on a recent browser.');
-        }
-    };
-    if (window.angular) {
-        var injector = window.angular.element(document.querySelector('[ng-app]') || document.body).injector();
-        if (injector) {
-            var $q = injector.get('$q');
-            return $q(function (resolve, reject) {
-                cb(resolve, reject);
-            });
-        }
-        else {
-            console.warn('Angular 1 was detected but $q couldn\'t be retrieved. This is usually when the app is not bootstrapped on the html or body tag. Falling back to native promises which won\'t trigger an automatic digest when promises resolve.');
-            return tryNativePromise();
-        }
-    }
-    else {
-        return tryNativePromise();
-    }
-}
-function wrapPromise(pluginObj, methodName, args, opts) {
-    if (opts === void 0) { opts = {}; }
-    var pluginResult, rej;
-    var p = getPromise(function (resolve, reject) {
-        pluginResult = callCordovaPlugin(pluginObj, methodName, args, opts, resolve, reject);
-        rej = reject;
-    });
-    // Angular throws an error on unhandled rejection, but in this case we have already printed
-    // a warning that Cordova is undefined or the plugin is uninstalled, so there is no reason
-    // to error
-    if (pluginResult && pluginResult.error) {
-        p.catch(function () { });
-        rej(pluginResult.error);
-    }
-    return p;
-}
-function wrapOtherPromise(pluginObj, methodName, args, opts) {
-    if (opts === void 0) { opts = {}; }
-    return getPromise(function (resolve, reject) {
-        var pluginResult = callCordovaPlugin(pluginObj, methodName, args, opts);
-        if (pluginResult && pluginResult.error) {
-            reject(pluginResult.error);
-        }
-        pluginResult.then(resolve).catch(reject);
-    });
-}
-function wrapObservable(pluginObj, methodName, args, opts) {
-    if (opts === void 0) { opts = {}; }
-    return new Observable_2(function (observer) {
-        var pluginResult = callCordovaPlugin(pluginObj, methodName, args, opts, observer.next.bind(observer), observer.error.bind(observer));
-        if (pluginResult && pluginResult.error) {
-            observer.error(pluginResult.error);
-        }
-        return function () {
-            try {
-                if (opts.clearFunction) {
-                    if (opts.clearWithArgs) {
-                        return get(window, pluginObj.pluginRef)[opts.clearFunction].apply(pluginObj, args);
-                    }
-                    return get(window, pluginObj.pluginRef)[opts.clearFunction].call(pluginObj, pluginResult);
-                }
-            }
-            catch (e) {
-                console.warn('Unable to clear the previous observable watch for', pluginObj.name, methodName);
-                console.error(e);
-            }
-        };
-    });
-}
-function callInstance(pluginObj, methodName, args, opts, resolve, reject) {
-    if (opts === void 0) { opts = {}; }
-    args = setIndex(args, opts, resolve, reject);
-    return pluginObj._objectInstance[methodName].apply(pluginObj._objectInstance, args);
-}
-function wrapInstance(pluginObj, methodName, opts) {
-    if (opts === void 0) { opts = {}; }
-    return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
-        if (opts.sync) {
-            // Sync doesn't wrap the plugin with a promise or observable, it returns the result as-is
-            return callInstance(pluginObj, methodName, args, opts);
-        }
-        else if (opts.observable) {
-            return new Observable_2(function (observer) {
-                var pluginResult = callInstance(pluginObj, methodName, args, opts, observer.next.bind(observer), observer.error.bind(observer));
-                return function () {
-                    try {
-                        if (opts.clearWithArgs) {
-                            return pluginObj._objectInstance[opts.clearFunction].apply(pluginObj._objectInstance, args);
-                        }
-                        return pluginObj._objectInstance[opts.clearFunction].call(pluginObj, pluginResult);
-                    }
-                    catch (e) {
-                        console.warn('Unable to clear the previous observable watch for', pluginObj.name, methodName);
-                        console.error(e);
-                    }
-                };
-            });
-        }
-        else if (opts.otherPromise) {
-            return getPromise(function (resolve, reject) {
-                var result = callInstance(pluginObj, methodName, args, opts, resolve, reject);
-                result.then(resolve, reject);
-            });
-        }
-        else {
-            return getPromise(function (resolve, reject) {
-                callInstance(pluginObj, methodName, args, opts, resolve, reject);
-            });
-        }
-    };
-}
-/**
- * Wrap the event with an observable
- * @param event
- * @returns {Observable}
- */
-function wrapEventObservable(event) {
-    return new Observable_2(function (observer) {
-        window.addEventListener(event, observer.next.bind(observer), false);
-        return function () { return window.removeEventListener(event, observer.next.bind(observer), false); };
-    });
-}
-/**
- * @private
- * @param pluginObj
- * @param methodName
- * @param opts
- * @returns {function(...[any]): (undefined|*|Observable|*|*)}
- */
-var wrap = function (pluginObj, methodName, opts) {
-    if (opts === void 0) { opts = {}; }
-    return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
-        if (opts.sync) {
-            // Sync doesn't wrap the plugin with a promise or observable, it returns the result as-is
-            return callCordovaPlugin(pluginObj, methodName, args, opts);
-        }
-        else if (opts.observable) {
-            return wrapObservable(pluginObj, methodName, args, opts);
-        }
-        else if (opts.eventObservable && opts.event) {
-            return wrapEventObservable(opts.event);
-        }
-        else if (opts.otherPromise) {
-            return wrapOtherPromise(pluginObj, methodName, args, opts);
-        }
-        else {
-            return wrapPromise(pluginObj, methodName, args, opts);
-        }
-    };
-};
-/**
- * @private
- *
- * Class decorator specifying Plugin metadata. Required for all plugins.
- *
- * @usage
- * ```typescript
- * @Plugin({
- *  name: 'MyPlugin',
- *  plugin: 'cordova-plugin-myplugin',
- *  pluginRef: 'window.myplugin'
- *  })
- *  export class MyPlugin {
- *
- *    // Plugin wrappers, properties, and functions go here ...
- *
- *  }
- * ```
- */
-function Plugin(config) {
-    return function (cls) {
-        // Add these fields to the class
-        for (var k in config) {
-            cls[k] = config[k];
-        }
-        cls['installed'] = function () {
-            return !!getPlugin(config.pluginRef);
-        };
-        return cls;
-    };
-}
-/**
- * @private
- *
- * Wrap a stub function in a call to a Cordova plugin, checking if both Cordova
- * and the required plugin are installed.
- */
-function Cordova(opts) {
-    if (opts === void 0) { opts = {}; }
-    return function (target, methodName, descriptor) {
-        return {
-            value: function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                return wrap(this, methodName, opts).apply(this, args);
-            }
-        };
-    };
-}
-/**
- * @private
- *
- * Wrap an instance method
- */
-function CordovaInstance(opts) {
-    if (opts === void 0) { opts = {}; }
-    return function (target, methodName) {
-        return {
-            value: function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                return wrapInstance(this, methodName, opts).apply(this, args);
-            }
-        };
-    };
-}
-/**
- * @private
- *
- *
- * Before calling the original method, ensure Cordova and the plugin are installed.
- */
-function CordovaProperty(target, key, descriptor) {
-    var originalMethod = descriptor.get;
-    descriptor.get = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
-        if (!window.cordova) {
-            cordovaWarn(this.name, null);
-            return {};
-        }
-        var pluginObj = this;
-        var pluginInstance = getPlugin(pluginObj.pluginRef);
-        if (!pluginInstance) {
-            pluginWarn(this, key);
-            return {};
-        }
-        return originalMethod.apply(this, args);
-    };
-    return descriptor;
-}
-/**
- * @private
- * @param target
- * @param key
- * @param descriptor
- * @constructor
- */
-function InstanceProperty(target, key, descriptor) {
-    descriptor.get = function () {
-        return this._objectInstance[key];
-    };
-    descriptor.set = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
-        this._objectInstance[key] = args[0];
-    };
-    return descriptor;
-}
-
-var __decorate$2 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var ActionSheet$1 = (function () {
-    function ActionSheet() {
-    }
-    /**
-     * Show a native ActionSheet component. See below for options.
-     * @param {options} Options See table below
-     * @returns {Promise} Returns a Promise that resolves with the index of the
-     *   button pressed (1 based, so 1, 2, 3, etc.)
-     */
-    ActionSheet.show = function (options) { return; };
-    /**
-     * Progamtically hide the native ActionSheet
-     * @returns {Promise} Returns a Promise that resolves when the actionsheet is closed
-     */
-    ActionSheet.hide = function (options) { return; };
-    __decorate$2([
-        Cordova()
-    ], ActionSheet, "show", null);
-    __decorate$2([
-        Cordova()
-    ], ActionSheet, "hide", null);
-    ActionSheet = __decorate$2([
-        Plugin({
-            plugin: 'cordova-plugin-actionsheet',
-            pluginRef: 'plugins.actionsheet',
-            repo: 'https://github.com/EddyVerbruggen/cordova-plugin-actionsheet',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], ActionSheet);
-    return ActionSheet;
-}());
-
 var __decorate$3 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var AdMob = (function () {
-    function AdMob() {
-    }
-    // Static Methods
-    /**
-     *
-     * @param adIdOrOptions
-     */
-    AdMob.createBanner = function (adIdOrOptions) { return; };
-    /**
-     *
-     */
-    AdMob.removeBanner = function () { };
-    /**
-     *
-     * @param position
-     */
-    AdMob.showBanner = function (position) { };
-    /**
-     *
-     * @param x
-     * @param y
-     */
-    AdMob.showBannerAtXY = function (x, y) { };
-    /**
-     *
-     */
-    AdMob.hideBanner = function () { };
-    /**
-     *
-     * @param adIdOrOptions
-     */
-    AdMob.prepareInterstitial = function (adIdOrOptions) { return; };
-    /**
-     * Show interstitial
-     */
-    AdMob.showInterstitial = function () { };
-    /**
-     *
-     */
-    AdMob.isInterstitialReady = function () { return; };
-    /**
-     * Prepare a reward video ad
-     * @param adIdOrOptions
-     */
-    AdMob.prepareRewardVideoAd = function (adIdOrOptions) { return; };
-    /**
-     * Show a reward video ad
-     */
-    AdMob.showRewardVideoAd = function () { };
-    /**
-     * Sets the values for configuration and targeting
-     * @param options Returns a promise that resolves if the options are set successfully
-     */
-    AdMob.setOptions = function (options) { return; };
-    /**
-     * Get user ad settings
-     * @returns {Promise<any>} Returns a promise that resolves with the ad settings
-     */
-    AdMob.getAdSettings = function () { return; };
-    // Events
-    AdMob.onBannerFailedToReceive = function () { return; };
-    AdMob.onBannerReceive = function () { return; };
-    AdMob.onBannerPresent = function () { return; };
-    AdMob.onBannerLeaveApp = function () { return; };
-    AdMob.onBannerDismiss = function () { return; };
-    AdMob.onInterstitialFailedToReceive = function () { return; };
-    AdMob.onInterstitialReceive = function () { return; };
-    AdMob.onInterstitialPresent = function () { return; };
-    AdMob.onInterstitialLeaveApp = function () { return; };
-    AdMob.onInterstitialDismiss = function () { return; };
-    __decorate$3([
-        Cordova()
-    ], AdMob, "createBanner", null);
-    __decorate$3([
-        Cordova({
-            sync: true
-        })
-    ], AdMob, "removeBanner", null);
-    __decorate$3([
-        Cordova({
-            sync: true
-        })
-    ], AdMob, "showBanner", null);
-    __decorate$3([
-        Cordova({
-            sync: true
-        })
-    ], AdMob, "showBannerAtXY", null);
-    __decorate$3([
-        Cordova({
-            sync: true
-        })
-    ], AdMob, "hideBanner", null);
-    __decorate$3([
-        Cordova()
-    ], AdMob, "prepareInterstitial", null);
-    __decorate$3([
-        Cordova({
-            sync: true
-        })
-    ], AdMob, "showInterstitial", null);
-    __decorate$3([
-        Cordova()
-    ], AdMob, "isInterstitialReady", null);
-    __decorate$3([
-        Cordova()
-    ], AdMob, "prepareRewardVideoAd", null);
-    __decorate$3([
-        Cordova({
-            sync: true
-        })
-    ], AdMob, "showRewardVideoAd", null);
-    __decorate$3([
-        Cordova()
-    ], AdMob, "setOptions", null);
-    __decorate$3([
-        Cordova()
-    ], AdMob, "getAdSettings", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onBannerFailedToReceive'
-        })
-    ], AdMob, "onBannerFailedToReceive", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onBannerReceive'
-        })
-    ], AdMob, "onBannerReceive", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onBannerPresent'
-        })
-    ], AdMob, "onBannerPresent", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onBannerLeaveApp'
-        })
-    ], AdMob, "onBannerLeaveApp", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onBannerDismiss'
-        })
-    ], AdMob, "onBannerDismiss", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onInterstitialFailedToReceive'
-        })
-    ], AdMob, "onInterstitialFailedToReceive", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onInterstitialReceive'
-        })
-    ], AdMob, "onInterstitialReceive", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onInterstitialPresent'
-        })
-    ], AdMob, "onInterstitialPresent", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onInterstitialLeaveApp'
-        })
-    ], AdMob, "onInterstitialLeaveApp", null);
-    __decorate$3([
-        Cordova({
-            eventObservable: true,
-            event: 'onInterstitialDismiss'
-        })
-    ], AdMob, "onInterstitialDismiss", null);
-    AdMob = __decorate$3([
-        Plugin({
-            plugin: 'cordova-plugin-admobpro',
-            pluginRef: 'AdMob',
-            repo: 'https://github.com/floatinghotpot/cordova-admob-pro',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], AdMob);
-    return AdMob;
-}());
-
-var __decorate$4 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var AndroidFingerprintAuth = (function () {
-    function AndroidFingerprintAuth() {
-    }
-    /**
-     * Opens a native dialog fragment to use the device hardware fingerprint scanner to authenticate against fingerprints registered for the device.
-     * @param params {any}
-     */
-    AndroidFingerprintAuth.show = function (params) { return; };
-    /**
-     * Check if service is available
-     */
-    AndroidFingerprintAuth.isAvailable = function () { return; };
-    __decorate$4([
-        Cordova()
-    ], AndroidFingerprintAuth, "show", null);
-    __decorate$4([
-        Cordova()
-    ], AndroidFingerprintAuth, "isAvailable", null);
-    AndroidFingerprintAuth = __decorate$4([
-        Plugin({
-            plugin: 'cordova-plugin-android-fingerprint-auth',
-            pluginRef: 'FingerprintAuth',
-            repo: 'https://github.com/mjwheatley/cordova-plugin-android-fingerprint-auth'
-        })
-    ], AndroidFingerprintAuth);
-    return AndroidFingerprintAuth;
-}());
-
-var __decorate$5 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var AppAvailability = (function () {
-    function AppAvailability() {
-    }
-    /**
-     * Checks if an app is available on device
-     * @param {string} app Package name on android, or URI scheme on iOS
-     * @returns {Promise<boolean>}
-     */
-    AppAvailability.check = function (app) { return; };
-    __decorate$5([
-        Cordova()
-    ], AppAvailability, "check", null);
-    AppAvailability = __decorate$5([
-        Plugin({
-            plugin: 'cordova-plugin-appavailability',
-            pluginRef: 'appAvailability',
-            repo: 'https://github.com/ohh2ahh/AppAvailability',
-            platforms: ['Android', 'iOS']
-        })
-    ], AppAvailability);
-    return AppAvailability;
-}());
-
-var __decorate$6 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var AppRate = (function () {
-    function AppRate() {
-    }
-    Object.defineProperty(AppRate, "preferences", {
-        /**
-         * Configure various settings for the Rating View.
-         * See table below for options
-         */
-        get: function () { return window.AppRate.preferences; },
-        enumerable: true,
-        configurable: true
-    });
-    /**
-     * Prompts the user for rating
-     * @param {boolean} immediately  Show the rating prompt immediately.
-     */
-    AppRate.promptForRating = function (immediately) { };
-    
-    __decorate$6([
-        CordovaProperty
-    ], AppRate, "preferences", null);
-    __decorate$6([
-        Cordova()
-    ], AppRate, "promptForRating", null);
-    AppRate = __decorate$6([
-        Plugin({
-            plugin: 'cordova-plugin-apprate',
-            pluginRef: 'AppRate',
-            repo: 'https://github.com/pushandplay/cordova-plugin-apprate',
-            platforms: ['Android', 'iOS']
-        })
-    ], AppRate);
-    return AppRate;
-}());
-
-var __decorate$7 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var AppVersion = (function () {
-    function AppVersion() {
-    }
-    /**
-     * Returns the name of the app
-     * @returns {Promise}
-     */
-    AppVersion.getAppName = function () { return; };
-    /**
-     * Returns the package name of the app
-     * @returns {Promise}
-     */
-    AppVersion.getPackageName = function () { return; };
-    /**
-     * Returns the build identifier of the app
-     * @returns {Promise}
-     */
-    AppVersion.getVersionCode = function () { return; };
-    /**
-     * Returns the version of the app
-     * @returns {Promise}
-     */
-    AppVersion.getVersionNumber = function () { return; };
-    __decorate$7([
-        Cordova()
-    ], AppVersion, "getAppName", null);
-    __decorate$7([
-        Cordova()
-    ], AppVersion, "getPackageName", null);
-    __decorate$7([
-        Cordova()
-    ], AppVersion, "getVersionCode", null);
-    __decorate$7([
-        Cordova()
-    ], AppVersion, "getVersionNumber", null);
-    AppVersion = __decorate$7([
-        Plugin({
-            plugin: 'cordova-plugin-app-version',
-            pluginRef: 'cordova.getAppVersion',
-            repo: 'https://github.com/whiteoctober/cordova-plugin-app-version',
-            platforms: ['Android', 'iOS']
-        })
-    ], AppVersion);
-    return AppVersion;
-}());
-
-var __decorate$8 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Badge$1 = (function () {
-    function Badge() {
-    }
-    /**
-     * Clear the badge of the app icon.
-     */
-    Badge.clear = function () { return; };
-    /**
-     * Set the badge of the app icon.
-     * @param {number} badgeNumber  The new badge number.
-     * @returns {Promise}
-     */
-    Badge.set = function (badgeNumber) { return; };
-    /**
-     * Get the badge of the app icon.
-     * @returns {Promise}
-     */
-    Badge.get = function () { return; };
-    /**
-     * Increase the badge number.
-     * @param {number} increaseBy  Count to add to the current badge number
-     * @returns {Promise}
-     */
-    Badge.increase = function (increaseBy) { return; };
-    /**
-     * Decrease the badge number.
-     * @param {number} decreaseBy  Count to subtract from the current badge number
-     * @returns {Promise}
-     */
-    Badge.decrease = function (decreaseBy) { return; };
-    /**
-     * Determine if the app has permission to show badges.
-     */
-    Badge.hasPermission = function () { return; };
-    /**
-     * Register permission to set badge notifications
-     * @returns {Promise}
-     */
-    Badge.registerPermission = function () { return; };
-    __decorate$8([
-        Cordova()
-    ], Badge, "clear", null);
-    __decorate$8([
-        Cordova()
-    ], Badge, "set", null);
-    __decorate$8([
-        Cordova()
-    ], Badge, "get", null);
-    __decorate$8([
-        Cordova()
-    ], Badge, "increase", null);
-    __decorate$8([
-        Cordova()
-    ], Badge, "decrease", null);
-    __decorate$8([
-        Cordova()
-    ], Badge, "hasPermission", null);
-    __decorate$8([
-        Cordova()
-    ], Badge, "registerPermission", null);
-    Badge = __decorate$8([
-        Plugin({
-            plugin: 'cordova-plugin-badge',
-            pluginRef: 'cordova.plugins.notification.badge',
-            repo: 'https://github.com/katzer/cordova-plugin-badge',
-            platforms: ['Android', 'iOS', 'Browser', 'Windows', 'Amazon FireOS', 'Windows Phone 8']
-        })
-    ], Badge);
-    return Badge;
-}());
-
-var __decorate$9 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var BackgroundGeolocation = (function () {
-    function BackgroundGeolocation() {
-    }
-    /**
-     * Configure the plugin.
-     *
-     * @param {Function} Success callback will be called when background location is determined.
-     * @param {Function} Fail callback to be executed every time a geolocation error occurs.
-     * @param {Object} An object of type Config
-     *
-     * @return Location object, which tries to mimic w3c Coordinates interface.
-     * See http://dev.w3.org/geo/api/spec-source.html#coordinates_interface
-     * Callback to be executed every time a geolocation is recorded in the background.
-     */
-    BackgroundGeolocation.configure = function (callback, errorCallback, options) { return; };
-    /**
-     * Turn ON the background-geolocation system.
-     * The user will be tracked whenever they suspend the app.
-     */
-    BackgroundGeolocation.start = function () { return; };
-    /**
-     * Turn OFF background-tracking
-     */
-    BackgroundGeolocation.stop = function () { return; };
-    /**
-     * Inform the native plugin that you're finished, the background-task may be completed
-     * NOTE: IOS, WP only
-     */
-    BackgroundGeolocation.finish = function () { };
-    /**
-     * Force the plugin to enter "moving" or "stationary" state
-     * NOTE: IOS, WP only
-     */
-    BackgroundGeolocation.changePace = function (isMoving) { };
-    /**
-     * Setup configuration
-     */
-    BackgroundGeolocation.setConfig = function (options) { return; };
-    /**
-     * Returns current stationaryLocation if available. null if not
-     * NOTE: IOS, WP only
-     */
-    BackgroundGeolocation.getStationaryLocation = function () { return; };
-    /**
-     * Add a stationary-region listener. Whenever the devices enters "stationary-mode",
-     * your #success callback will be executed with #location param containing #radius of region
-     * NOTE: IOS, WP only
-     */
-    BackgroundGeolocation.onStationary = function () { return; };
-    /**
-     * Check if location is enabled on the device
-     * @returns {Promise<number>} Returns a promise with int argument that takes values 0, 1 (true).
-     * NOTE: ANDROID only
-     */
-    BackgroundGeolocation.isLocationEnabled = function () { return; };
-    /**
-     * Display app settings to change permissions
-     */
-    BackgroundGeolocation.showAppSettings = function () { };
-    /**
-     * Display device location settings
-     */
-    BackgroundGeolocation.showLocationSettings = function () { };
-    /**
-     * Method can be used to detect user changes in location services settings.
-     * If user enable or disable location services then success callback will be executed.
-     * In case or error (SettingNotFoundException) fail callback will be executed.
-     * NOTE: ANDROID only
-     */
-    BackgroundGeolocation.watchLocationMode = function () { return; };
-    /**
-     * Stop watching for location mode changes.
-     * NOTE: ANDROID only
-     */
-    BackgroundGeolocation.stopWatchingLocationMode = function () { };
-    /**
-     * Method will return all stored locations.
-     * Locations are stored when:
-     *  - config.stopOnTerminate is false and main activity was killed
-     *    by the system
-     *  or
-     *  - option.debug is true
-     * NOTE: ANDROID only
-     */
-    BackgroundGeolocation.getLocations = function () { return; };
-    /**
-     * Delete stored location by given locationId.
-     * NOTE: ANDROID only
-     */
-    BackgroundGeolocation.deleteLocation = function (locationId) { return; };
-    /**
-     * Delete all stored locations.
-     * NOTE: ANDROID only
-     */
-    BackgroundGeolocation.deleteAllLocations = function () { return; };
-    __decorate$9([
-        Cordova({
-            sync: true
-        })
-    ], BackgroundGeolocation, "configure", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "start", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "stop", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "finish", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "changePace", null);
-    __decorate$9([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], BackgroundGeolocation, "setConfig", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "getStationaryLocation", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "onStationary", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "isLocationEnabled", null);
-    __decorate$9([
-        Cordova({ sync: true })
-    ], BackgroundGeolocation, "showAppSettings", null);
-    __decorate$9([
-        Cordova({ sync: true })
-    ], BackgroundGeolocation, "showLocationSettings", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "watchLocationMode", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "stopWatchingLocationMode", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "getLocations", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "deleteLocation", null);
-    __decorate$9([
-        Cordova()
-    ], BackgroundGeolocation, "deleteAllLocations", null);
-    BackgroundGeolocation = __decorate$9([
-        Plugin({
-            plugin: 'cordova-plugin-mauron85-background-geolocation',
-            pluginRef: 'backgroundGeolocation',
-            repo: 'https://github.com/mauron85/cordova-plugin-background-geolocation',
-            platforms: ['iOS', 'Android', 'Windows Phone 8']
-        })
-    ], BackgroundGeolocation);
-    return BackgroundGeolocation;
-}());
-
-var __decorate$10 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var BackgroundMode = (function () {
-    function BackgroundMode() {
-    }
-    /**
-    * Enable the background mode.
-    * Once called, prevents the app from being paused while in background.
-    */
-    BackgroundMode.enable = function () { };
-    /**
-    * Disable the background mode.
-    * Once the background mode has been disabled, the app will be paused when in background.
-    */
-    BackgroundMode.disable = function () { };
-    /**
-    * Checks if background mode is enabled or not.
-    * @returns {boolean} returns a true of false if the background mode is enabled.
-    */
-    BackgroundMode.isEnabled = function () { return; };
-    /**
-    * Can be used to get the information if the background mode is active.
-    * @returns {boolean} returns tru or flase if the background mode is active.
-    */
-    BackgroundMode.isActive = function () { return; };
-    /**
-    * Override the default title, ticker and text.
-    * Available only for Android platform.
-    * @param {Configure} options List of option to configure. See table below
-    */
-    BackgroundMode.setDefaults = function (options) { };
-    /**
-    * Modify the displayed information.
-    * Available only for Android platform.
-    * @param {Configure} options Any options you want to update. See table below.
-    */
-    BackgroundMode.update = function (options) { };
-    /**
-    * Sets a callback for a specific event
-    * Can be used to get notified or run function when the background mode has been activated, deactivated or failed.
-    * @param {string} eventName The name of the event. Available events: activate, deactivate, failure
-    */
-    BackgroundMode.on = function (eventName, callback) { };
-    __decorate$10([
-        Cordova({
-            sync: true
-        })
-    ], BackgroundMode, "enable", null);
-    __decorate$10([
-        Cordova()
-    ], BackgroundMode, "disable", null);
-    __decorate$10([
-        Cordova()
-    ], BackgroundMode, "isEnabled", null);
-    __decorate$10([
-        Cordova()
-    ], BackgroundMode, "isActive", null);
-    __decorate$10([
-        Cordova({
-            platforms: ['Android']
-        })
-    ], BackgroundMode, "setDefaults", null);
-    __decorate$10([
-        Cordova({
-            platforms: ['Android']
-        })
-    ], BackgroundMode, "update", null);
-    __decorate$10([
-        Cordova({
-            sync: true
-        })
-    ], BackgroundMode, "on", null);
-    BackgroundMode = __decorate$10([
-        Plugin({
-            plugin: 'cordova-plugin-background-mode',
-            pluginRef: 'cordova.plugins.backgroundMode',
-            repo: 'https://github.com/katzer/cordova-plugin-background-mode',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], BackgroundMode);
-    return BackgroundMode;
-}());
-
-var __decorate$11 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var BarcodeScanner = (function () {
-    function BarcodeScanner() {
-    }
-    /**
-     * Open the barcode scanner.
-     * @param options {Object} Optional options to pass to the scanner
-     * @return Returns a Promise that resolves with scanner data, or rejects with an error.
-     */
-    BarcodeScanner.scan = function (options) { return; };
-    /**
-     * Encodes data into a barcode.
-     * NOTE: not well supported on Android
-     * @param type {string} Type of encoding
-     * @param data {any} Data to encode
-     */
-    BarcodeScanner.encode = function (type, data) { return; };
-    /**
-     * @private
-     */
-    BarcodeScanner.Encode = {
-        TEXT_TYPE: 'TEXT_TYPE',
-        EMAIL_TYPE: 'EMAIL_TYPE',
-        PHONE_TYPE: 'PHONE_TYPE',
-        SMS_TYPE: 'SMS_TYPE'
-    };
-    __decorate$11([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], BarcodeScanner, "scan", null);
-    __decorate$11([
-        Cordova()
-    ], BarcodeScanner, "encode", null);
-    BarcodeScanner = __decorate$11([
-        Plugin({
-            plugin: 'phonegap-plugin-barcodescanner',
-            pluginRef: 'cordova.plugins.barcodeScanner',
-            repo: 'https://github.com/phonegap/phonegap-plugin-barcodescanner',
-            platforms: ['Android', 'iOS', 'Windows Phone 8', 'Windows 10', 'Windows 8', 'BlackBerry 10', 'Browser']
-        })
-    ], BarcodeScanner);
-    return BarcodeScanner;
-}());
-
-var __decorate$12 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Base64ToGallery = (function () {
-    function Base64ToGallery() {
-    }
-    /**
-     * Converts a base64 string to an image file in the device gallery
-     * @param {string} data The actual base64 string that you want to save
-     * @param {any} options (optional) An object with properties: prefix: string, mediaScanner: boolean. Prefix will be prepended to the filename. If true, mediaScanner runs Media Scanner on Android and saves to Camera Roll on iOS; if false, saves to Library folder on iOS.
-     * @returns {Promise} returns a promise that resolves when the image is saved.
-     */
-    Base64ToGallery.base64ToGallery = function (data, options) {
-        return;
-    };
-    __decorate$12([
-        Cordova({
-            successIndex: 2,
-            errorIndex: 3
-        })
-    ], Base64ToGallery, "base64ToGallery", null);
-    Base64ToGallery = __decorate$12([
-        Plugin({
-            plugin: 'cordova-base64-to-gallery',
-            pluginRef: 'cordova',
-            repo: 'https://github.com/Nexxa/cordova-base64-to-gallery',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], Base64ToGallery);
-    return Base64ToGallery;
-}());
-
-var __decorate$13 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var BatteryStatus = (function () {
-    function BatteryStatus() {
-    }
-    /**
-     * Watch the change in battery level
-     * @returns {Observable} Returns an observable that pushes a status object
-     */
-    BatteryStatus.onChange = function () { return; };
-    /**
-     * Watch when the battery level goes low
-     * @returns {Observable<StatusObject>} Returns an observable that pushes a status object
-     */
-    BatteryStatus.onLow = function () { return; };
-    /**
-     * Watch when the battery level goes to critial
-     * @returns {Observable<StatusObject>} Returns an observable that pushes a status object
-     */
-    BatteryStatus.onCritical = function () { return; };
-    __decorate$13([
-        Cordova({
-            eventObservable: true,
-            event: 'batterystatus'
-        })
-    ], BatteryStatus, "onChange", null);
-    __decorate$13([
-        Cordova({
-            eventObservable: true,
-            event: 'batterylow'
-        })
-    ], BatteryStatus, "onLow", null);
-    __decorate$13([
-        Cordova({
-            eventObservable: true,
-            event: 'batterycritical'
-        })
-    ], BatteryStatus, "onCritical", null);
-    BatteryStatus = __decorate$13([
-        Plugin({
-            plugin: 'cordova-plugin-battery-status',
-            repo: 'https://github.com/apache/cordova-plugin-battery-status',
-            platforms: ['Amazon Fire OS', 'iOS', 'Android', 'BlackBerry 10', 'Windows Phone 7', 'Windows Phone 8', 'Windows', 'Firefox OS', 'Browser']
-        })
-    ], BatteryStatus);
-    return BatteryStatus;
-}());
-
-var __decorate$14 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Brightness = (function () {
-    function Brightness() {
-    }
-    /**
-     * Sets the brightness of the display.
-     *
-     * @param {value} Floating number between 0 and 1 in which case 1 means 100% brightness and 0 means 0% brightness.
-     * @returns {Promise} Returns a Promise that resolves if setting brightness was successful.
-     */
-    Brightness.setBrightness = function (value) { return; };
-    /**
-     * Reads the current brightness of the device display.
-     *
-     * @returns {Promise} Returns a Promise that resolves with the
-     * brightness value of the device display (floating number between 0 and 1).
-     */
-    Brightness.getBrightness = function () { return; };
-    /**
-    * Keeps the screen on. Prevents the device from setting the screen to sleep.
-    */
-    Brightness.setKeepScreenOn = function (value) { };
-    __decorate$14([
-        Cordova()
-    ], Brightness, "setBrightness", null);
-    __decorate$14([
-        Cordova()
-    ], Brightness, "getBrightness", null);
-    __decorate$14([
-        Cordova()
-    ], Brightness, "setKeepScreenOn", null);
-    Brightness = __decorate$14([
-        Plugin({
-            plugin: 'cordova-plugin-brightness',
-            pluginRef: 'cordova.plugins.brightness',
-            repo: 'https://github.com/mgcrea/cordova-plugin-brightness',
-            platforms: ['Android', 'iOS']
-        })
-    ], Brightness);
-    return Brightness;
-}());
-
-var __decorate$15 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var BLE = (function () {
-    function BLE() {
-    }
-    /**
-     * Scan and discover BLE peripherals for the specified amount of time.
-     *
-     * @usage
-     * ```
-     * BLE.scan([], 5).subscribe(device => {
-     *   console.log(JSON.stringify(device));
-     * });
-     * ```
-     * @param {string[]} services  List of service UUIDs to discover, or `[]` to find all devices
-     * @param {number} seconds  Number of seconds to run discovery
-     * @return Returns an Observable that notifies of each peripheral that is discovered during the specified time.
-     */
-    BLE.scan = function (services, seconds) { return; };
-    /**
-     * Scan and discover BLE peripherals until `stopScan` is called.
-     *
-     * @usage
-     * ```
-     * BLE.startScan([]).subscribe(device => {
-     *   console.log(JSON.stringify(device));
-     * });
-     *
-     * setTimeout(() => {
-     *   BLE.stopScan();
-     * }, 5000);
-     * ```
-     * @param {string[]} services  List of service UUIDs to discover, or `[]` to find all devices
-     * @return Returns an Observable that notifies of each peripheral discovered.
-     */
-    BLE.startScan = function (services) { return; };
-    /**
-     * Stop a scan started by `startScan`.
-     *
-     * @usage
-     * ```
-     * BLE.startScan([]).subscribe(device => {
-     *   console.log(JSON.stringify(device));
-     * });
-     * setTimeout(() => {
-     *   BLE.stopScan().then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @return returns a Promise.
-     */
-    BLE.stopScan = function () { return; };
-    /**
-     * Connect to a peripheral.
-     * @usage
-     * ```
-     *   BLE.connect('12:34:56:78:9A:BC').subscribe(peripheralData => {
-     *     console.log(peripheralData);
-     *   },
-     *   peripheralData => {
-     *     console.log('disconnected');
-     *   });
-     * ```
-     * @param deviceId {string}  UUID or MAC address of the peripheral
-     * @return Returns an Observable that notifies of connect/disconnect.
-     */
-    BLE.connect = function (deviceId) { return; };
-    /**
-     * Disconnect from a peripheral.
-     * @usage
-     * ```
-     *   BLE.disconnect('12:34:56:78:9A:BC').then(() => {
-     *     console.log('Disconnected');
-     *   });
-     * ```
-     * @param deviceId {string}  UUID or MAC address of the peripheral
-     * @return Returns a Promise
-     */
-    BLE.disconnect = function (deviceId) { return; };
-    /**
-     * Read the value of a characteristic.
-     *
-     * @param {string} deviceId  UUID or MAC address of the peripheral
-     * @param {string} serviceUUID  UUID of the BLE service
-     * @param {string} characteristicUUID  UUID of the BLE characteristic
-     * @return Returns a Promise
-     */
-    BLE.read = function (deviceId, serviceUUID, characteristicUUID) { return; };
-    
-    /**
-     * Write the value of a characteristic.
-     * @usage
-     * ```
-     * // send 1 byte to switch a light on
-     * var data = new Uint8Array(1);
-     * data[0] = 1;
-     * BLE.write(device_id, "FF10", "FF11", data.buffer);
-     *
-     * // send a 3 byte value with RGB color
-     * var data = new Uint8Array(3);
-     * data[0] = 0xFF;  // red
-     * data[0] = 0x00; // green
-     * data[0] = 0xFF; // blue
-     * BLE.write(device_id, "ccc0", "ccc1", data.buffer);
-     *
-     * // send a 32 bit integer
-     * var data = new Uint32Array(1);
-     * data[0] = counterInput.value;
-     * BLE.write(device_id, SERVICE, CHARACTERISTIC, data.buffer);
-     *
-     * ```
-     * @param {string} deviceId  UUID or MAC address of the peripheral
-     * @param {string} serviceUUID  UUID of the BLE service
-     * @param {string} characteristicUUID  UUID of the BLE characteristic
-     * @param {ArrayBuffer} value  Data to write to the characteristic, as an ArrayBuffer.
-     * @return Returns a Promise
-     */
-    BLE.write = function (deviceId, serviceUUID, characteristicUUID, value) { return; };
-    /**
-     * Write the value of a characteristic without waiting for confirmation from the peripheral.
-     *
-     * @param {string} deviceId  UUID or MAC address of the peripheral
-     * @param {string} serviceUUID  UUID of the BLE service
-     * @param {string} characteristicUUID  UUID of the BLE characteristic
-     * @param {ArrayBuffer} value  Data to write to the characteristic, as an ArrayBuffer.
-     * @return Returns a Promise
-     */
-    BLE.writeWithoutResponse = function (deviceId, serviceUUID, characteristicUUID, value) { return; };
-    /**
-     * Register to be notified when the value of a characteristic changes.
-     *
-     * @usage
-     * ```
-     * BLE.startNotification(device_id, "FF10", "FF11").subscribe(buffer => {
-     *   console.log(String.fromCharCode.apply(null, new Uint8Array(buffer));
-     * });
-     * ```
-     *
-     * @param {string} deviceId  UUID or MAC address of the peripheral
-     * @param {string} serviceUUID  UUID of the BLE service
-     * @param {string} characteristicUUID  UUID of the BLE characteristic
-     * @return Returns an Observable that notifies of characteristic changes.
-     */
-    BLE.startNotification = function (deviceId, serviceUUID, characteristicUUID) { return; };
-    /**
-     * Stop being notified when the value of a characteristic changes.
-     *
-     * @param {string} deviceId  UUID or MAC address of the peripheral
-     * @param {string} serviceUUID  UUID of the BLE service
-     * @param {string} characteristicUUID  UUID of the BLE characteristic
-     * @return Returns a Promise.
-     */
-    BLE.stopNotification = function (deviceId, serviceUUID, characteristicUUID) { return; };
-    /**
-     * Report the connection status.
-     *
-     * @usage
-     * ```
-     * BLE.isConnected('FFCA0B09-CB1D-4DC0-A1EF-31AFD3EDFB53').then(
-     *   () => { console.log('connected'); },
-     *   () => { console.log('not connected'); }
-     * );
-     * ```
-     * @param {string} deviceId  UUID or MAC address of the peripheral
-     * @return Returns a Promise.
-     */
-    BLE.isConnected = function (deviceId) { return; };
-    /**
-     * Report if bluetooth is enabled.
-     *
-     * @usage
-     * ```
-     * BLE.isEnabled().then(
-     *   () => { console.log('enabled'); },
-     *   () => { console.log('not enabled'); }
-     * );
-     * ```
-     * @return Returns a Promise.
-     */
-    BLE.isEnabled = function () { return; };
-    /**
-     * Open System Bluetooth settings (Android only).
-     *
-     * @return Returns a Promise.
-     */
-    BLE.showBluetoothSettings = function () { return; };
-    /**
-     * Enable Bluetooth on the device (Android only).
-     *
-     * @return Returns a Promise.
-     */
-    BLE.enable = function () { return; };
-    __decorate$15([
-        Cordova({
-            observable: true
-        })
-    ], BLE, "scan", null);
-    __decorate$15([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopScan',
-            clearWithArgs: true
-        })
-    ], BLE, "startScan", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "stopScan", null);
-    __decorate$15([
-        Cordova({
-            observable: true,
-            clearFunction: 'disconnect',
-            clearWithArgs: true
-        })
-    ], BLE, "connect", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "disconnect", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "read", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "write", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "writeWithoutResponse", null);
-    __decorate$15([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopNotification',
-            clearWithArgs: true
-        })
-    ], BLE, "startNotification", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "stopNotification", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "isConnected", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "isEnabled", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "showBluetoothSettings", null);
-    __decorate$15([
-        Cordova()
-    ], BLE, "enable", null);
-    BLE = __decorate$15([
-        Plugin({
-            plugin: 'cordova-plugin-ble-central',
-            pluginRef: 'ble',
-            repo: 'https://github.com/don/cordova-plugin-ble-central',
-            platforms: ['iOS', 'Android']
-        })
-    ], BLE);
-    return BLE;
-}());
-
-var __decorate$16 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var BluetoothSerial = (function () {
-    function BluetoothSerial() {
-    }
-    /**
-     * Connect to a Bluetooth device
-     * @param {string} macAddress_or_uuid Identifier of the remote device
-     * @returns {Observable} Subscribe to connect, unsubscribe to disconnect.
-     */
-    BluetoothSerial.connect = function (macAddress_or_uuid) { return; };
-    /**
-     * Connect insecurely to a Bluetooth device
-     * @param {string} macAddress Identifier of the remote device
-     * @returns {Observable} Subscribe to connect, unsubscribe to disconnect.
-     */
-    BluetoothSerial.connectInsecure = function (macAddress) { return; };
-    /**
-     * Writes data to the serial port
-     * @param {any} data ArrayBuffer of data
-     * @returns {Promise} returns a promise when data has been written
-     */
-    BluetoothSerial.write = function (data) { return; };
-    /**
-     * Gets the number of bytes of data available
-     * @returns {Promise} returns a promise that contains the available bytes
-     */
-    BluetoothSerial.available = function () { return; };
-    /**
-     * Reads data from the buffer
-     * @returns {Promise} returns a promise with data from the buffer
-     */
-    BluetoothSerial.read = function () { return; };
-    /**
-     * Reads data from the buffer until it reaches a delimiter
-     * @param {string} delimiter string that you want to search until
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.readUntil = function (delimiter) { return; };
-    /**
-     * Subscribe to be notified when data is received
-     * @param {string} delimiter the string you want to watch for
-     * @returns {Observable} returns an observable.
-     */
-    BluetoothSerial.subscribe = function (delimiter) { return; };
-    /**
-     * Subscribe to be notified when data is received
-     * @returns {Observable} returns an observable
-     */
-    BluetoothSerial.subscribeRawData = function () { return; };
-    /**
-     * Clears data in buffer
-     * @returns {Promise} returns a promise when completed
-     */
-    BluetoothSerial.clear = function () { return; };
-    /**
-     * Lists bonded devices
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.list = function () { return; };
-    /**
-     * Reports if bluetooth is enabled
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.isEnabled = function () { return; };
-    /**
-     * Reports the connection status
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.isConnected = function () { return; };
-    /**
-     * Reads the RSSI from the connected peripheral
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.readRSSI = function () { return; };
-    /**
-     * Show the Bluetooth settings on the device
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.showBluetoothSettings = function () { return; };
-    /**
-     * Enable Bluetooth on the device
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.enable = function () { return; };
-    /**
-     * Discover unpaired devices
-     * @returns {Promise} returns a promise
-     */
-    BluetoothSerial.discoverUnpaired = function () { return; };
-    /**
-     * Subscribe to be notified on Bluetooth device discovery. Discovery process must be initiated with the `discoverUnpaired` function.
-     * @returns {Observable} Returns an observable
-     */
-    BluetoothSerial.setDeviceDiscoveredListener = function () { return; };
-    /**
-     * Sets the human readable device name that is broadcasted to other devices
-     * @param {string} newName Desired name of device
-     */
-    BluetoothSerial.setName = function (newName) { };
-    /**
-     * Makes the device discoverable by other devices
-     * @param {number} discoverableDuration Desired number of seconds device should be discoverable for
-     */
-    BluetoothSerial.setDiscoverable = function (discoverableDuration) { };
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone'],
-            observable: true,
-            clearFunction: 'disconnect'
-        })
-    ], BluetoothSerial, "connect", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android'],
-            observable: true,
-            clearFunction: 'disconnect'
-        })
-    ], BluetoothSerial, "connectInsecure", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "write", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "available", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "read", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "readUntil", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone'],
-            observable: true,
-            clearFunction: 'unsubscribe'
-        })
-    ], BluetoothSerial, "subscribe", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone'],
-            observable: true,
-            clearFunction: 'unsubscribeRawData'
-        })
-    ], BluetoothSerial, "subscribeRawData", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "clear", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "list", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "isEnabled", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "isConnected", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "readRSSI", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "showBluetoothSettings", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "enable", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], BluetoothSerial, "discoverUnpaired", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android', 'iOS', 'Windows Phone'],
-            observable: true,
-            clearFunction: 'clearDeviceDiscoveredListener'
-        })
-    ], BluetoothSerial, "setDeviceDiscoveredListener", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android'],
-            sync: true
-        })
-    ], BluetoothSerial, "setName", null);
-    __decorate$16([
-        Cordova({
-            platforms: ['Android'],
-            sync: true
-        })
-    ], BluetoothSerial, "setDiscoverable", null);
-    BluetoothSerial = __decorate$16([
-        Plugin({
-            repo: 'https://github.com/don/BluetoothSerial',
-            plugin: 'cordova-plugin-bluetooth-serial',
-            pluginRef: 'bluetoothSerial',
-            platforms: ['Android', 'iOS', 'Windows Phone', 'Browser']
-        })
-    ], BluetoothSerial);
-    return BluetoothSerial;
-}());
-
-var __decorate$17 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Calendar = (function () {
-    function Calendar() {
-    }
-    /**
-     * This function checks if we have permission to read/write from/to the calendar.
-     * The promise will resolve with `true` when:
-     * - You're running on iOS, or
-     * - You're targetting API level lower than 23, or
-     * - You're using Android < 6, or
-     * - You've already granted permission
-     *
-     * If this returns false, you should call `requestReadWritePermissions` function
-     * @returns {Promise<boolean>}
-     */
-    Calendar.hasReadWritePermission = function () { return; };
-    /**
-     * Check if we have read permission
-     * @returns {Promise<boolean>}
-     */
-    Calendar.hasReadPermission = function () { return; };
-    /**
-     * Check if we have write permission
-     * @returns {Promise<boolean>}
-     */
-    Calendar.hasWritePermission = function () { return; };
-    /**
-     * Request write permission
-     * @returns {Promise<any>}
-     */
-    Calendar.requestWritePermission = function () { return; };
-    /**
-     * Request read permission
-     * @returns {Promise<any>}
-     */
-    Calendar.requestReadPermission = function () { return; };
-    /**
-     * Requests read/write permissions
-     * @returns {Promise<any>}
-     */
-    Calendar.requestReadWritePermission = function () { return; };
-    /**
-     * Create a calendar. (iOS only)
-     *
-     * @param {string | Object} nameOrOptions  either a string name or a options object. If string, provide the calendar name. IF an object, provide a calendar name as a string and a calendar color in hex format as a string
-     * @return {Promise} Returns a Promise
-     */
-    Calendar.createCalendar = function (nameOrOptions) { return; };
-    /**
-     * Delete a calendar. (iOS only)
-     * @param {string} name  Name of the calendar to delete.
-     * @return Returns a Promise
-     */
-    Calendar.deleteCalendar = function (name) { return; };
-    /**
-     * Returns the default calendar options.
-     *
-     * @return Returns an object with the default calendar options:
-     *   firstReminderMinutes: 60,
-     *   secondReminderMinutes: null,
-     *   recurrence: null, // options are: 'daily', 'weekly', 'monthly', 'yearly'
-     *   recurrenceInterval: 1, // only used when recurrence is set
-     *   recurrenceEndDate: null,
-     *   calendarName: null,
-     *   calendarId: null,
-     *   url: null
-     */
-    Calendar.getCalendarOptions = function () {
-        return {
-            firstReminderMinutes: 60,
-            secondReminderMinutes: null,
-            recurrence: null,
-            recurrenceInterval: 1,
-            recurrenceEndDate: null,
-            calendarName: null,
-            calendarId: null,
-            url: null
-        };
-    };
-    /**
-     * Silently create an event.
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @return Returns a Promise
-     */
-    Calendar.createEvent = function (title, location, notes, startDate, endDate) { return; };
-    /**
-     * Silently create an event with additional options.
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @param {CalendarOptions} [options]  Additional options, see `getCalendarOptions`
-     * @return Returns a Promise
-     */
-    Calendar.createEventWithOptions = function (title, location, notes, startDate, endDate, options) { return; };
-    /**
-     * Interactively create an event.
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @return Returns a Promise
-     */
-    Calendar.createEventInteractively = function (title, location, notes, startDate, endDate) { return; };
-    /**
-     * Interactively create an event with additional options.
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @param {CalendarOptions} [options]  Additional options, see `getCalendarOptions`
-     * @return Returns a Promise
-     */
-    Calendar.createEventInteractivelyWithOptions = function (title, location, notes, startDate, endDate, options) { return; };
-    // deprecated
-    // @Cordova()
-    // static createEventInNamedCalendar(
-    //   title?: string,
-    //   location?: string,
-    //   notes?: string,
-    //   startDate?: Date,
-    //   endDate?: Date,
-    //   calendarName?: string
-    // ) {}
-    /**
-     * Find an event.
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @return Returns a Promise
-     */
-    Calendar.findEvent = function (title, location, notes, startDate, endDate) { return; };
-    /**
-     * Find an event with additional options.
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @param {CalendarOptions} [options]  Additional options, see `getCalendarOptions`
-     * @return Returns a Promise that resolves with the event, or rejects with an error.
-     */
-    Calendar.findEventWithOptions = function (title, location, notes, startDate, endDate, options) { return; };
-    /**
-     * Find a list of events within the specified date range. (Android only)
-     *
-     * @param {Date} [startDate]  The start date
-     * @param {Date} [endDate]  The end date
-     * @return Returns a Promise that resolves with the list of events, or rejects with an error.
-     */
-    Calendar.listEventsInRange = function (startDate, endDate) { return; };
-    /**
-     * Get a list of all calendars.
-     * @return A Promise that resolves with the list of calendars, or rejects with an error.
-     */
-    Calendar.listCalendars = function () { return; };
-    /**
-     * Get a list of all future events in the specified calendar. (iOS only)
-     * @return Returns a Promise that resolves with the list of events, or rejects with an error.
-     */
-    Calendar.findAllEventsInNamedCalendar = function (calendarName) { return; };
-    /**
-     * Modify an event. (iOS only)
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @param {string} [newTitle]  The new event title
-     * @param {string} [newLocation]  The new event location
-     * @param {string} [newNotes]  The new event notes
-     * @param {Date} [newStartDate]  The new event start date
-     * @param {Date} [newEndDate]  The new event end date
-     * @return Returns a Promise
-     */
-    Calendar.modifyEvent = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate) { return; };
-    /**
-     * Modify an event with additional options. (iOS only)
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @param {string} [newTitle]  The new event title
-     * @param {string} [newLocation]  The new event location
-     * @param {string} [newNotes]  The new event notes
-     * @param {Date} [newStartDate]  The new event start date
-     * @param {Date} [newEndDate]  The new event end date
-     * @param {CalendarOptions} [options]  Additional options, see `getCalendarOptions`
-     * @return Returns a Promise
-     */
-    Calendar.modifyEventWithOptions = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, options) { return; };
-    /**
-     * Delete an event.
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @return Returns a Promise
-     */
-    Calendar.deleteEvent = function (title, location, notes, startDate, endDate) { return; };
-    /**
-     * Delete an event from the specified Calendar. (iOS only)
-     *
-     * @param {string} [title]  The event title
-     * @param {string} [location]  The event location
-     * @param {string} [notes]  The event notes
-     * @param {Date} [startDate]  The event start date
-     * @param {Date} [endDate]  The event end date
-     * @param {string} calendarName
-     * @return Returns a Promise
-     */
-    Calendar.deleteEventFromNamedCalendar = function (title, location, notes, startDate, endDate, calendarName) { return; };
-    /**
-     * Open the calendar at the specified date.
-     * @param {Date} date The date you want to open the calendar on
-     * @return {Promise<any>} Promise returns a promise
-     */
-    Calendar.openCalendar = function (date) { return; };
-    __decorate$17([
-        Cordova()
-    ], Calendar, "hasReadWritePermission", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "hasReadPermission", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "hasWritePermission", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "requestWritePermission", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "requestReadPermission", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "requestReadWritePermission", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "createCalendar", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "deleteCalendar", null);
-    __decorate$17([
-        Cordova({
-            sync: true
-        })
-    ], Calendar, "getCalendarOptions", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "createEvent", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "createEventWithOptions", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "createEventInteractively", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "createEventInteractivelyWithOptions", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "findEvent", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "findEventWithOptions", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "listEventsInRange", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "listCalendars", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "findAllEventsInNamedCalendar", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "modifyEvent", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "modifyEventWithOptions", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "deleteEvent", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "deleteEventFromNamedCalendar", null);
-    __decorate$17([
-        Cordova()
-    ], Calendar, "openCalendar", null);
-    Calendar = __decorate$17([
-        Plugin({
-            plugin: 'cordova-plugin-calendar',
-            pluginRef: 'plugins.calendar',
-            repo: 'https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin',
-            platforms: ['Android', 'iOS']
-        })
-    ], Calendar);
-    return Calendar;
-}());
-
-var __decorate$18 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var CallNumber = (function () {
-    function CallNumber() {
-    }
-    /**
-     * Calls a phone number
-     * @param numberToCall {string} The phone number to call as a string
-     * @param bypassAppChooser {boolean} Set to true to bypass the app chooser and go directly to dialer
-     */
-    CallNumber.callNumber = function (numberToCall, bypassAppChooser) {
-        return;
-    };
-    __decorate$18([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], CallNumber, "callNumber", null);
-    CallNumber = __decorate$18([
-        Plugin({
-            plugin: 'call-number',
-            pluginRef: 'plugins.CallNumber',
-            repo: 'https://github.com/Rohfosho/CordovaCallNumberPlugin',
-            platforms: ['iOS', 'Android']
-        })
-    ], CallNumber);
-    return CallNumber;
-}());
-
-var __decorate$19 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Camera = (function () {
-    function Camera() {
-    }
-    /**
-     * Take a picture or video, or load one from the library.
-     * @param {CameraOptions?} options Options that you want to pass to the camera. Encoding type, quality, etc. Optional
-     * @return {Promise} Returns a Promise that resolves with Base64 encoding of the image data, or the image file URI, depending on cameraOptions, otherwise rejects with an error.
-     */
-    Camera.getPicture = function (options) { return; };
-    /**
-     * Remove intermediate image files that are kept in temporary storage after calling camera.getPicture.
-     * Applies only when the value of Camera.sourceType equals Camera.PictureSourceType.CAMERA and the Camera.destinationType equals Camera.DestinationType.FILE_URI.
-     * @return Returns a Promise
-     */
-    Camera.cleanup = function () { return; };
-    
-    /**
-     * @private
-     * @enum {number}
-     */
-    Camera.DestinationType = {
-        /** Return base64 encoded string. DATA_URL can be very memory intensive and cause app crashes or out of memory errors. Use FILE_URI or NATIVE_URI if possible */
-        DATA_URL: 0,
-        /** Return file uri (content://media/external/images/media/2 for Android) */
-        FILE_URI: 1,
-        /** Return native uri (eg. asset-library://... for iOS) */
-        NATIVE_URI: 2
-    };
-    /**
-     * @private
-     * @enum {number}
-     */
-    Camera.EncodingType = {
-        /** Return JPEG encoded image */
-        JPEG: 0,
-        /** Return PNG encoded image */
-        PNG: 1
-    };
-    /**
-     * @private
-     * @enum {number}
-     */
-    Camera.MediaType = {
-        /** Allow selection of still pictures only. DEFAULT. Will return format specified via DestinationType */
-        PICTURE: 0,
-        /** Allow selection of video only, ONLY RETURNS URL */
-        VIDEO: 1,
-        /** Allow selection from all media types */
-        ALLMEDIA: 2
-    };
-    /**
-     * @private
-     * @enum {number}
-     */
-    Camera.PictureSourceType = {
-        /** Choose image from picture library (same as SAVEDPHOTOALBUM for Android) */
-        PHOTOLIBRARY: 0,
-        /** Take picture from camera */
-        CAMERA: 1,
-        /** Choose image from picture library (same as PHOTOLIBRARY for Android) */
-        SAVEDPHOTOALBUM: 2
-    };
-    /**
-     * @private
-     * Matches iOS UIPopoverArrowDirection constants to specify arrow location on popover.
-     * @enum {number}
-     */
-    Camera.PopoverArrowDirection = {
-        ARROW_UP: 1,
-        ARROW_DOWN: 2,
-        ARROW_LEFT: 4,
-        ARROW_RIGHT: 8,
-        ARROW_ANY: 15
-    };
-    /**
-     * @private
-     * @enum {number}
-     */
-    Camera.Direction = {
-        /** Use the back-facing camera */
-        BACK: 0,
-        /** Use the front-facing camera */
-        FRONT: 1
-    };
-    __decorate$19([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Camera, "getPicture", null);
-    __decorate$19([
-        Cordova({
-            platforms: ['iOS']
-        })
-    ], Camera, "cleanup", null);
-    Camera = __decorate$19([
-        Plugin({
-            plugin: 'cordova-plugin-camera',
-            pluginRef: 'navigator.camera',
-            repo: 'https://github.com/apache/cordova-plugin-camera',
-            platforms: ['Android', 'BlackBerry', 'Browser', 'Firefox', 'FireOS', 'iOS', 'Windows', 'Windows Phone 8', 'Ubuntu']
-        })
-    ], Camera);
-    return Camera;
-}());
-
-var __decorate$20 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var CameraPreview = (function () {
-    function CameraPreview() {
-    }
-    /**
-     * Starts the camera preview instance.
-     * @param {CameraPreviewRect} position and size of the preview window - {x: number, y: number, width: number, height: number}
-     * @param {string} which camera to use - 'front' | 'back'
-     * @param {boolean} enable tap to take picture
-     * @param {boolean} enable preview box drag across the screen
-     * @param {boolean} send preview box to the back of the webview
-     * @param {number} alpha of the preview box
-     */
-    CameraPreview.startCamera = function (rect, defaultCamera, tapEnabled, dragEnabled, toBack, alpha) { };
-    
-    /**
-     * Stops the camera preview instance.
-     */
-    CameraPreview.stopCamera = function () { };
-    
-    /**
-     * Take the picture, the parameter size is optional
-     * @param {CameraPreviewSize} optional - size of the picture to take
-     */
-    CameraPreview.takePicture = function (size) { };
-    
-    /**
-     * Register a callback function that receives the original picture and the image captured from the preview box.
-     */
-    CameraPreview.setOnPictureTakenHandler = function () { return; };
-    
-    /**
-     * Switch from the rear camera and front camera, if available.
-     */
-    CameraPreview.switchCamera = function () { };
-    
-    /**
-     * Show the camera preview box.
-     */
-    CameraPreview.show = function () { };
-    
-    /**
-     * Hide the camera preview box.
-     */
-    CameraPreview.hide = function () { };
-    
-    /**
-     * Set the default mode for the Flash.
-     */
-    // @Cordova({
-    //   sync: true
-    // })
-    // static setFlashMode(mode: number): void { };
-    /**
-     * Set camera color effect.
-     */
-    CameraPreview.setColorEffect = function (effect) { };
-    
-    /**
-     * @private
-     * @enum {number}
-     */
-    CameraPreview.FlashMode = {
-        OFF: 0,
-        ON: 1,
-        AUTO: 2
-    };
-    __decorate$20([
-        Cordova({
-            sync: true
-        })
-    ], CameraPreview, "startCamera", null);
-    __decorate$20([
-        Cordova({
-            sync: true
-        })
-    ], CameraPreview, "stopCamera", null);
-    __decorate$20([
-        Cordova({
-            sync: true
-        })
-    ], CameraPreview, "takePicture", null);
-    __decorate$20([
-        Cordova({
-            observable: true
-        })
-    ], CameraPreview, "setOnPictureTakenHandler", null);
-    __decorate$20([
-        Cordova({
-            sync: true
-        })
-    ], CameraPreview, "switchCamera", null);
-    __decorate$20([
-        Cordova({
-            sync: true
-        })
-    ], CameraPreview, "show", null);
-    __decorate$20([
-        Cordova({
-            sync: true
-        })
-    ], CameraPreview, "hide", null);
-    __decorate$20([
-        Cordova({
-            sync: true
-        })
-    ], CameraPreview, "setColorEffect", null);
-    CameraPreview = __decorate$20([
-        Plugin({
-            plugin: 'cordova-plugin-camera-preview',
-            pluginRef: 'cordova.plugins.camerapreview',
-            repo: 'https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview',
-            platforms: ['Android', 'iOS']
-        })
-    ], CameraPreview);
-    return CameraPreview;
-}());
-
-var __decorate$21 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var CardIO = (function () {
-    function CardIO() {
-    }
-    /**
-     * Check whether card scanning is currently available. (May vary by
-     * device, OS version, network connectivity, etc.)
-     *
-     */
-    CardIO.canScan = function () { return; };
-    /**
-     * Scan a credit card with card.io.
-     * @param {CardIOOptions} options Options for configuring the plugin
-     */
-    CardIO.scan = function (options) { return; };
-    /**
-     * Retrieve the version of the card.io library. Useful when contacting support.
-     */
-    CardIO.version = function () { return; };
-    __decorate$21([
-        Cordova()
-    ], CardIO, "canScan", null);
-    __decorate$21([
-        Cordova()
-    ], CardIO, "scan", null);
-    __decorate$21([
-        Cordova()
-    ], CardIO, "version", null);
-    CardIO = __decorate$21([
-        Plugin({
-            plugin: 'https://github.com/card-io/card.io-Cordova-Plugin',
-            pluginRef: 'CardIO',
-            repo: 'https://github.com/card-io/card.io-Cordova-Plugin',
-            platforms: ['iOS', 'Android']
-        })
-    ], CardIO);
-    return CardIO;
-}());
-
-var __decorate$22 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Clipboard = (function () {
-    function Clipboard() {
-    }
-    /**
-     * Copies the given text
-     * @param {string} text Text that gets copied on the system clipboard
-     * @returns {Promise<T>} Returns a promise after the text has been copied
-     */
-    Clipboard.copy = function (text) { return; };
-    /**
-     * Pastes the text stored in clipboard
-     * @returns {Promise<T>} Returns a promise after the text has been pasted
-     */
-    Clipboard.paste = function () { return; };
-    __decorate$22([
-        Cordova()
-    ], Clipboard, "copy", null);
-    __decorate$22([
-        Cordova()
-    ], Clipboard, "paste", null);
-    Clipboard = __decorate$22([
-        Plugin({
-            plugin: 'https://github.com/VersoSolutions/CordovaClipboard.git',
-            pluginRef: 'cordova.plugins.clipboard',
-            repo: 'https://github.com/VersoSolutions/CordovaClipboard',
-            platforms: ['Amazon Fire OS', 'iOS', 'Android', 'BlackBerry 10', 'Windows Phone 7', 'Windows Phone 8', 'Windows', 'Firefox OS', 'Browser']
-        })
-    ], Clipboard);
-    return Clipboard;
-}());
-
-var __decorate$23 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var SyncStatus;
-(function (SyncStatus) {
-    /**
-     * The application is up to date.
-     */
-    SyncStatus[SyncStatus["UP_TO_DATE"] = 0] = "UP_TO_DATE";
-    /**
-     * An update is available, it has been downloaded, unzipped and copied to the deployment folder.
-     * After the completion of the callback invoked with SyncStatus.UPDATE_INSTALLED, the application will be reloaded with the updated code and resources.
-     */
-    SyncStatus[SyncStatus["UPDATE_INSTALLED"] = 1] = "UPDATE_INSTALLED";
-    /**
-     * An optional update is available, but the user declined to install it. The update was not downloaded.
-     */
-    SyncStatus[SyncStatus["UPDATE_IGNORED"] = 2] = "UPDATE_IGNORED";
-    /**
-     * An error happened during the sync operation. This might be an error while communicating with the server, downloading or unziping the update.
-     * The console logs should contain more information about what happened. No update has been applied in this case.
-     */
-    SyncStatus[SyncStatus["ERROR"] = 3] = "ERROR";
-    /**
-     * There is an ongoing sync in progress, so this attempt to sync has been aborted.
-     */
-    SyncStatus[SyncStatus["IN_PROGRESS"] = 4] = "IN_PROGRESS";
-    /**
-     * Intermediate status - the plugin is about to check for updates.
-     */
-    SyncStatus[SyncStatus["CHECKING_FOR_UPDATE"] = 5] = "CHECKING_FOR_UPDATE";
-    /**
-     * Intermediate status - a user dialog is about to be displayed. This status will be reported only if user interaction is enabled.
-     */
-    SyncStatus[SyncStatus["AWAITING_USER_ACTION"] = 6] = "AWAITING_USER_ACTION";
-    /**
-     * Intermediate status - the update package is about to be downloaded.
-     */
-    SyncStatus[SyncStatus["DOWNLOADING_PACKAGE"] = 7] = "DOWNLOADING_PACKAGE";
-    /**
-     * Intermediate status - the update package is about to be installed.
-     */
-    SyncStatus[SyncStatus["INSTALLING_UPDATE"] = 8] = "INSTALLING_UPDATE";
-})(SyncStatus || (SyncStatus = {}));
-/**
- * Defines the available install modes for updates.
- */
-var InstallMode;
-(function (InstallMode) {
-    /**
-     * The update will be applied to the running application immediately. The application will be reloaded with the new content immediately.
-     */
-    InstallMode[InstallMode["IMMEDIATE"] = 0] = "IMMEDIATE";
-    /**
-     * The update is downloaded but not installed immediately. The new content will be available the next time the application is started.
-     */
-    InstallMode[InstallMode["ON_NEXT_RESTART"] = 1] = "ON_NEXT_RESTART";
-    /**
-     * The udpate is downloaded but not installed immediately. The new content will be available the next time the application is resumed or restarted, whichever event happends first.
-     */
-    InstallMode[InstallMode["ON_NEXT_RESUME"] = 2] = "ON_NEXT_RESUME";
-})(InstallMode || (InstallMode = {}));
-/**
- * @name CodePush
- * @description
- * CodePush plugin for Cordova by Microsoft that supports iOS and Android.
- *
- * For more info, please see https://github.com/ksachdeva/ionic2-code-push-example
- *
- * @usage
- * ```typescript
- * import { CodePush } from 'ionic-native';
- *
- * // note - mostly error & completed methods of observable will not fire
- * // as syncStatus will contain the current state of the update
- * CodePush.sync().subscribe((syncStatus) => console.log(syncStatus));
- *
- * const downloadProgress = (progress) => { console.log(`Downloaded ${progress.receivedBytes} of ${progress.totalBytes}`); }
- * CodePush.sync({}, downloadProgress).subscribe((syncStatus) => console.log(syncStatus));
- *
- * ```
- */
-var CodePush = (function () {
-    function CodePush() {
-    }
-    /**
-     * Get the current package information.
-     *
-     * @param packageSuccess Callback invoked with the currently deployed package information.
-     * @param packageError Optional callback invoked in case of an error.
-     */
-    CodePush.getCurrentPackage = function () {
-        return;
-    };
-    /**
-     * Gets the pending package information, if any. A pending package is one that has been installed but the application still runs the old code.
-     * This happends only after a package has been installed using ON_NEXT_RESTART or ON_NEXT_RESUME mode, but the application was not restarted/resumed yet.
-     */
-    CodePush.getPendingPackage = function () {
-        return;
-    };
-    /**
-     * Checks with the CodePush server if an update package is available for download.
-     *
-     * @param querySuccess Callback invoked in case of a successful response from the server.
-     *                     The callback takes one RemotePackage parameter. A non-null package is a valid update.
-     *                     A null package means the application is up to date for the current native application version.
-     * @param queryError Optional callback invoked in case of an error.
-     * @param deploymentKey Optional deployment key that overrides the config.xml setting.
-     */
-    CodePush.checkForUpdate = function (deploymentKey) {
-        return;
-    };
-    /**
-     * Notifies the plugin that the update operation succeeded and that the application is ready.
-     * Calling this function is required on the first run after an update. On every subsequent application run, calling this function is a noop.
-     * If using sync API, calling this function is not required since sync calls it internally.
-     *
-     * @param notifySucceeded Optional callback invoked if the plugin was successfully notified.
-     * @param notifyFailed Optional callback invoked in case of an error during notifying the plugin.
-     */
-    CodePush.notifyApplicationReady = function () {
-        return;
-    };
-    /**
-     * Reloads the application. If there is a pending update package installed using ON_NEXT_RESTART or ON_NEXT_RESUME modes, the update
-     * will be immediately visible to the user. Otherwise, calling this function will simply reload the current version of the application.
-     */
-    CodePush.restartApplication = function () {
-        return;
-    };
-    /**
-     * Convenience method for installing updates in one method call.
-     * This method is provided for simplicity, and its behavior can be replicated by using window.codePush.checkForUpdate(), RemotePackage's download() and LocalPackage's install() methods.
-     *
-     * The algorithm of this method is the following:
-     * - Checks for an update on the CodePush server.
-     * - If an update is available
-     *         - If the update is mandatory and the alertMessage is set in options, the user will be informed that the application will be updated to the latest version.
-     *           The update package will then be downloaded and applied.
-     *         - If the update is not mandatory and the confirmMessage is set in options, the user will be asked if they want to update to the latest version.
-     *           If they decline, the syncCallback will be invoked with SyncStatus.UPDATE_IGNORED.
-     *         - Otherwise, the update package will be downloaded and applied with no user interaction.
-     * - If no update is available on the server, or if a previously rolled back update is available and the ignoreFailedUpdates is set to true, the syncCallback will be invoked with the SyncStatus.UP_TO_DATE.
-     * - If an error occurs during checking for update, downloading or installing it, the syncCallback will be invoked with the SyncStatus.ERROR.
-     *
-     * @param syncCallback Optional callback to be called with the status of the sync operation.
-     * @param syncOptions Optional SyncOptions parameter configuring the behavior of the sync operation.
-     * @param downloadProgress Optional callback invoked during the download process. It is called several times with one DownloadProgress parameter.
-     *
-     */
-    CodePush.sync = function (syncOptions, downloadProgress) {
-        return;
-    };
-    __decorate$23([
-        Cordova()
-    ], CodePush, "getCurrentPackage", null);
-    __decorate$23([
-        Cordova()
-    ], CodePush, "getPendingPackage", null);
-    __decorate$23([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], CodePush, "checkForUpdate", null);
-    __decorate$23([
-        Cordova()
-    ], CodePush, "notifyApplicationReady", null);
-    __decorate$23([
-        Cordova()
-    ], CodePush, "restartApplication", null);
-    __decorate$23([
-        Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3 // we don't need this, so we set it to a value higher than # of args
-        })
-    ], CodePush, "sync", null);
-    CodePush = __decorate$23([
-        Plugin({
-            plugin: 'cordova-plugin-code-push',
-            pluginRef: 'codePush',
-            repo: 'https://github.com/Microsoft/cordova-plugin-code-push',
-            platforms: ['Android', 'iOS']
-        })
-    ], CodePush);
-    return CodePush;
-}());
-
-var __decorate$24 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Contact = (function () {
-    function Contact() {
-        this._objectInstance = navigator.contacts.create();
-    }
-    Object.defineProperty(Contact.prototype, "id", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "displayName", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "name", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "nickname", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "phoneNumbers", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "emails", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "addresses", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "ims", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "organizations", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "birthday", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "note", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "photos", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "categories", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "urls", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Contact.prototype.clone = function () {
-        var newContact = new Contact();
-        for (var prop in this) {
-            if (prop === 'id')
-                return;
-            newContact[prop] = this[prop];
-        }
-        return newContact;
-    };
-    Contact.prototype.remove = function () { return; };
-    Contact.prototype.save = function () { return; };
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "id", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "displayName", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "name", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "nickname", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "phoneNumbers", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "emails", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "addresses", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "ims", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "organizations", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "birthday", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "note", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "photos", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "categories", null);
-    __decorate$24([
-        InstanceProperty
-    ], Contact.prototype, "urls", null);
-    __decorate$24([
-        CordovaInstance()
-    ], Contact.prototype, "remove", null);
-    __decorate$24([
-        CordovaInstance()
-    ], Contact.prototype, "save", null);
-    return Contact;
-}());
-/**
- * @private
- */
-var ContactName = (function () {
-    function ContactName(formatted, familyName, givenName, middleName, honorificPrefix, honorificSuffix) {
-        this._objectInstance = new window.ContactName(formatted, familyName, givenName, middleName, honorificPrefix, honorificSuffix);
-    }
-    Object.defineProperty(ContactName.prototype, "formatted", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactName.prototype, "familyName", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactName.prototype, "givenName", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactName.prototype, "middleName", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactName.prototype, "honorificPrefix", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactName.prototype, "honorificSuffix", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$24([
-        InstanceProperty
-    ], ContactName.prototype, "formatted", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactName.prototype, "familyName", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactName.prototype, "givenName", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactName.prototype, "middleName", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactName.prototype, "honorificPrefix", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactName.prototype, "honorificSuffix", null);
-    return ContactName;
-}());
-/**
- * @private
- */
-var ContactField = (function () {
-    function ContactField(type, value, pref) {
-        this._objectInstance = new window.ContactField(type, value, pref);
-    }
-    Object.defineProperty(ContactField.prototype, "type", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactField.prototype, "value", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactField.prototype, "pref", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$24([
-        InstanceProperty
-    ], ContactField.prototype, "type", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactField.prototype, "value", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactField.prototype, "pref", null);
-    return ContactField;
-}());
-/**
- * @private
- */
-var ContactAddress = (function () {
-    function ContactAddress(pref, type, formatted, streetAddress, locality, region, postalCode, country) {
-        this._objectInstance = new window.ContactAddress(pref, type, formatted, streetAddress, locality, region, postalCode, country);
-    }
-    Object.defineProperty(ContactAddress.prototype, "pref", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactAddress.prototype, "type", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactAddress.prototype, "formatted", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactAddress.prototype, "streetAddress", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactAddress.prototype, "locality", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactAddress.prototype, "region", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactAddress.prototype, "postalCode", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactAddress.prototype, "country", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "pref", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "type", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "formatted", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "streetAddress", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "locality", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "region", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "postalCode", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactAddress.prototype, "country", null);
-    return ContactAddress;
-}());
-/**
- * @private
- */
-var ContactOrganization = (function () {
-    function ContactOrganization() {
-        this._objectInstance = new window.ContactOrganization();
-    }
-    Object.defineProperty(ContactOrganization.prototype, "pref", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactOrganization.prototype, "type", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactOrganization.prototype, "name", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactOrganization.prototype, "department", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactOrganization.prototype, "title", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$24([
-        InstanceProperty
-    ], ContactOrganization.prototype, "pref", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactOrganization.prototype, "type", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactOrganization.prototype, "name", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactOrganization.prototype, "department", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactOrganization.prototype, "title", null);
-    return ContactOrganization;
-}());
-/**
- * @private
- */
-var ContactFindOptions = (function () {
-    function ContactFindOptions() {
-        this._objectInstance = new window.ContactFindOptions();
-    }
-    Object.defineProperty(ContactFindOptions.prototype, "filter", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactFindOptions.prototype, "multiple", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactFindOptions.prototype, "desiredFields", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ContactFindOptions.prototype, "hasPhoneNumber", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$24([
-        InstanceProperty
-    ], ContactFindOptions.prototype, "filter", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactFindOptions.prototype, "multiple", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactFindOptions.prototype, "desiredFields", null);
-    __decorate$24([
-        InstanceProperty
-    ], ContactFindOptions.prototype, "hasPhoneNumber", null);
-    return ContactFindOptions;
-}());
-/**
- * @name Contacts
- * @description
- * Access and manage Contacts on the device.
- *
- * @usage
- *
- * ```typescript
- * import { Contact } from 'ionic-native';
- *
- *
- * let contact = new Contact();
- * contact.displayName = 'Mr. Ionitron';
- * contact.save().then(
- *   () => console.log('Contact saved!', contact),
- *   (error: any) => console.error('Error saving contact.', error)
- * );
- * ```
- *
- *
- */
-var Contacts = (function () {
-    function Contacts() {
-    }
-    /**
-     * Create a single contact.
-     * @return Returns a object Contact
-     */
-    Contacts.create = function () {
-        return new Contact();
-    };
-    /**
-     * Search for contacts in the Contacts list.
-     * @param fields {string[]}  Contact fields to be used as a search qualifier.
-     *  A zero-length contactFields parameter is invalid and results in ContactError.INVALID_ARGUMENT_ERROR.
-     *  A contactFields value of "*" searches all contact fields.
-     *
-     * @param options {Object} the options to query with:
-     *   filter: The search string used to find navigator.contacts. (string) (Default: "")
-     *   multiple: Determines if the find operation returns multiple navigator.contacts. (Boolean) (Default: false)
-     *   desiredFields: Contact fields to be returned back. If specified, the resulting Contact object only features values for these fields. (DOMString[]) [Optional]
-     *   hasPhoneNumber(Android only): Filters the search to only return contacts with a phone number informed. (Boolean) (Default: false)
-     *
-     * @return Returns a Promise that resolves with the search results (an array of Contact objects)
-     */
-    Contacts.find = function (fields, options) { return; };
-    /**
-     * Select a single Contact.
-     * @return Returns a Promise that resolves with the selected Contact
-     */
-    Contacts.pickContact = function () { return; };
-    __decorate$24([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], Contacts, "find", null);
-    __decorate$24([
-        Cordova()
-    ], Contacts, "pickContact", null);
-    Contacts = __decorate$24([
-        Plugin({
-            plugin: 'cordova-plugin-contacts',
-            pluginRef: 'navigator.contacts',
-            repo: 'https://github.com/apache/cordova-plugin-contacts'
-        })
-    ], Contacts);
-    return Contacts;
-}());
-
-var __decorate$25 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Crop = (function () {
-    function Crop() {
-    }
-    /**
-     * Crops an image
-     * @param pathToImage
-     * @param options
-     * @return {Promise<string>} Returns a promise that resolves with the new image path, or rejects if failed to crop.
-     */
-    Crop.crop = function (pathToImage, options) { return; };
-    __decorate$25([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Crop, "crop", null);
-    Crop = __decorate$25([
-        Plugin({
-            plugin: 'cordova-plugin-crop',
-            pluginRef: 'plugins',
-            repo: 'https://github.com/jeduan/cordova-plugin-crop'
-        })
-    ], Crop);
-    return Crop;
-}());
-
-var __decorate$26 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var DatePicker = (function () {
-    function DatePicker() {
-    }
-    /**
-     * Shows the date and/or time picker dialog(s)
-     * @param {DatePickerOptions} options Options for the date picker.
-     * @returns {Promise<Date>} Returns a promise that resolves with the picked date and/or time, or rejects with an error.
-     */
-    DatePicker.show = function (options) { return; };
-    __decorate$26([
-        Cordova()
-    ], DatePicker, "show", null);
-    DatePicker = __decorate$26([
-        Plugin({
-            plugin: 'cordova-plugin-datepicker',
-            pluginRef: 'datePicker',
-            repo: 'https://github.com/VitaliiBlagodir/cordova-plugin-datepicker'
-        })
-    ], DatePicker);
-    return DatePicker;
-}());
-
-var __decorate$27 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var DBMeter = (function () {
-    function DBMeter() {
-    }
-    /**
-     * Starts listening
-     * @return {Observable<string>} Returns an observable. Subscribe to start listening. Unsubscribe to stop listening.
-     */
-    DBMeter.start = function () { return; };
-    /**
-     * Stops listening
-     * @private
-     */
-    DBMeter.stop = function () { return; };
-    /**
-     * Check if the DB Meter is listening
-     * @return {Promise<boolean>} Returns a promise that resolves with a boolean that tells us whether the DB meter is listening
-     */
-    DBMeter.isListening = function () { return; };
-    /**
-     * Delete the DB Meter instance
-     * @return {Promise<any>} Returns a promise that will resolve if the instance has been deleted, and rejects if errors occur.
-     */
-    DBMeter.delete = function () { return; };
-    __decorate$27([
-        Cordova({
-            observable: true,
-            clearFunction: 'stop'
-        })
-    ], DBMeter, "start", null);
-    __decorate$27([
-        Cordova()
-    ], DBMeter, "stop", null);
-    __decorate$27([
-        Cordova()
-    ], DBMeter, "isListening", null);
-    __decorate$27([
-        Cordova()
-    ], DBMeter, "delete", null);
-    DBMeter = __decorate$27([
-        Plugin({
-            plugin: 'cordova-plugin-dbmeter',
-            pluginRef: 'DBMeter',
-            repo: 'https://github.com/akofman/cordova-plugin-dbmeter',
-            platforms: ['iOS', 'Android']
-        })
-    ], DBMeter);
-    return DBMeter;
-}());
-
-var __decorate$28 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Deeplinks = (function () {
-    function Deeplinks() {
-    }
-    /**
-     * Define a set of paths to match against incoming deeplinks.
-     *
-     * @param {paths} Define a set of paths to match against incoming deeplinks.
-     * paths takes an object of the form { 'path': data }. If a deeplink
-     * matches the path, the resulting path-data pair will be returned in the
-     * promise result which you can then use to navigate in the app as you see fit.
-     * @returns {Promise} Returns a Promise that resolves when a deeplink comes through, and
-     * is rejected if a deeplink comes through that does not match a given path.
-     */
-    Deeplinks.route = function (paths) { return; };
-    /**
-     *
-     * This is a convenience version of `route` that takes a reference to a NavController
-     * from Ionic 2, or a custom class that conforms to this protocol:
-     *
-     * NavController.push = function(View, Params){}
-     *
-     * This handler will automatically navigate when a route matches. If you need finer-grained
-     * control over the behavior of a matching deeplink, use the plain `route` method.
-     *
-     * @param {paths} Define a set of paths to match against incoming deeplinks.
-     * paths takes an object of the form { 'path': data }. If a deeplink
-     * matches the path, the resulting path-data pair will be returned in the
-     * promise result which you can then use to navigate in the app as you see fit.
-     *
-     * @returns {Promise} Returns a Promise that resolves when a deeplink comes through, and
-     * is rejected if a deeplink comes through that does not match a given path.
-     */
-    Deeplinks.routeWithNavController = function (navController, paths) { return; };
-    __decorate$28([
-        Cordova({
-            observable: true
-        })
-    ], Deeplinks, "route", null);
-    __decorate$28([
-        Cordova({
-            observable: true
-        })
-    ], Deeplinks, "routeWithNavController", null);
-    Deeplinks = __decorate$28([
-        Plugin({
-            plugin: 'ionic-plugin-deeplinks',
-            pluginRef: 'IonicDeeplink',
-            repo: 'https://github.com/driftyco/ionic-plugin-deeplinks',
-            platforms: ['iOS', 'Android'],
-            install: 'ionic plugin add ionic-plugin-deeplinks --variable URL_SCHEME=myapp --variable DEEPLINK_SCHEME=https --variable DEEPLINK_HOST=example.com --variable ANDROID_PATH_PREFIX=/'
-        })
-    ], Deeplinks);
-    return Deeplinks;
-}());
-
-var __decorate$29 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Device = (function () {
-    function Device() {
-    }
-    Object.defineProperty(Device, "device", {
-        /**
-         * Returns the whole device object.
-         *
-         * @returns {Object} The device object.
-         */
-        get: function () { return window.device; },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$29([
-        CordovaProperty
-    ], Device, "device", null);
-    Device = __decorate$29([
-        Plugin({
-            plugin: 'cordova-plugin-device',
-            pluginRef: 'device',
-            repo: 'https://github.com/apache/cordova-plugin-device'
-        })
-    ], Device);
-    return Device;
-}());
-
-var __decorate$30 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var DeviceAccounts = (function () {
-    function DeviceAccounts() {
-    }
-    /**
-     *  Gets all accounts registered on the Android Device
-     */
-    DeviceAccounts.get = function () { return; };
-    /**
-     *  Get all accounts registered on Android device for requested type
-     */
-    DeviceAccounts.getByType = function (type) { return; };
-    /**
-     *  Get all emails registered on Android device (accounts with 'com.google' type)
-     */
-    DeviceAccounts.getEmails = function () { return; };
-    /**
-     *  Get the first email registered on Android device
-     */
-    DeviceAccounts.getEmail = function () { return; };
-    __decorate$30([
-        Cordova()
-    ], DeviceAccounts, "get", null);
-    __decorate$30([
-        Cordova()
-    ], DeviceAccounts, "getByType", null);
-    __decorate$30([
-        Cordova()
-    ], DeviceAccounts, "getEmails", null);
-    __decorate$30([
-        Cordova()
-    ], DeviceAccounts, "getEmail", null);
-    DeviceAccounts = __decorate$30([
-        Plugin({
-            plugin: 'https://github.com/loicknuchel/cordova-device-accounts.git',
-            pluginRef: 'plugins.DeviceAccounts',
-            repo: 'https://github.com/loicknuchel/cordova-device-accounts',
-            platforms: ['Android']
-        })
-    ], DeviceAccounts);
-    return DeviceAccounts;
-}());
-
-var __decorate$31 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var DeviceMotion = (function () {
-    function DeviceMotion() {
-    }
-    /**
-     * Get the current acceleration along the x, y, and z axes.
-     * @returns {Promise<any>} Returns object with x, y, z, and timestamp properties
-     */
-    DeviceMotion.getCurrentAcceleration = function () { return; };
-    /**
-     * Watch the device acceleration. Clear the watch by unsubscribing from the observable.
-     * @param {AccelerometerOptions} options list of options for the accelerometer.
-     * @returns {Observable<AccelerationData>} Observable returns an observable that you can subscribe to
-     */
-    DeviceMotion.watchAcceleration = function (options) { return; };
-    __decorate$31([
-        Cordova()
-    ], DeviceMotion, "getCurrentAcceleration", null);
-    __decorate$31([
-        Cordova({
-            callbackOrder: 'reverse',
-            observable: true,
-            clearFunction: 'clearWatch'
-        })
-    ], DeviceMotion, "watchAcceleration", null);
-    DeviceMotion = __decorate$31([
-        Plugin({
-            plugin: 'cordova-plugin-device-motion',
-            pluginRef: 'navigator.accelerometer',
-            repo: 'https://github.com/apache/cordova-plugin-device-motion'
-        })
-    ], DeviceMotion);
-    return DeviceMotion;
-}());
-
-var __decorate$32 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var DeviceOrientation = (function () {
-    function DeviceOrientation() {
-    }
-    /**
-     * Get the current compass heading.
-     * @returns {Promise<CompassHeading>}
-     */
-    DeviceOrientation.getCurrentHeading = function () { return; };
-    /**
-     * Get the device current heading at a regular interval
-     *
-     * Stop the watch by unsubscribing from the observable
-     * @param {CompassOptions} options Options for compass. Frequency and Filter. Optional
-     * @returns {Observable<CompassHeading>} Returns an observable that contains the compass heading
-     */
-    DeviceOrientation.watchHeading = function (options) { return; };
-    __decorate$32([
-        Cordova()
-    ], DeviceOrientation, "getCurrentHeading", null);
-    __decorate$32([
-        Cordova({
-            callbackOrder: 'reverse',
-            observable: true,
-            clearFunction: 'clearWatch'
-        })
-    ], DeviceOrientation, "watchHeading", null);
-    DeviceOrientation = __decorate$32([
-        Plugin({
-            plugin: 'cordova-plugin-device-orientation',
-            pluginRef: 'navigator.compass',
-            repo: 'https://github.com/apache/cordova-plugin-device-orientation'
-        })
-    ], DeviceOrientation);
-    return DeviceOrientation;
-}());
-
-var __decorate$33 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Diagnostic = (function () {
-    function Diagnostic() {
-    }
-    /**
-     * Checks if app is able to access device location.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isLocationAvailable = function () { return; };
-    /**
-     * Checks if Wifi is connected/enabled. On iOS this returns true if the device is connected to a network by WiFi. On Android and Windows 10 Mobile this returns true if the WiFi setting is set to enabled.
-     * On Android this requires permission. `<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />`
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isWifiAvailable = function () { return; };
-    /**
-     * Checks if the device has a camera. On Android this returns true if the device has a camera. On iOS this returns true if both the device has a camera AND the application is authorized to use it. On Windows 10 Mobile this returns true if both the device has a rear-facing camera AND the
-     * application is authorized to use it.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isCameraAvailable = function () { return; };
-    /**
-     * Checks if the device has Bluetooth capabilities and if so that Bluetooth is switched on (same on Android, iOS and Windows 10 Mobile)
-     * On Android this requires permission <uses-permission android:name="android.permission.BLUETOOTH" />
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isBluetoothAvailable = function () { return; };
-    /**
-     * Displays the device location settings to allow user to enable location services/change location mode.
-     */
-    Diagnostic.switchToLocationSettings = function () { };
-    /**
-     * Displays mobile settings to allow user to enable mobile data.
-     */
-    Diagnostic.switchToMobileDataSettings = function () { };
-    /**
-     * Displays Bluetooth settings to allow user to enable Bluetooth.
-     */
-    Diagnostic.switchToBluetoothSettings = function () { };
-    /**
-     * Displays WiFi settings to allow user to enable WiFi.
-     */
-    Diagnostic.switchToWifiSettings = function () { };
-    /**
-     * Returns true if the WiFi setting is set to enabled, and is the same as `isWifiAvailable()`
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isWifiEnabled = function () { return; };
-    /**
-     * Enables/disables WiFi on the device.
-     * Requires `ACCESS_WIFI_STATE` and `CHANGE_WIFI_STATE` permissions on Android
-     * @param state {boolean}
-     */
-    Diagnostic.setWifiState = function (state) { return; };
-    /**
-     * Enables/disables Bluetooth on the device.
-     * Requires `BLUETOOTH` and `BLUETOOTH_ADMIN` permissions on Android
-     * @param state {boolean}
-     */
-    Diagnostic.setBluetoothState = function (state) { return; };
-    /**
-     * Returns true if the device setting for location is on. On Android this returns true if Location Mode is switched on. On iOS this returns true if Location Services is switched on.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isLocationEnabled = function () { return; };
-    /**
-     * Checks if the application is authorized to use location.
-     * Note for Android: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isLocationAuthorized = function () { return; };
-    /**
-     * Returns the location authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getLocationAuthorizationStatus = function () { return; };
-    /**
-     * Returns the location authorization status for the application.
-     * Note for Android: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     *
-     * mode - (iOS-only / optional) location authorization mode: "always" or "when_in_use". If not specified, defaults to "when_in_use".
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestLocationAuthorization = function (mode) { return; };
-    /**
-     * Checks if camera hardware is present on device.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isCameraPresent = function () { return; };
-    /**
-     * Checks if the application is authorized to use the camera.
-     * Note for Android: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return TRUE as permissions are already granted at installation time.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isCameraAuthorized = function () { return; };
-    /**
-     * Returns the camera authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getCameraAuthorizationStatus = function () { return; };
-    /**
-     * Requests camera authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestCameraAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized to use the microphone.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isMicrophoneAuthorized = function () { return; };
-    /**
-     * Returns the microphone authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getMicrophoneAuthorizationStatus = function () { return; };
-    /**
-     * Requests microphone authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestMicrophoneAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized to use contacts (address book).
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isContactsAuthorized = function () { return; };
-    /**
-     * Returns the contacts authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getContactsAuthroizationStatus = function () { return; };
-    /**
-     * Requests contacts authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestContactsAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized to use the calendar.
-     *
-     * Notes for Android:
-     *   - This is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return TRUE as permissions are already granted at installation time.
-     *
-     * Notes for iOS:
-     *   - This relates to Calendar Events (not Calendar Reminders)
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isCalendarAuthorized = function () { return; };
-    /**
-     * Returns the calendar authorization status for the application.
-     *
-     * Notes for Android:
-     *   - This is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return `GRANTED` status as permissions are already granted at installation time.
-     *
-     * Notes for iOS:
-     *   - This relates to Calendar Events (not Calendar Reminders)
-     *
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getCalendarAuthorizationStatus = function () { return; };
-    /**
-     * Requests calendar authorization for the application.
-     *
-     * Notes for iOS:
-     *   - Should only be called if authorization status is NOT_DETERMINED. Calling it when in any other state will have no effect and just return the current authorization status.
-     *   - This relates to Calendar Events (not Calendar Reminders)
-     *
-     * Notes for Android:
-     *   - This is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will have no effect as the permissions are already granted at installation time.
-     *   - This requests permission for `READ_CALENDAR` run-time permission
-     *   - Required permissions must be added to `AndroidManifest.xml` as appropriate - see Android permissions: `READ_CALENDAR`, `WRITE_CALENDAR`
-     *
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestCalendarAuthorization = function () { return; };
-    /**
-     * Opens settings page for this app.
-     * On Android, this opens the "App Info" page in the Settings app.
-     * On iOS, this opens the app settings page in the Settings app. This works only on iOS 8+ - iOS 7 and below will invoke the errorCallback.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.switchToSettings = function () { return; };
-    /**
-     * Returns the state of Bluetooth on the device.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getBluetoothState = function () { return; };
-    /**
-     * Registers a function to be called when a change in Bluetooth state occurs.
-     * @param handler
-     */
-    Diagnostic.registerBluetoothStateChangeHandler = function (handler) { };
-    /**
-     * Registers a function to be called when a change in Location state occurs.
-     * @param handler
-     */
-    Diagnostic.registerLocationStateChangeHandler = function (handler) { };
-    /**
-     * Checks if high-accuracy locations are available to the app from GPS hardware.
-     * Returns true if Location mode is enabled and is set to "Device only" or "High accuracy" AND if the app is authorised to use location.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isGpsLocationAvailable = function () { return; };
-    /**
-     * Checks if location mode is set to return high-accuracy locations from GPS hardware.
-     *   Returns true if Location mode is enabled and is set to either:
-     *   - Device only = GPS hardware only (high accuracy)
-     *   - High accuracy = GPS hardware, network triangulation and Wifi network IDs (high and low accuracy)
-     */
-    Diagnostic.isGpsLocationEnabled = function () { return; };
-    /**
-     * Checks if low-accuracy locations are available to the app from network triangulation/WiFi access points.
-     * Returns true if Location mode is enabled and is set to "Battery saving" or "High accuracy" AND if the app is authorised to use location.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isNetworkLocationAvailable = function () { return; };
-    /**
-     * Checks if location mode is set to return low-accuracy locations from network triangulation/WiFi access points.
-     * Returns true if Location mode is enabled and is set to either:
-     *   - Battery saving = network triangulation and Wifi network IDs (low accuracy)
-     *   - High accuracy = GPS hardware, network triangulation and Wifi network IDs (high and low accuracy)
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isNetworkLocationEnabled = function () { return; };
-    /**
-     * Returns the current location mode setting for the device.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getLocationMode = function () { return; };
-    /**
-     * Returns the current authorisation status for a given permission.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @param permission
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getPermissionAuthorizationStatus = function (permission) { return; };
-    /**
-     * Returns the current authorisation status for multiple permissions.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @param permissions
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getPermissionsAuthorizationStatus = function (permissions) { return; };
-    /**
-     * Requests app to be granted authorisation for a runtime permission.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will have no effect as the permissions are already granted at installation time.
-     * @param permission
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestRuntimePermission = function (permission) { return; };
-    /**
-     * Requests app to be granted authorisation for multiple runtime permissions.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @param permissions
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestRuntimePermissions = function (permissions) { return; };
-    /**
-     * Checks if the device setting for Bluetooth is switched on.
-     * This requires `BLUETOOTH` permission on Android
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isBluetoothEnabled = function () { return; };
-    /**
-     * Checks if the device has Bluetooth capabilities.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.hasBluetoothSupport = function () { return; };
-    /**
-     * Checks if the device has Bluetooth Low Energy (LE) capabilities.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.hasBluetoothLESupport = function () { return; };
-    /**
-     * Checks if the device supports Bluetooth Low Energy (LE) Peripheral mode.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.hasBluetoothLEPeripheralSupport = function () { return; };
-    /**
-     * Checks if the application is authorized to use the Camera Roll in Photos app.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isCameraRollAuthorized = function () { return; };
-    /**
-     * Returns the authorization status for the application to use the Camera Roll in Photos app.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.getCameraRollAuthorizationStatus = function () { return; };
-    /**
-     * Requests camera roll authorization for the application.
-     * Should only be called if authorization status is NOT_REQUESTED.
-     * Calling it when in any other state will have no effect.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestCameraRollAuthorization = function () { return; };
-    /**
-     * Checks if remote (push) notifications are enabled.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isRemoteNotificationsEnabled = function () { return; };
-    /**
-     * Indicates if the app is registered for remote (push) notifications on the device.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isRegisteredForRemoteNotifications = function () { return; };
-    /**
-     * Indicates the current setting of notification types for the app in the Settings app.
-     * Note: on iOS 8+, if "Allow Notifications" switch is OFF, all types will be returned as disabled.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getRemoteNotificationTypes = function () { return; };
-    /**
-     * Checks if the application is authorized to use reminders.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isRemindersAuthorized = function () { return; };
-    /**
-     * Returns the reminders authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getRemindersAuthorizationStatus = function () { return; };
-    /**
-     * Requests reminders authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestRemindersAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized for background refresh.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isBackgroundRefreshAuthorized = function () { return; };
-    /**
-     * Returns the background refresh authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getBackgroundRefreshStatus = function () { return; };
-    Diagnostic.permission = {
-        READ_CALENDAR: 'READ_CALENDAR',
-        WRITE_CALENDAR: 'WRITE_CALENDAR',
-        CAMERA: 'CAMERA',
-        READ_CONTACTS: 'READ_CONTACTS',
-        WRITE_CONTACTS: 'WRITE_CONTACTS',
-        GET_ACCOUNTS: 'GET_ACCOUNTS',
-        ACCESS_FINE_LOCATION: 'ACCESS_FINE_LOCATION',
-        ACCESS_COARSE_LOCATION: 'ACCESS_COARSE_LOCATION',
-        RECORD_AUDIO: 'RECORD_AUDIO',
-        READ_PHONE_STATE: 'READ_PHONE_STATE',
-        CALL_PHONE: 'CALL_PHONE',
-        ADD_VOICEMAIL: 'ADD_VOICEMAIL',
-        USE_SIP: 'USE_SIP',
-        PROCESS_OUTGOING_CALLS: 'PROCESS_OUTGOING_CALLS',
-        READ_CALL_LOG: 'READ_CALL_LOG',
-        WRITE_CALL_LOG: 'WRITE_CALL_LOG',
-        SEND_SMS: 'SEND_SMS',
-        RECEIVE_SMS: 'RECEIVE_SMS',
-        READ_SMS: 'READ_SMS',
-        RECEIVE_WAP_PUSH: 'RECEIVE_WAP_PUSH',
-        RECEIVE_MMS: 'RECEIVE_MMS',
-        WRITE_EXTERNAL_STORAGE: 'WRITE_EXTERNAL_STORAGE',
-        READ_EXTERNAL_STORAGE: 'READ_EXTERNAL_STORAGE',
-        BODY_SENSORS: 'BODY_SENSORS'
-    };
-    Diagnostic.permissionStatus = {
-        GRANTED: 'GRANTED',
-        GRANTED_WHEN_IN_USE: 'GRANTED_WHEN_IN_USE',
-        RESTRICTED: 'RESTRICTED',
-        DENIED: 'DENIED',
-        DENIED_ALWAYS: 'DENIED_ALWAYS',
-        NOT_REQUESTED: 'NOT_REQUESTED'
-    };
-    Diagnostic.locationAuthorizationMode = {
-        ALWAYS: 'ALWAYS',
-        WHEN_IN_USE: 'WHEN_IN_USE'
-    };
-    Diagnostic.permissionGroups = {
-        CALENDAR: ['READ_CALENDAR', 'WRITE_CALENDAR'],
-        CAMERA: ['CAMERA'],
-        CONTACTS: ['READ_CONTACTS', 'WRITE_CONTACTS', 'GET_ACCOUNTS'],
-        LOCATION: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION'],
-        MICROPHONE: ['RECORD_AUDIO'],
-        PHONE: ['READ_PHONE_STATE', 'CALL_PHONE', 'ADD_VOICEMAIL', 'USE_SIP', 'PROCESS_OUTGOING_CALLS', 'READ_CALL_LOG', 'WRITE_CALL_LOG'],
-        SENSORS: ['BODY_SENSORS'],
-        SMS: ['SEND_SMS', 'RECEIVE_SMS', 'READ_SMS', 'RECEIVE_WAP_PUSH', 'RECEIVE_MMS'],
-        STORAGE: ['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE']
-    };
-    Diagnostic.locationMode = {
-        HIGH_ACCURACY: 'high_accuracy',
-        DEVICE_ONLY: 'device_only',
-        BATTERY_SAVING: 'battery_saving',
-        LOCATION_OFF: 'location_off'
-    };
-    Diagnostic.bluetoothState = {
-        UNKNOWN: 'unknown',
-        RESETTING: 'resetting',
-        UNSUPPORTED: 'unsupported',
-        UNAUTHORIZED: 'unauthorized',
-        POWERED_OFF: 'powered_off',
-        POWERED_ON: 'powered_on',
-        POWERING_OFF: 'powering_off',
-        POWERING_ON: 'powering_on'
-    };
-    __decorate$33([
-        Cordova()
-    ], Diagnostic, "isLocationAvailable", null);
-    __decorate$33([
-        Cordova()
-    ], Diagnostic, "isWifiAvailable", null);
-    __decorate$33([
-        Cordova()
-    ], Diagnostic, "isCameraAvailable", null);
-    __decorate$33([
-        Cordova()
-    ], Diagnostic, "isBluetoothAvailable", null);
-    __decorate$33([
-        Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToLocationSettings", null);
-    __decorate$33([
-        Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToMobileDataSettings", null);
-    __decorate$33([
-        Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToBluetoothSettings", null);
-    __decorate$33([
-        Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToWifiSettings", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "isWifiEnabled", null);
-    __decorate$33([
-        Cordova({ callbackOrder: 'reverse', platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "setWifiState", null);
-    __decorate$33([
-        Cordova({ callbackOrder: 'reverse', platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "setBluetoothState", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isLocationEnabled", null);
-    __decorate$33([
-        Cordova()
-    ], Diagnostic, "isLocationAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getLocationAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestLocationAuthorization", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isCameraPresent", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isCameraAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getCameraAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestCameraAuthorization", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isMicrophoneAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getMicrophoneAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestMicrophoneAuthorization", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isContactsAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getContactsAuthroizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestContactsAuthorization", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isCalendarAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getCalendarAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestCalendarAuthorization", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "switchToSettings", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getBluetoothState", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'], sync: true })
-    ], Diagnostic, "registerBluetoothStateChangeHandler", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android', 'iOS'], sync: true })
-    ], Diagnostic, "registerLocationStateChangeHandler", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isGpsLocationAvailable", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isGpsLocationEnabled", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isNetworkLocationAvailable", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isNetworkLocationEnabled", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "getLocationMode", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "getPermissionAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "getPermissionsAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "requestRuntimePermission", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "requestRuntimePermissions", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isBluetoothEnabled", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "hasBluetoothSupport", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "hasBluetoothLESupport", null);
-    __decorate$33([
-        Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "hasBluetoothLEPeripheralSupport", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isCameraRollAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getCameraRollAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "requestCameraRollAuthorization", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isRemoteNotificationsEnabled", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isRegisteredForRemoteNotifications", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getRemoteNotificationTypes", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isRemindersAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getRemindersAuthorizationStatus", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "requestRemindersAuthorization", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isBackgroundRefreshAuthorized", null);
-    __decorate$33([
-        Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getBackgroundRefreshStatus", null);
-    Diagnostic = __decorate$33([
-        Plugin({
-            plugin: 'cordova.plugins.diagnostic',
-            pluginRef: 'cordova.plugins.diagnostic',
-            repo: 'https://github.com/dpa99c/cordova-diagnostic-plugin'
-        })
-    ], Diagnostic);
-    return Diagnostic;
-}());
-
-var __decorate$34 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Dialogs = (function () {
-    function Dialogs() {
-    }
-    /**
-     * Shows a custom alert or dialog box.
-     * @param {string} message Dialog message.
-     * @param {string} title Dialog title. (Optional, defaults to Alert)
-     * @param {string} buttonName Button name. (Optional, defaults to OK)
-     * @returns {Promise<any>} Returns a blank promise once the user has dismissed the alert.
-     */
-    Dialogs.alert = function (message, title, buttonName) {
-        if (title === void 0) { title = 'Alert'; }
-        if (buttonName === void 0) { buttonName = 'OK'; }
-        return;
-    };
-    /**
-     * Displays a customizable confirmation dialog box.
-     * @param {string} message Dialog message.
-     * @param {string} title Dialog title. (Optional, defaults to Confirm)
-     * @param {Array<string>} buttonLabels Array of strings specifying button labels. (Optional, defaults to [OK,Cancel])
-     * @returns {Promise<number>} Returns a promise that resolves the button index that was clicked. Note that the index use one-based indexing.
-     */
-    Dialogs.confirm = function (message, title, buttonLabels) {
-        if (title === void 0) { title = 'Confirm'; }
-        if (buttonLabels === void 0) { buttonLabels = ['OK', 'Cancel']; }
-        return;
-    };
-    /**
-     * Displays a native dialog box that is more customizable than the browser's prompt function.
-     * @param {string} message Dialog message.
-     * @param {string} title Dialog title. (Optional, defaults to Prompt)
-     * @param {Array<string>} buttonLabels  Array of strings specifying button labels. (Optional, defaults to ["OK","Cancel"])
-     * @param {string} defaultText Default textbox input value.  (Optional, Default: empty string)
-     * @returns {Promise<any>} Returns a promise that resolves an object with the button index clicked and the text entered
-     */
-    Dialogs.prompt = function (message, title, buttonLabels, defaultText) {
-        if (title === void 0) { title = 'Prompt'; }
-        if (buttonLabels === void 0) { buttonLabels = ['OK', 'Cancel']; }
-        if (defaultText === void 0) { defaultText = ''; }
-        return;
-    };
-    /**
-     * The device plays a beep sound.
-     * @param {numbers} times The number of times to repeat the beep.
-     */
-    Dialogs.beep = function (times) { };
-    __decorate$34([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 4
-        })
-    ], Dialogs, "alert", null);
-    __decorate$34([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 4
-        })
-    ], Dialogs, "confirm", null);
-    __decorate$34([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 5
-        })
-    ], Dialogs, "prompt", null);
-    __decorate$34([
-        Cordova({
-            sync: true
-        })
-    ], Dialogs, "beep", null);
-    Dialogs = __decorate$34([
-        Plugin({
-            plugin: 'cordova-plugin-dialogs',
-            pluginRef: 'navigator.notification',
-            repo: 'https://github.com/apache/cordova-plugin-dialogs.git'
-        })
-    ], Dialogs);
-    return Dialogs;
-}());
-
-var __decorate$35 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var EmailComposer = (function () {
-    function EmailComposer() {
-    }
-    /**
-     * Verifies if sending emails is supported on the device.
-     *
-     * @param app {string?} An optional app id or uri scheme.
-     * @returns {Promise<boolean>} Resolves if available, rejects if not available
-     */
-    EmailComposer.isAvailable = function (app) {
-        return new Promise(function (resolve, reject) {
-            if (app) {
-                cordova.plugins.email.isAvailable(app, function (isAvailable) {
-                    if (isAvailable) {
-                        resolve();
-                    }
-                    else {
-                        reject();
-                    }
-                });
-            }
-            else {
-                cordova.plugins.email.isAvailable(function (isAvailable) {
-                    if (isAvailable) {
-                        resolve();
-                    }
-                    else {
-                        reject();
-                    }
-                });
-            }
-        });
-    };
-    /**
-     * Adds a new mail app alias.
-     *
-     * @param alias {string} The alias name
-     * @param packageName {string} The package name
-     */
-    EmailComposer.addAlias = function (alias, packageName) { };
-    /**
-     * Displays the email composer pre-filled with data.
-     *
-     * @param email {Email} Email
-     * @param scope {any?} An optional scope for the promise
-     * @returns {Promise<any>} Resolves promise when the EmailComposer has been opened
-     */
-    EmailComposer.open = function (email, scope) { return; };
-    __decorate$35([
-        Cordova()
-    ], EmailComposer, "addAlias", null);
-    __decorate$35([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 3
-        })
-    ], EmailComposer, "open", null);
-    EmailComposer = __decorate$35([
-        Plugin({
-            plugin: 'cordova-plugin-email-composer',
-            pluginRef: 'cordova.plugins.email',
-            repo: 'https://github.com/katzer/cordova-plugin-email-composer.git',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], EmailComposer);
-    return EmailComposer;
-}());
-
-var __decorate$36 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var EstimoteBeacons = (function () {
-    function EstimoteBeacons() {
-    }
-    /**
-     * Ask the user for permission to use location services
-     * while the app is in the foreground.
-     * You need to call this function or requestAlwaysAuthorization
-     * on iOS 8+.
-     * Does nothing on other platforms.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.requestWhenInUseAuthorization().then(
-     *   () => { console.log('on success'); },
-     *   () => { console.log('on error'); }
-     * );
-     * ```
-     *
-     * @see {@link https://community.estimote.com/hc/en-us/articles/203393036-Estimote-SDK-and-iOS-8-Location-Services|Estimote SDK and iOS 8 Location Services}
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.requestWhenInUseAuthorization = function () { return; };
-    /**
-     * Ask the user for permission to use location services
-     * whenever the app is running.
-     * You need to call this function or requestWhenInUseAuthorization
-     * on iOS 8+.
-     * Does nothing on other platforms.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.requestAlwaysAuthorization().then(
-     *   () => { console.log('on success'); },
-     *   () => { console.log('on error'); }
-     * );
-     * ```
-     *
-     * @see {@link https://community.estimote.com/hc/en-us/articles/203393036-Estimote-SDK-and-iOS-8-Location-Services|Estimote SDK and iOS 8 Location Services}
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.requestAlwaysAuthorization = function () { return; };
-    /**
-     * Get the current location authorization status.
-     * Implemented on iOS 8+.
-     * Does nothing on other platforms.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.authorizationStatus().then(
-     *   (result) => { console.log('Location authorization status: ' + result); },
-     *   (errorMessage) => { console.log('Error: ' + errorMessage); }
-     * );
-     * ```
-     *
-     * @see {@link https://community.estimote.com/hc/en-us/articles/203393036-Estimote-SDK-and-iOS-8-Location-Services|Estimote SDK and iOS 8 Location Services}
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.authorizationStatus = function () { return; };
-    /**
-     * Start advertising as a beacon.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startAdvertisingAsBeacon('B9407F30-F5F8-466E-AFF9-25556B57FE6D', 1, 1, 'MyRegion')
-     *    .then(() => { console.log('Beacon started'); });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopAdvertisingAsBeacon().then((result) => { console.log('Beacon stopped'); });
-     * }, 5000);
-     * ```
-     * @param uuid {string} UUID string the beacon should advertise (mandatory).
-     * @param major {number} Major value to advertise (mandatory).
-     * @param minor {number} Minor value to advertise (mandatory).
-     * @param regionId {string} Identifier of the region used to advertise (mandatory).
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.startAdvertisingAsBeacon = function (uuid, major, minor, regionId) { return; };
-    /**
-     * Stop advertising as a beacon.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startAdvertisingAsBeacon('B9407F30-F5F8-466E-AFF9-25556B57FE6D', 1, 1, 'MyRegion')
-     *    .then(() => { console.log('Beacon started'); });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopAdvertisingAsBeacon().then((result) => { console.log('Beacon stopped'); });
-     * }, 5000);
-     * ```
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.stopAdvertisingAsBeacon = function () { return; };
-    /**
-     * Enable analytics.
-     *
-     * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.enableAnalytics(true).then(() => { console.log('Analytics enabled'); });
-     * ```
-     * @param enable {number} Boolean value to turn analytics on or off (mandatory).
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.enableAnalytics = function (enable) { return; };
-    /**
-    * Test if analytics is enabled.
-    *
-    * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.isAnalyticsEnabled().then((enabled) => { console.log('Analytics enabled: ' + enabled); });
-     * ```
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.isAnalyticsEnabled = function () { return; };
-    /**
-    * Test if App ID and App Token is set.
-    *
-    * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.isAuthorized().then((isAuthorized) => { console.log('App ID and App Token is set: ' + isAuthorized); });
-     * ```
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.isAuthorized = function () { return; };
-    /**
-    * Set App ID and App Token.
-    *
-    * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.setupAppIDAndAppToken('MyAppID', 'MyAppToken').then(() => { console.log('AppID and AppToken configured!'); });
-     * ```
-     * @param appID {string} The App ID (mandatory).
-     * @param appToken {string} The App Token (mandatory).
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.setupAppIDAndAppToken = function (appID, appToken) { return; };
-    /**
-     * Start scanning for all nearby beacons using CoreBluetooth (no region object is used).
-     * Available on iOS.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startEstimoteBeaconDiscovery().subscribe(beacons => {
-     *   console.log(JSON.stringify(beacons));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopEstimoteBeaconDiscovery().then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @return Returns an Observable that notifies of each beacon discovered.
-     */
-    EstimoteBeacons.startEstimoteBeaconDiscovery = function () { return; };
-    /**
-     * Stop CoreBluetooth scan. Available on iOS.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startEstimoteBeaconDiscovery().subscribe(beacons => {
-     *   console.log(JSON.stringify(beacons));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopEstimoteBeaconDiscovery().then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.stopEstimoteBeaconDiscovery = function () { return; };
-    /**
-     * Start ranging beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.startRangingBeaconsInRegion(region).subscribe(info => {
-     *   console.log(JSON.stringify(info));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopRangingBeaconsInRegion(region).then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @return Returns an Observable that notifies of each beacon discovered.
-     */
-    EstimoteBeacons.startRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Stop ranging beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.startRangingBeaconsInRegion(region).subscribe(info => {
-     *   console.log(JSON.stringify(info));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopRangingBeaconsInRegion(region).then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.stopRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Start ranging secure beacons. Available on iOS.
-     * This function has the same parameters/behaviour as
-     * {@link EstimoteBeacons.startRangingBeaconsInRegion}.
-     * To use secure beacons set the App ID and App Token using
-     * {@link EstimoteBeacons.setupAppIDAndAppToken}.
-     */
-    EstimoteBeacons.startRangingSecureBeaconsInRegion = function (region) { return; };
-    /**
-     * Stop ranging secure beacons. Available on iOS.
-     * This function has the same parameters/behaviour as
-     * {@link EstimoteBeacons.stopRangingBeaconsInRegion}.
-     */
-    EstimoteBeacons.stopRangingSecureBeaconsInRegion = function (region) { return; };
-    /**
-     * Start monitoring beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.startMonitoringForRegion(region).subscribe(state => {
-     *   console.log('Region state: ' + JSON.stringify(state));
-     * });
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @param [notifyEntryStateOnDisplay=false] {boolean} Set to true to detect if you
-     * are inside a region when the user turns display on, see
-     * {@link https://developer.apple.com/library/prerelease/ios/documentation/CoreLocation/Reference/CLBeaconRegion_class/index.html#//apple_ref/occ/instp/CLBeaconRegion/notifyEntryStateOnDisplay|iOS documentation}
-     * for further details (optional, defaults to false, iOS only).
-     * @return Returns an Observable that notifies of each region state discovered.
-     */
-    EstimoteBeacons.startMonitoringForRegion = function (region, notifyEntryStateOnDisplay) { return; };
-    /**
-     * Stop monitoring beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.stopMonitoringForRegion(region).then(() => { console.log('monitoring is stopped'); });
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.stopMonitoringForRegion = function (region) { return; };
-    /**
-     * Start monitoring secure beacons. Available on iOS.
-     * This function has the same parameters/behaviour as
-     * EstimoteBeacons.startMonitoringForRegion.
-     * To use secure beacons set the App ID and App Token using
-     * {@link EstimoteBeacons.setupAppIDAndAppToken}.
-     * @see {@link EstimoteBeacons.startMonitoringForRegion}
-     */
-    EstimoteBeacons.startSecureMonitoringForRegion = function (region, notifyEntryStateOnDisplay) { return; };
-    /**
-    * Stop monitoring secure beacons. Available on iOS.
-    * This function has the same parameters/behaviour as
-    * {@link EstimoteBeacons.stopMonitoringForRegion}.
-    */
-    EstimoteBeacons.stopSecureMonitoringForRegion = function (region) { return; };
-    /**
-     * Connect to Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.connectToBeacon(FF:0F:F0:00:F0:00);
-     * ```
-     * ```
-     * EstimoteBeacons.connectToBeacon({
-     *     proximityUUID: '000000FF-F00F-0FF0-F000-000FF0F00000',
-     *     major: 1,
-     *     minor: 1
-     *   });
-     * ```
-     * @param beacon {Beacon} Beacon to connect to.
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.connectToBeacon = function (beacon) { return; };
-    /**
-     * Disconnect from connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.disconnectConnectedBeacon();
-     * ```
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.disconnectConnectedBeacon = function () { return; };
-    /**
-     * Write proximity UUID to connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * // Example that writes constant ESTIMOTE_PROXIMITY_UUID
-     * EstimoteBeacons.writeConnectedProximityUUID(ESTIMOTE_PROXIMITY_UUID);
-     *
-     * @param uuid {string} String to write as new UUID
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.writeConnectedProximityUUID = function (uuid) { return; };
-    /**
-     * Write major to connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * // Example that writes 1
-     * EstimoteBeacons.writeConnectedMajor(1);
-     *
-     * @param major {number} number to write as new major
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.writeConnectedMajor = function (major) { return; };
-    /**
-     * Write minor to connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * // Example that writes 1
-     * EstimoteBeacons.writeConnectedMinor(1);
-     *
-     * @param minor {number} number to write as new minor
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.writeConnectedMinor = function (minor) { return; };
-    /** Proximity value */
-    EstimoteBeacons.ProximityUnknown = 0;
-    /** Proximity value */
-    EstimoteBeacons.ProximityImmediate = 1;
-    /** Proximity value */
-    EstimoteBeacons.ProximityNear = 2;
-    /** Proximity value */
-    EstimoteBeacons.ProximityFar = 3;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorUnknown = 0;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorMintCocktail = 1;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorIcyMarshmallow = 2;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorBlueberryPie = 3;
-    /**
-     * Beacon colour.
-     */
-    EstimoteBeacons.BeaconColorSweetBeetroot = 4;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorCandyFloss = 5;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorLemonTart = 6;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorVanillaJello = 7;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorLiquoriceSwirl = 8;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorWhite = 9;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorTransparent = 10;
-    /** Region state */
-    EstimoteBeacons.RegionStateUnknown = 'unknown';
-    /** Region state */
-    EstimoteBeacons.RegionStateOutside = 'outside';
-    /** Region state */
-    EstimoteBeacons.RegionStateInside = 'inside';
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "requestWhenInUseAuthorization", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "requestAlwaysAuthorization", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "authorizationStatus", null);
-    __decorate$36([
-        Cordova({
-            clearFunction: 'stopAdvertisingAsBeacon'
-        })
-    ], EstimoteBeacons, "startAdvertisingAsBeacon", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "stopAdvertisingAsBeacon", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "enableAnalytics", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "isAnalyticsEnabled", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "isAuthorized", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "setupAppIDAndAppToken", null);
-    __decorate$36([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopEstimoteBeaconDiscovery'
-        })
-    ], EstimoteBeacons, "startEstimoteBeaconDiscovery", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "stopEstimoteBeaconDiscovery", null);
-    __decorate$36([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopRangingBeaconsInRegion',
-            clearWithArgs: true
-        })
-    ], EstimoteBeacons, "startRangingBeaconsInRegion", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "stopRangingBeaconsInRegion", null);
-    __decorate$36([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopRangingSecureBeaconsInRegion',
-            clearWithArgs: true
-        })
-    ], EstimoteBeacons, "startRangingSecureBeaconsInRegion", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "stopRangingSecureBeaconsInRegion", null);
-    __decorate$36([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopMonitoringForRegion',
-            clearWithArgs: true,
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], EstimoteBeacons, "startMonitoringForRegion", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "stopMonitoringForRegion", null);
-    __decorate$36([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopSecureMonitoringForRegion',
-            clearWithArgs: true,
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], EstimoteBeacons, "startSecureMonitoringForRegion", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "stopSecureMonitoringForRegion", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "connectToBeacon", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "disconnectConnectedBeacon", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "writeConnectedProximityUUID", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "writeConnectedMajor", null);
-    __decorate$36([
-        Cordova()
-    ], EstimoteBeacons, "writeConnectedMinor", null);
-    EstimoteBeacons = __decorate$36([
-        Plugin({
-            plugin: 'cordova-plugin-estimote',
-            pluginRef: 'estimote.beacons',
-            repo: 'https://github.com/evothings/phonegap-estimotebeacons',
-            platforms: ['iOS', 'Android']
-        })
-    ], EstimoteBeacons);
-    return EstimoteBeacons;
-}());
-
-var __decorate$37 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Facebook = (function () {
-    function Facebook() {
-    }
-    /**
-     * Browser wrapper
-     * @param {number} appId Your Facebook AppID from their dashboard
-     * @param {string} version The version of API you may want to use. Optional
-     */
-    Facebook.browserInit = function (appId, version) {
-        return;
-    };
-    /**
-     * Login to Facebook to authenticate this app.
-     *
-     * ```typescript
-     * {
-     *   status: "connected",
-     *   authResponse: {
-     *     session_key: true,
-     *     accessToken: "kgkh3g42kh4g23kh4g2kh34g2kg4k2h4gkh3g4k2h4gk23h4gk2h34gk234gk2h34AndSoOn",
-     *     expiresIn: 5183979,
-     *     sig: "...",
-     *     secret: "...",
-     *     userID: "634565435"
-     *   }
-     * }
-     * ```
-     *
-     * @param {string[]}  permissions List of [permissions](https://developers.facebook.com/docs/facebook-login/permissions) this app has upon logging in.
-     * @return {Promise<FacebookLoginResponse>} Returns a Promise that resolves with a status object if login succeeds, and rejects if login fails.
-     */
-    Facebook.login = function (permissions) { return; };
-    /**
-     * Logout of Facebook.
-     *
-     * For more info see the [Facebook docs](https://developers.facebook.com/docs/reference/javascript/FB.logout)
-     * @return Returns a Promise that resolves on a successful logout, and rejects if logout fails.
-     */
-    Facebook.logout = function () { return; };
-    /**
-     * Determine if a user is logged in to Facebook and has authenticated your app.  There are three possible states for a user:
-     *
-     * 1) the user is logged into Facebook and has authenticated your application (connected)
-     * 2) the user is logged into Facebook but has not authenticated your application (not_authorized)
-     * 3) the user is either not logged into Facebook or explicitly logged out of your application so it doesn't attempt to connect to Facebook and thus, we don't know if they've authenticated your application or not (unknown)
-     *
-     * Resolves with a response like:
-     *
-     * ```
-     * {
-     *   authResponse: {
-     *     userID: "12345678912345",
-     *     accessToken: "kgkh3g42kh4g23kh4g2kh34g2kg4k2h4gkh3g4k2h4gk23h4gk2h34gk234gk2h34AndSoOn",
-     *     session_Key: true,
-     *     expiresIn: "5183738",
-     *     sig: "..."
-     *   },
-     *   status: "connected"
-     * }
-     * ```
-     *
-     * For more information see the [Facebook docs](https://developers.facebook.com/docs/reference/javascript/FB.getLoginStatus)
-     *
-     * @return Returns a Promise that resolves with a status, or rejects with an error
-     */
-    Facebook.getLoginStatus = function () { return; };
-    /**
-     * Get a Facebook access token for using Facebook services.
-     *
-     * @return Returns a Promise that resolves with an access token, or rejects with an error
-     */
-    Facebook.getAccessToken = function () { return; };
-    /**
-     * Show one of various Facebook dialogs. Example of options for a Share dialog:
-     *
-     * ```
-     * {
-     *   method: "share",
-     *   href: "http://example.com",
-     *   caption: "Such caption, very feed.",
-     *   description: "Much description",
-     *   picture: 'http://example.com/image.png'
-     * }
-     * ```
-     *
-     * For more options see the [Cordova plugin docs](https://github.com/jeduan/cordova-plugin-facebook4#show-a-dialog) and the [Facebook docs](https://developers.facebook.com/docs/javascript/reference/FB.ui)
-     * @options {Object}  options The dialog options
-     * @return Returns a Promise that resolves with success data, or rejects with an error
-     */
-    Facebook.showDialog = function (options) { return; };
-    /**
-     * Make a call to Facebook Graph API. Can take additional permissions beyond those granted on login.
-     *
-     * For more information see:
-     *
-     *  Calling the Graph API - https://developers.facebook.com/docs/javascript/reference/FB.api
-     *  Graph Explorer - https://developers.facebook.com/tools/explorer
-     *  Graph API - https://developers.facebook.com/docs/graph-api
-     *
-     * @param {string}  requestPath Graph API endpoint you want to call
-     * @param {string[]}  permissions List of [permissions](https://developers.facebook.com/docs/facebook-login/permissions) for this request.
-     * @return Returns a Promise that resolves with the result of the request, or rejects with an error
-     */
-    Facebook.api = function (requestPath, permissions) { return; };
-    /**
-     * Log an event.  For more information see the Events section above.
-     *
-     * @param {string}  name Name of the event
-     * @param {Object}  [params] An object containing extra data to log with the event
-     * @param {number}  [valueToSum] any value to be added to added to a sum on each event
-     * @return
-     */
-    Facebook.logEvent = function (name, params, valueToSum) { return; };
-    /**
-     * Log a purchase. For more information see the Events section above.
-     *
-     * @param {number}  value Value of the purchase.
-     * @param {string}  currency The currency, as an [ISO 4217 currency code](http://en.wikipedia.org/wiki/ISO_4217)
-     * @return Returns a Promise
-     */
-    Facebook.logPurchase = function (value, currency) { return; };
-    /**
-     * Open App Invite dialog. Does not require login.
-     *
-     * For more information see:
-     *
-     *   the App Invites Overview - https://developers.facebook.com/docs/app-invites/overview
-     *   the App Links docs - https://developers.facebook.com/docs/applinks
-     *
-     *
-     * @param {Object}  options An object containing an [App Link](https://developers.facebook.com/docs/applinks) URL to your app and an optional image URL.
-     *   url: [App Link](https://developers.facebook.com/docs/applinks) to your app
-     *   picture: image to be displayed in the App Invite dialog
-     *
-     * @return Returns a Promise that resolves with the result data, or rejects with an error
-     */
-    Facebook.appInvite = function (options) { return; };
-    __decorate$37([
-        Cordova()
-    ], Facebook, "browserInit", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "login", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "logout", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "getLoginStatus", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "getAccessToken", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "showDialog", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "api", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "logEvent", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "logPurchase", null);
-    __decorate$37([
-        Cordova()
-    ], Facebook, "appInvite", null);
-    Facebook = __decorate$37([
-        Plugin({
-            plugin: 'cordova-plugin-facebook4',
-            pluginRef: 'facebookConnectPlugin',
-            repo: 'https://github.com/jeduan/cordova-plugin-facebook4',
-            install: 'ionic plugin add cordova-plugin-facebook4 --variable APP_ID="123456789" --variable APP_NAME="myApplication"'
-        })
-    ], Facebook);
-    return Facebook;
-}());
-
-var __decorate$38 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var File = (function () {
-    function File() {
-    }
-    File.getFreeDiskSpace = function () {
-        return;
-    };
-    /**
-     * Check if a directory exists in a certain path, directory.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} dir Name of directory to check
-     * @return {Promise<boolean|FileError>} Returns a Promise that resolves to true if the directory exists or rejects with an error.
-     */
-    File.checkDir = function (path, dir) {
-        if ((/^\//.test(dir))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
-        }
-        var fullpath = path + dir;
-        return File.resolveDirectoryUrl(fullpath)
-            .then(function () {
-            return true;
-        });
-    };
-    /**
-     * Creates a new directory in the specific path.
-     * The replace boolean value determines whether to replace an existing directory with the same name.
-     * If an existing directory exists and the replace value is false, the promise will fail and return an error.
-     *
-     * @param {string} path  Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} dirName Name of directory to create
-     * @param {boolean} replace If true, replaces file with same name. If false returns error
-     * @return {Promise<DirectoryEntry|FileError>} Returns a Promise that resolves with a DirectoryEntry or rejects with an error.
-     */
-    File.createDir = function (path, dirName, replace) {
-        if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
-        }
-        var options = {
-            create: true
-        };
-        if (!replace) {
-            options.exclusive = true;
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, options);
-        });
-    };
-    /**
-     * Remove a directory at a given path.
-     *
-     * @param {string} path The path to the directory
-     * @param {string} dirName The directory name
-     * @return {Promise<RemoveResult|FileError>} Returns a Promise that resolves to a RemoveResult or rejects with an error.
-     */
-    File.removeDir = function (path, dirName) {
-        if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (de) {
-            return File.remove(de);
-        });
-    };
-    /**
-     * Move a directory to a given path.
-     *
-     * @param {string} path The source path to the directory
-     * @param {string} dirName The source directory name
-     * @param {string} newPath The destionation path to the directory
-     * @param {string} newDirName The destination directory name
-     * @return {Promise<DirectoryEntry|Entry|FileError>} Returns a Promise that resolves to the new DirectoryEntry object or rejects with an error.
-     */
-    File.moveDir = function (path, dirName, newPath, newDirName) {
-        var _this = this;
-        newDirName = newDirName || dirName;
-        if ((/^\//.test(newDirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
-        }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (srcde) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.move(srcde, deste, newDirName);
-            });
-        });
-    };
-    /**
-     * Copy a directory in various methods. If destination directory exists, will fail to copy.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} dirName Name of directory to copy
-     * @param {string} newPath Base FileSystem of new location
-     * @param {string} newDirName New name of directory to copy to (leave blank to remain the same)
-     * @return {Promise<Entry|FileError>} Returns a Promise that resolves to the new Entry object or rejects with an error.
-     */
-    File.copyDir = function (path, dirName, newPath, newDirName) {
-        var _this = this;
-        if ((/^\//.test(newDirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
-        }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (srcde) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.copy(srcde, deste, newDirName);
-            });
-        });
-    };
-    /**
-     * List files and directory from a given path.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} dirName Name of directory
-     * @return {Promise<Entry[]>} Returns a Promise that resolves to an array of Entry objects or rejects with an error.
-     */
-    File.listDir = function (path, dirName) {
-        if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, { create: false, exclusive: false });
-        })
-            .then(function (de) {
-            var reader = de.createReader();
-            return File.readEntries(reader);
-        });
-    };
-    /**
-     * Removes all files and the directory from a desired location.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} dirName Name of directory
-     * @return {Promise<RemoveResult>} Returns a Promise that resolves with a RemoveResult or rejects with an error.
-     */
-    File.removeRecursively = function (path, dirName) {
-        if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (de) {
-            return File.rimraf(de);
-        });
-    };
-    /**
-     * Check if a file exists in a certain path, directory.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file to check
-     * @return {Promise<boolean|FileError>} Returns a Promise that resolves with a boolean or rejects with an error.
-     */
-    File.checkFile = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveLocalFilesystemUrl(path + file)
-            .then(function (fse) {
-            if (fse.isFile) {
-                return true;
-            }
-            else {
-                var err = new FileError(13);
-                err.message = 'input is not a file';
-                return Promise.reject(err);
-            }
-        });
-    };
-    /**
-     * Creates a new file in the specific path.
-     * The replace boolean value determines whether to replace an existing file with the same name.
-     * If an existing file exists and the replace value is false, the promise will fail and return an error.
-     *
-     * @param {string} path  Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName Name of file to create
-     * @param {boolean} replace If true, replaces file with same name. If false returns error
-     * @return {Promise<FileEntry|FileError>} Returns a Promise that resolves to a FileEntry or rejects with an error.
-     */
-    File.createFile = function (path, fileName, replace) {
-        if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        var options = {
-            create: true
-        };
-        if (!replace) {
-            options.exclusive = true;
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, options);
-        });
-    };
-    /**
-     * Removes a file from a desired location.
-     *
-     * @param {string} path  Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName Name of file to remove
-     * @return {Promise<RemoveResult|FileError>} Returns a Promise that resolves to a RemoveResult or rejects with an error.
-     */
-    File.removeFile = function (path, fileName) {
-        if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, { create: false });
-        })
-            .then(function (fe) {
-            return File.remove(fe);
-        });
-    };
-    /** Write a new file to the desired location.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName path relative to base path
-     * @param {string | Blob} text content or blob to write
-     * @param {boolean | WriteOptions} replaceOrOptions replace file if set to true. See WriteOptions for more information.
-     * @returns {Promise<void>} Returns a Promise that resolves or rejects with an error.
-     */
-    File.writeFile = function (path, fileName, text, replaceOrOptions) {
-        if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        var opts = {};
-        if (replaceOrOptions) {
-            if (typeof (replaceOrOptions) === 'boolean') {
-                opts.replace = replaceOrOptions;
-            }
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, opts);
-        })
-            .then(function (fe) {
-            return File.createWriter(fe);
-        })
-            .then(function (writer) {
-            if (opts.append) {
-                writer.seek(writer.length);
-            }
-            if (opts.hasOwnProperty('truncate')) {
-                writer.truncate(opts.truncate);
-            }
-            return File.write(writer, text);
-        });
-    };
-    /** Write to an existing file.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName path relative to base path
-     * @param {string | Blob} text content or blob to write
-     * @returns {Promise<void>} Returns a Promise that resolves or rejects with an error.
-     */
-    File.writeExistingFile = function (path, fileName, text) {
-        if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, { create: false });
-        })
-            .then(function (fe) {
-            return File.createWriter(fe);
-        })
-            .then(function (writer) {
-            return File.write(writer, text);
-        });
-    };
-    /**
-     * Read the contents of a file as text.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<string|FileError>} Returns a Promise that resolves with the contents of the file as string or rejects with an error.
-     */
-    File.readAsText = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsText(file);
-                }, function (error) {
-                    reject(error);
-                });
-            });
-        });
-    };
-    /**
-     * Read file and return data as a base64 encoded data url.
-     * A data url is of the form:
-     *      data:[<mediatype>][;base64],<data>
-  
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<string|FileError>} Returns a Promise that resolves with the contents of the file as data URL or rejects with an error.
-     */
-    File.readAsDataURL = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsDataURL(file);
-                }, function (error) {
-                    reject(error);
-                });
-            });
-        });
-    };
-    /**
-     * Read file and return data as a binary data.
-  
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<string|FileError>} Returns a Promise that resolves with the contents of the file as string rejects with an error.
-     */
-    File.readAsBinaryString = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsBinaryString(file);
-                }, function (error) {
-                    reject(error);
-                });
-            });
-        });
-    };
-    /**
-     * Read file and return data as an ArrayBuffer.
-  
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<ArrayBuffer|FileError>} Returns a Promise that resolves with the contents of the file as ArrayBuffer or rejects with an error.
-     */
-    File.readAsArrayBuffer = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsArrayBuffer(file);
-                }, function (error) {
-                    reject(error);
-                });
-            });
-        });
-    };
-    /**
-     * Move a file to a given path.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName Name of file to move
-     * @param {string} newPath Base FileSystem of new location
-     * @param {string} newFileName New name of file to move to (leave blank to remain the same)
-     * @return {Promise<Entry|FileError>} Returns a Promise that resolves to the new Entry or rejects with an error.
-     */
-    File.moveFile = function (path, fileName, newPath, newFileName) {
-        var _this = this;
-        newFileName = newFileName || fileName;
-        if ((/^\//.test(newFileName))) {
-            var err = new FileError(5);
-            err.message = 'file name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getFile(fse, fileName, { create: false });
-        })
-            .then(function (srcfe) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.move(srcfe, deste, newFileName);
-            });
-        });
-    };
-    /**
-     * Copy a file in various methods. If file exists, will fail to copy.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName Name of file to copy
-     * @param {string} newPath Base FileSystem of new location
-     * @param {string} newFileName New name of file to copy to (leave blank to remain the same)
-     * @return {Promise<Entry|FileError>} Returns a Promise that resolves to an Entry or rejects with an error.
-     */
-    File.copyFile = function (path, fileName, newPath, newFileName) {
-        var _this = this;
-        newFileName = newFileName || fileName;
-        if ((/^\//.test(newFileName))) {
-            var err = new FileError(5);
-            err.message = 'file name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getFile(fse, fileName, { create: false });
-        })
-            .then(function (srcfe) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.copy(srcfe, deste, newFileName);
-            });
-        });
-    };
-    // these private methods help avoid cascading error handling
-    // in the public ones, primarily simply wrapping callback
-    // operations to return Promises that can then be chained.
-    /**
-     * @private
-     */
-    File.fillErrorMessage = function (err) {
-        err.message = File.cordovaFileError[err.code];
-    };
-    /**
-     * @private
-     */
-    File.resolveLocalFilesystemUrl = function (furl) {
-        return new Promise(function (resolve, reject) {
-            try {
-                window.resolveLocalFileSystemURL(furl, function (entry) {
-                    resolve(entry);
-                }, function (err) {
-                    File.fillErrorMessage(err);
-                    reject(err);
-                });
-            }
-            catch (xc) {
-                File.fillErrorMessage(xc);
-                reject(xc);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.resolveDirectoryUrl = function (durl) {
-        return File.resolveLocalFilesystemUrl(durl)
-            .then(function (de) {
-            if (de.isDirectory) {
-                return de;
-            }
-            else {
-                var err = new FileError(13);
-                err.message = 'input is not a directory';
-                return Promise.reject(err);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.getDirectory = function (fse, dn, flags) {
-        return new Promise(function (resolve, reject) {
-            try {
-                fse.getDirectory(dn, flags, function (de) {
-                    resolve(de);
-                }, function (err) {
-                    File.fillErrorMessage(err);
-                    reject(err);
-                });
-            }
-            catch (xc) {
-                File.fillErrorMessage(xc);
-                reject(xc);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.getFile = function (fse, fn, flags) {
-        return new Promise(function (resolve, reject) {
-            try {
-                fse.getFile(fn, flags, function (fe) {
-                    resolve(fe);
-                }, function (err) {
-                    File.fillErrorMessage(err);
-                    reject(err);
-                });
-            }
-            catch (xc) {
-                File.fillErrorMessage(xc);
-                reject(xc);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.remove = function (fe) {
-        return new Promise(function (resolve, reject) {
-            fe.remove(function () {
-                resolve({ success: true, fileRemoved: fe });
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.move = function (srce, destdir, newName) {
-        return new Promise(function (resolve, reject) {
-            srce.moveTo(destdir, newName, function (deste) {
-                resolve(deste);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.copy = function (srce, destdir, newName) {
-        return new Promise(function (resolve, reject) {
-            srce.copyTo(destdir, newName, function (deste) {
-                resolve(deste);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.readEntries = function (dr) {
-        return new Promise(function (resolve, reject) {
-            dr.readEntries(function (entries) {
-                resolve(entries);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.rimraf = function (de) {
-        return new Promise(function (resolve, reject) {
-            de.removeRecursively(function () {
-                resolve({ success: true, fileRemoved: de });
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.createWriter = function (fe) {
-        return new Promise(function (resolve, reject) {
-            fe.createWriter(function (writer) {
-                resolve(writer);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.write = function (writer, gu) {
-        if (gu instanceof Blob) {
-            return this.writeFileInChunks(writer, gu);
-        }
-        return new Promise(function (resolve, reject) {
-            writer.onwriteend = function (evt) {
-                if (writer.error) {
-                    reject(writer.error);
-                }
-                else {
-                    resolve();
-                }
-            };
-            writer.write(gu);
-        });
-    };
-    /**
-     * @private
-     */
-    File.writeFileInChunks = function (writer, file) {
-        var BLOCK_SIZE = 1024 * 1024;
-        var writtenSize = 0;
-        function writeNextChunk() {
-            var size = Math.min(BLOCK_SIZE, file.size - writtenSize);
-            var chunk = file.slice(writtenSize, writtenSize + size);
-            writtenSize += size;
-            writer.write(chunk);
-        }
-        return new Promise(function (resolve, reject) {
-            writer.onerror = reject;
-            writer.onwrite = function () {
-                if (writtenSize < file.size) {
-                    writeNextChunk();
-                }
-                else {
-                    resolve();
-                }
-            };
-            writeNextChunk();
-        });
-    };
-    File.cordovaFileError = {
-        1: 'NOT_FOUND_ERR',
-        2: 'SECURITY_ERR',
-        3: 'ABORT_ERR',
-        4: 'NOT_READABLE_ERR',
-        5: 'ENCODING_ERR',
-        6: 'NO_MODIFICATION_ALLOWED_ERR',
-        7: 'INVALID_STATE_ERR',
-        8: 'SYNTAX_ERR',
-        9: 'INVALID_MODIFICATION_ERR',
-        10: 'QUOTA_EXCEEDED_ERR',
-        11: 'TYPE_MISMATCH_ERR',
-        12: 'PATH_EXISTS_ERR',
-        13: 'WRONG_ENTRY_TYPE',
-        14: 'DIR_READ_ERR',
-    };
-    __decorate$38([
-        Cordova()
-    ], File, "getFreeDiskSpace", null);
-    File = __decorate$38([
-        Plugin({
-            plugin: 'cordova-plugin-file',
-            pluginRef: 'cordova.file',
-            repo: 'https://github.com/apache/cordova-plugin-file'
-        })
-    ], File);
-    return File;
-}());
-
-var __decorate$39 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var FileChooser = (function () {
-    function FileChooser() {
-    }
-    /**
-     * Open a file
-     */
-    FileChooser.open = function () { return; };
-    __decorate$39([
-        Cordova()
-    ], FileChooser, "open", null);
-    FileChooser = __decorate$39([
-        Plugin({
-            plugin: 'http://github.com/don/cordova-filechooser.git',
-            pluginRef: 'fileChooser',
-            repo: 'https://github.com/don/cordova-filechooser',
-            platforms: ['Android']
-        })
-    ], FileChooser);
-    return FileChooser;
-}());
-
-var __decorate$40 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var FileOpener = (function () {
-    function FileOpener() {
-    }
-    /**
-     * Open an file
-     * @param filePath {string} File Path
-     * @param fileMIMEType {string} File MIME Type
-     */
-    FileOpener.open = function (filePath, fileMIMEType) { return; };
-    /**
-     * Uninstalls a package
-     * @param packageId {string}  Package ID
-     */
-    FileOpener.uninstall = function (packageId) { return; };
-    /**
-     * Check if an app is already installed
-     * @param packageId {string} Package ID
-     */
-    FileOpener.appIsInstalled = function (packageId) { return; };
-    __decorate$40([
-        Cordova({
-            callbackStyle: 'object',
-            successName: 'success',
-            errorName: 'error'
-        })
-    ], FileOpener, "open", null);
-    __decorate$40([
-        Cordova({
-            callbackStyle: 'object',
-            successName: 'success',
-            errorName: 'error'
-        })
-    ], FileOpener, "uninstall", null);
-    __decorate$40([
-        Cordova({
-            callbackStyle: 'object',
-            successName: 'success',
-            errorName: 'error'
-        })
-    ], FileOpener, "appIsInstalled", null);
-    FileOpener = __decorate$40([
-        Plugin({
-            plugin: 'cordova-plugin-file-opener2',
-            pluginRef: 'cordova.plugins.fileOpener2',
-            repo: 'https://github.com/pwlin/cordova-plugin-file-opener2'
-        })
-    ], FileOpener);
-    return FileOpener;
-}());
-
-var __decorate$41 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Transfer = (function () {
-    function Transfer() {
-        this._objectInstance = new FileTransfer();
-    }
-    /**
-     * Sends a file to a server.
-     *
-     * @param {string} fileUrl  Filesystem URL representing the file on the device or a data URI. For backwards compatibility, this can also be the full path of the file on the device.
-     * @param {string} url  URL of the server to receive the file, as encoded by encodeURI().
-     * @param {FileUploadOptions} options  Optional parameters.
-     * @param {boolean} trustAllHosts  Optional parameter, defaults to false. If set to true, it accepts all security certificates. This is useful since Android rejects self-signed security certificates. Not recommended for production use. Supported on Android and iOS.
-     * @return Returns a Promise that resolves to a FileUploadResult and rejects with FileTransferError.
-     */
-    Transfer.prototype.upload = function (fileUrl, url, options, trustAllHosts) {
-        return;
-    };
-    /**
-     * Downloads a file from server.
-     *
-     * @param {string} source  URL of the server to download the file, as encoded by encodeURI().
-     * @param {stirng} target  Filesystem url representing the file on the device. For backwards compatibility, this can also be the full path of the file on the device.
-     * @param {boolean} trustAllHosts  Optional parameter, defaults to false. If set to true, it accepts all security certificates. This is useful because Android rejects self-signed security certificates. Not recommended for production use. Supported on Android and iOS.
-     * @param {object} Optional parameters, currently only supports headers (such as Authorization (Basic Authentication), etc).
-     * @return Returns a Promise that resolves to a FileEntry object.
-     */
-    Transfer.prototype.download = function (source, target, trustAllHosts, options) {
-        return;
-    };
-    /**
-     * Registers a listener that gets called whenever a new chunk of data is transferred.
-     * @param {function} Listener that takes a progress event.
-     */
-    Transfer.prototype.onProgress = function (listener) {
-        this._objectInstance.onprogress = listener;
-    };
-    /**
-     * Aborts an in-progress transfer. The onerror callback is passed a FileTransferError
-     * object which has an error code of FileTransferError.ABORT_ERR.
-     */
-    Transfer.prototype.abort = function () { };
-    /**
-     * Error code rejected from upload with FileTransferError
-     * Defined in FileTransferError.
-     *      FILE_NOT_FOUND_ERR: 1   Return when file was not found
-     *      INVALID_URL_ERR: 2,     Return when url was invalid
-     *      CONNECTION_ERR: 3,      Return on connection error
-     *      ABORT_ERR: 4,           Return on aborting
-     *      NOT_MODIFIED_ERR: 5     Return on "304 Not Modified" HTTP response
-     * @enum {number}
-     */
-    Transfer.FileTransferErrorCode = {
-        FILE_NOT_FOUND_ERR: 1,
-        INVALID_URL_ERR: 2,
-        CONNECTION_ERR: 3,
-        ABORT_ERR: 4,
-        NOT_MODIFIED_ERR: 5
-    };
-    __decorate$41([
-        CordovaInstance({
-            successIndex: 2,
-            errorIndex: 3
-        })
-    ], Transfer.prototype, "upload", null);
-    __decorate$41([
-        CordovaInstance({
-            successIndex: 2,
-            errorIndex: 3
-        })
-    ], Transfer.prototype, "download", null);
-    __decorate$41([
-        CordovaInstance({
-            sync: true
-        })
-    ], Transfer.prototype, "abort", null);
-    Transfer = __decorate$41([
-        Plugin({
-            plugin: 'cordova-plugin-file-transfer',
-            pluginRef: 'FileTransfer',
-            repo: 'https://github.com/apache/cordova-plugin-file-transfer'
-        })
-    ], Transfer);
-    return Transfer;
-}());
-
-var __decorate$42 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Flashlight = (function () {
-    function Flashlight() {
-    }
-    /**
-     * Checks if the flashlight is available
-     * @returns {Promise<boolean>} Returns a promise that resolves with a boolean stating if the flashlight is available.
-     */
-    Flashlight.available = function () { return; };
-    /**
-     * Switches the flashlight on
-     * @returns {Promise<boolean>}
-     */
-    Flashlight.switchOn = function () { return; };
-    /**
-     * Switches the flashlight off
-     * @returns {Promise<boolean>}
-     */
-    Flashlight.switchOff = function () { return; };
-    /**
-     * Toggles the flashlight
-     * @returns {Promise<any>}
-     */
-    Flashlight.toggle = function () { return; };
-    /**
-     * Checks if the flashlight is turned on.
-     * @returns {boolean}
-     */
-    Flashlight.isSwitchedOn = function () { return; };
-    __decorate$42([
-        Cordova()
-    ], Flashlight, "available", null);
-    __decorate$42([
-        Cordova()
-    ], Flashlight, "switchOn", null);
-    __decorate$42([
-        Cordova()
-    ], Flashlight, "switchOff", null);
-    __decorate$42([
-        Cordova()
-    ], Flashlight, "toggle", null);
-    __decorate$42([
-        Cordova({
-            sync: true
-        })
-    ], Flashlight, "isSwitchedOn", null);
-    Flashlight = __decorate$42([
-        Plugin({
-            plugin: 'cordova-plugin-flashlight',
-            pluginRef: 'window.plugins.flashlight',
-            repo: 'https://github.com/EddyVerbruggen/Flashlight-PhoneGap-Plugin.git'
-        })
-    ], Flashlight);
-    return Flashlight;
-}());
-
-var __decorate$43 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Geofence = (function () {
-    function Geofence() {
-    }
-    /**
-     * Initializes the plugin. User will be prompted to allow the app to use location and notifications.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.initialize = function () { return; };
-    
-    /**
-     * Adds a new geofence or array of geofences. For geofence object, see above.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.addOrUpdate = function (geofences) { return; };
-    
-    /**
-     * Removes a geofence or array of geofences. `geofenceID` corresponds to one or more IDs specified when the
-     * geofence was created.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.remove = function (geofenceId) { return; };
-    
-    /**
-     * Removes all geofences.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.removeAll = function () { return; };
-    
-    /**
-     * Returns an array of geofences currently being monitored.
-     *
-     * @return {Promise<Array<string>>}
-     */
-    Geofence.getWatched = function () { return; };
-    
-    /**
-     * Called when a geofence is crossed in the direction specified by `TransitType`.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.onTransitionReceived = function () {
-        return new Observable_2(function (observer) {
-            window && window.geofence && (window.geofence.onTransitionReceived = observer.next.bind(observer));
-            return function () { return window.geofence.onTransitionReceived = function () { }; };
-        });
-    };
-    /**
-     * Called when the user clicks a geofence notification. iOS and Android only.
-     *
-     * @return {Promise<Object>}
-     */
-    Geofence.onNotificationClicked = function () {
-        return new Observable_2(function (observer) {
-            window && window.geofence && (window.geofence.onNotificationClicked = observer.next.bind(observer));
-            return function () { return window.geofence.onNotificationClicked = function () { }; };
-        });
-    };
-    Geofence.TransitionType = {
-        ENTER: 1,
-        EXIT: 2,
-        BOTH: 3
-    };
-    __decorate$43([
-        Cordova()
-    ], Geofence, "initialize", null);
-    __decorate$43([
-        Cordova()
-    ], Geofence, "addOrUpdate", null);
-    __decorate$43([
-        Cordova()
-    ], Geofence, "remove", null);
-    __decorate$43([
-        Cordova()
-    ], Geofence, "removeAll", null);
-    __decorate$43([
-        Cordova()
-    ], Geofence, "getWatched", null);
-    Geofence = __decorate$43([
-        Plugin({
-            plugin: 'cordova-plugin-geofence',
-            pluginRef: 'geofence',
-            repo: 'https://github.com/cowbell/cordova-plugin-geofence/',
-            platforms: ['Android', 'iOS', 'Windows Phone 8', 'Windows Phone']
-        })
-    ], Geofence);
-    return Geofence;
-}());
-
-var __decorate$44 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Geolocation = (function () {
-    function Geolocation() {
-    }
-    /**
-     * Get the device's current position.
-     *
-     * @param {GeolocationOptions} options  The [geolocation options](https://developer.mozilla.org/en-US/docs/Web/API/PositionOptions).
-     * @return Returns a Promise that resolves with the [position](https://developer.mozilla.org/en-US/docs/Web/API/Position) of the device, or rejects with an error.
-     */
-    Geolocation.getCurrentPosition = function (options) { return; };
-    /**
-     * Watch the current device's position.  Clear the watch by unsubscribing from
-     * Observable changes.
-     *
-     * ```typescript
-     * var subscription = Geolocation.watchPosition()
-     *                               .filter((p) => p.code === undefined) //Filter Out Errors
-     *                               .subscribe(position => {
-     *   console.log(position.coords.longitude + ' ' + position.coords.latitude);
-     * });
-     *
-     * // To stop notifications
-     * subscription.unsubscribe();
-     * ```
-     *
-     * @param {GeolocationOptions} options  The [geolocation options](https://developer.mozilla.org/en-US/docs/Web/API/PositionOptions).
-     * @return Returns an Observable that notifies with the [position](https://developer.mozilla.org/en-US/docs/Web/API/Position) of the device, or errors.
-     */
-    Geolocation.watchPosition = function (options) {
-        return new Observable_2(function (observer) {
-            var watchId = navigator.geolocation.watchPosition(observer.next.bind(observer), observer.next.bind(observer), options);
-            return function () { return navigator.geolocation.clearWatch(watchId); };
-        });
-    };
-    __decorate$44([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Geolocation, "getCurrentPosition", null);
-    Geolocation = __decorate$44([
-        Plugin({
-            plugin: 'cordova-plugin-geolocation',
-            pluginRef: 'navigator.geolocation',
-            repo: 'https://github.com/apache/cordova-plugin-geolocation'
-        })
-    ], Geolocation);
-    return Geolocation;
-}());
-
-var __decorate$45 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Globalization = (function () {
-    function Globalization() {
-    }
-    /**
-     * Returns the BCP-47 compliant language identifier tag to the successCallback with a properties object as a parameter. That object should have a value property with a String value.
-     * @return {Promise<{value: string}>}
-     */
-    Globalization.getPreferredLanguage = function () { return; };
-    /**
-     * Returns the BCP 47 compliant locale identifier string to the successCallback with a properties object as a parameter.
-     * @return {Promise<{value: string}>}
-     */
-    Globalization.getLocaleName = function () { return; };
-    /**
-     * Converts date to string
-     * @param {Date} date Date you wish to convert
-     * @param options Options for the converted date. Length, selector.
-     * @return {Promise<{value: string}>} Returns a promise when the date has been converted.
-     */
-    Globalization.dateToString = function (date, options) { return; };
-    /**
-     * Parses a date formatted as a string, according to the client's user preferences and calendar using the time zone of the client, and returns the corresponding date object.
-     * @param {string} dateString Date as a string to be converted
-     * @param options Options for the converted date. Length, selector.
-     * @return {Promise<{value: string}>} Returns a promise when the date has been converted.
-     */
-    Globalization.stringToDate = function (dateString, options) { return; };
-    /**
-     * Returns a pattern string to format and parse dates according to the client's user preferences.
-     * @param options Object with the format length and selector
-     * @return {Promise<{value: string}>} Returns a promise.
-     */
-    Globalization.getDatePattern = function (options) { return; };
-    /**
-     * Returns an array of the names of the months or days of the week, depending on the client's user preferences and calendar.
-     * @param options Object with type (narrow or wide) and item (month or days).
-     * @return {Promise<{value: string}>} Returns a promise.
-     */
-    Globalization.getDateNames = function (options) { return; };
-    /**
-     * Indicates whether daylight savings time is in effect for a given date using the client's time zone and calendar.
-     * @param {data} date Date to process
-     * @returns {Promise<dst>} reutrns a promise with the value
-     */
-    Globalization.isDayLightSavingsTime = function (date) { return; };
-    /**
-     * Returns the first day of the week according to the client's user preferences and calendar.
-     * @returns {Promise<value>} reutrns a promise with the value
-     */
-    Globalization.getFirstDayOfWeek = function () { return; };
-    /**
-     * Returns a number formatted as a string according to the client's user preferences.
-     * @param options
-     */
-    Globalization.numberToString = function (options) { return; };
-    /**
-     *
-     * @param {string} stringToConvert String you want to conver to a number
-     * @param options  The type of number you want to return. Can be decimal, percent, or currency.
-     * @returns {Promise} Returns a promise with the value.
-     */
-    Globalization.stringToNumber = function (stringToConvert, options) { return; };
-    /**
-     * Returns a pattern string to format and parse numbers according to the client's user preferences.
-     * @param options Can be decimal, percent, or currency.
-     * @returns {Promise} returns a promise with the value.
-     */
-    Globalization.getNumberPattern = function (options) { return; };
-    /**
-     * Returns a pattern string to format and parse currency values according to the client's user preferences and ISO 4217 currency code.
-     * @param {string} currencyCode Currency Code.A
-     * @returns {Promise} returns a promise with the value
-     */
-    Globalization.getCurrencyPattern = function (currencyCode) { return; };
-    __decorate$45([
-        Cordova()
-    ], Globalization, "getPreferredLanguage", null);
-    __decorate$45([
-        Cordova()
-    ], Globalization, "getLocaleName", null);
-    __decorate$45([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], Globalization, "dateToString", null);
-    __decorate$45([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], Globalization, "stringToDate", null);
-    __decorate$45([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Globalization, "getDatePattern", null);
-    __decorate$45([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Globalization, "getDateNames", null);
-    __decorate$45([
-        Cordova()
-    ], Globalization, "isDayLightSavingsTime", null);
-    __decorate$45([
-        Cordova()
-    ], Globalization, "getFirstDayOfWeek", null);
-    __decorate$45([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], Globalization, "numberToString", null);
-    __decorate$45([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], Globalization, "stringToNumber", null);
-    __decorate$45([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Globalization, "getNumberPattern", null);
-    __decorate$45([
-        Cordova()
-    ], Globalization, "getCurrencyPattern", null);
-    Globalization = __decorate$45([
-        Plugin({
-            plugin: 'cordova-plugin-globalization',
-            pluginRef: 'navigator.globalization',
-            repo: 'https://github.com/apache/cordova-plugin-globalization'
-        })
-    ], Globalization);
-    return Globalization;
-}());
-
-var __decorate$46 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var GooglePlus = (function () {
-    function GooglePlus() {
-    }
-    /**
-     * The login function walks the user through the Google Auth process.
-     * @param options
-     */
-    GooglePlus.login = function (options) { return; };
-    /**
-     * You can call trySilentLogin to check if they're already signed in to the app and sign them in silently if they are.
-     * @param options
-     */
-    GooglePlus.trySilentLogin = function (options) { return; };
-    /**
-     * This will clear the OAuth2 token.
-     */
-    GooglePlus.logout = function () { return; };
-    /**
-     * This will clear the OAuth2 token, forget which account was used to login, and disconnect that account from the app. This will require the user to allow the app access again next time they sign in. Be aware that this effect is not always instantaneous. It can take time to completely disconnect.
-     */
-    GooglePlus.disconnect = function () { return; };
-    __decorate$46([
-        Cordova()
-    ], GooglePlus, "login", null);
-    __decorate$46([
-        Cordova()
-    ], GooglePlus, "trySilentLogin", null);
-    __decorate$46([
-        Cordova()
-    ], GooglePlus, "logout", null);
-    __decorate$46([
-        Cordova()
-    ], GooglePlus, "disconnect", null);
-    GooglePlus = __decorate$46([
-        Plugin({
-            plugin: 'cordova-plugin-googleplus',
-            pluginRef: 'window.plugins.googleplus',
-            repo: 'https://github.com/EddyVerbruggen/cordova-plugin-googleplus',
-            platforms: ['Web', 'Android', 'iOS'],
-            install: 'ionic plugin add cordova-plugin-googleplus --variable REVERSED_CLIENT_ID=myreversedclientid'
-        })
-    ], GooglePlus);
-    return GooglePlus;
-}());
-
-var __decorate$47 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-
-/**
- * @private
- */
-
-/**
- * @name Google Maps
- * @description This plugin uses the native Google Maps SDK
- * @usage
- * ```
- * import { GoogleMap, GoogleMapsEvent } from 'ionic-native';
- *
- * // create a new map using element ID
- * let map = new GoogleMap('elementID');
- *
- * // or create a new map by passing HTMLElement
- * let element: HTMLElement = document.getElementById('elementID');
- *
- * // In Angular 2 or Ionic 2, if we have this element in html: <div #map></div>
- * // then we can use @ViewChild to find the element and pass it to GoogleMaps
- * @ViewChild('map') mapElement;
- * let map = new GoogleMap(mapElement);
- *
- * // listen to MAP_READY event
- * map.one(GoogleMapsEvent.MAP_READY).subscribe(() => console.log('Map is ready!'));
- *
- *
- * // create LatLng object
- * let ionic: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
- *
- * // create CameraPosition
- * let position: CameraPosition = {
- *   target: ionic,
- *   zoom: 18,
- *   tilt: 30
- * };
- *
- * // move the map's camera to position
- * map.moveCamera(position);
- *
- * // create new marker
- * let markerOptions: GoogleMapsMarkerOptions = {
- *   position: ionic,
- *   title: 'Ionic'
- * };
- *
- * map.addMarker(markerOptions)
- *   .then((marker: GoogleMapsMarker) => {
- *     marker.showInfoWindow();
- *   });
- * ```
- */
-var GoogleMap = (function () {
-    function GoogleMap(element, options) {
-        if (typeof element === 'string')
-            element = document.getElementById(element);
-        this._objectInstance = plugin.google.maps.Map.getMap(element, options);
-    }
-    /**
-     * Checks if a map object has been created and is available.
-     *
-     * @return {Promise<boolean>}
-     */
-    GoogleMap.isAvailable = function () {
-        return;
-    };
-    /**
-     * Listen to a map event.
-     *
-     * @return {Observable<any>}
-     */
-    GoogleMap.prototype.on = function (event) {
-        var _this = this;
-        return new Observable_2(function (observer) {
-            _this._objectInstance.on(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.off(event); };
-        });
-    };
-    /**
-     * Listen to a map event only once.
-     *
-     * @return {Promise<any>}
-     */
-    GoogleMap.prototype.one = function (event) {
-        var _this = this;
-        return new Promise(function (resolve) { return _this._objectInstance.one(event, resolve); });
-    };
-    GoogleMap.prototype.setDebuggable = function (isDebuggable) {
-    };
-    GoogleMap.prototype.setClickable = function (isClickable) {
-    };
-    /**
-     * Get the position of the camera.
-     *
-     * @return {Promise<CameraPosition>}
-     */
-    GoogleMap.prototype.getCameraPosition = function () {
-        return;
-    };
-    /**
-     * Get the location of the user.
-     *
-     * @return {Promise<MyLocation>}
-     */
-    GoogleMap.prototype.getMyLocation = function (options) {
-        return;
-    };
-    /**
-     * Get the visible region.
-     *
-     * @return {Promise<VisibleRegion>}
-     */
-    GoogleMap.prototype.getVisibleRegion = function () {
-        return;
-    };
-    GoogleMap.prototype.showDialog = function () {
-    };
-    GoogleMap.prototype.closeDialog = function () {
-    };
-    GoogleMap.prototype.getLicenseInfo = function () {
-        return;
-    };
-    GoogleMap.prototype.setCenter = function (latLng) {
-    };
-    GoogleMap.prototype.setZoom = function (zoomLevel) {
-    };
-    GoogleMap.prototype.setMapTypeId = function (typeId) {
-    };
-    GoogleMap.prototype.setTilt = function (tiltLevel) {
-    };
-    GoogleMap.prototype.animateCamera = function (animateCameraOptions) { return; };
-    GoogleMap.prototype.moveCamera = function (cameraPosition) { return; };
-    GoogleMap.prototype.setMyLocationEnabled = function (enabled) {
-    };
-    GoogleMap.prototype.setIndoorEnabled = function (enabled) {
-    };
-    GoogleMap.prototype.setTrafficEnabled = function (enabled) {
-    };
-    GoogleMap.prototype.setCompassEnabled = function (enabled) {
-    };
-    GoogleMap.prototype.setAllGesturesEnabled = function (enabled) {
-    };
-    GoogleMap.prototype.addMarker = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this._objectInstance.addMarker(options, function (marker) {
-                if (marker) {
-                    resolve(new GoogleMapsMarker(marker));
-                }
-                else {
-                    reject();
-                }
-            });
-        });
-    };
-    GoogleMap.prototype.addCircle = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this._objectInstance.addCircle(options, function (circle) {
-                if (circle) {
-                    resolve(new GoogleMapsCircle(circle));
-                }
-                else {
-                    reject();
-                }
-            });
-        });
-    };
-    GoogleMap.prototype.addPolygon = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this._objectInstance.addPolygon(options, function (polygon) {
-                if (polygon) {
-                    resolve(new GoogleMapsPolygon(polygon));
-                }
-                else {
-                    reject();
-                }
-            });
-        });
-    };
-    GoogleMap.prototype.addPolyline = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this._objectInstance.addPolyline(options, function (polyline) {
-                if (polyline) {
-                    resolve(new GoogleMapsPolyline(polyline));
-                }
-                else {
-                    reject();
-                }
-            });
-        });
-    };
-    GoogleMap.prototype.addTileOverlay = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this._objectInstance.addTileOverlay(options, function (tileOverlay) {
-                if (tileOverlay) {
-                    resolve(new GoogleMapsTileOverlay(tileOverlay));
-                }
-                else {
-                    reject();
-                }
-            });
-        });
-    };
-    GoogleMap.prototype.addGroundOverlay = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this._objectInstance.addGroundOverlay(options, function (groundOverlay) {
-                if (groundOverlay) {
-                    resolve(new GoogleMapsGroundOverlay(groundOverlay));
-                }
-                else {
-                    reject();
-                }
-            });
-        });
-    };
-    GoogleMap.prototype.addKmlOverlay = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this._objectInstance.addKmlOverlay(options, function (kmlOverlay) {
-                if (kmlOverlay) {
-                    resolve(new GoogleMapsKmlOverlay(kmlOverlay));
-                }
-                else {
-                    reject();
-                }
-            });
-        });
-    };
-    GoogleMap.prototype.setDiv = function (domNode) {
-    };
-    GoogleMap.prototype.setVisible = function (visible) {
-    };
-    GoogleMap.prototype.setOptions = function (options) {
-    };
-    GoogleMap.prototype.setBackgroundColor = function (backgroundColor) {
-    };
-    GoogleMap.prototype.setPadding = function (top, right, bottom, left) {
-    };
-    GoogleMap.prototype.clear = function () {
-    };
-    GoogleMap.prototype.refreshLayout = function () {
-    };
-    GoogleMap.prototype.fromLatLngToPoint = function (latLng, point) {
-        return;
-    };
-    GoogleMap.prototype.fromPointToLatLng = function (point, latLng) {
-        return;
-    };
-    GoogleMap.prototype.toDataURL = function () {
-        return;
-    };
-    GoogleMap.prototype.remove = function () {
-    };
-    GoogleMap.prototype.panBy = function () {
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setDebuggable", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setClickable", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "getCameraPosition", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "getMyLocation", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "getVisibleRegion", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "showDialog", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "closeDialog", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "getLicenseInfo", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setCenter", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setZoom", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setMapTypeId", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setTilt", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "animateCamera", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "moveCamera", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setMyLocationEnabled", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setIndoorEnabled", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setTrafficEnabled", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setCompassEnabled", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setAllGesturesEnabled", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setDiv", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setOptions", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setBackgroundColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "setPadding", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "clear", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "refreshLayout", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "fromLatLngToPoint", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "fromPointToLatLng", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMap.prototype, "toDataURL", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "remove", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMap.prototype, "panBy", null);
-    __decorate$47([
-        Cordova()
-    ], GoogleMap, "isAvailable", null);
-    GoogleMap = __decorate$47([
-        Plugin({
-            pluginRef: 'plugin.google.maps.Map',
-            plugin: 'cordova-plugin-googlemaps',
-            repo: 'https://github.com/mapsplugin/cordova-plugin-googlemaps',
-            install: 'ionic plugin add cordova-plugin-googlemaps --variable API_KEY_FOR_ANDROID="YOUR_ANDROID_API_KEY_IS_HERE" --variable API_KEY_FOR_IOS="YOUR_IOS_API_KEY_IS_HERE"'
-        })
-    ], GoogleMap);
-    return GoogleMap;
-}());
-/**
- * @private
- */
-var GoogleMapsMarker = (function () {
-    function GoogleMapsMarker(_objectInstance) {
-        this._objectInstance = _objectInstance;
-    }
-    GoogleMapsMarker.prototype.addEventListener = function (event) {
-        var _this = this;
-        return new Observable_2(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
-        });
-    };
-    GoogleMapsMarker.prototype.isVisible = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.setVisible = function (visible) {
-    };
-    GoogleMapsMarker.prototype.getHashCode = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.remove = function () {
-    };
-    GoogleMapsMarker.prototype.setOpacity = function (alpha) {
-    };
-    GoogleMapsMarker.prototype.getOpacity = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.setZIndex = function () {
-    };
-    GoogleMapsMarker.prototype.setIconAnchor = function (x, y) {
-    };
-    GoogleMapsMarker.prototype.setInfoWindowAnchor = function (x, y) {
-    };
-    GoogleMapsMarker.prototype.setDraggable = function (draggable) {
-    };
-    GoogleMapsMarker.prototype.isDraggable = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.setFlat = function (flat) {
-        return;
-    };
-    GoogleMapsMarker.prototype.setIcon = function (icon) {
-    };
-    GoogleMapsMarker.prototype.setTitle = function (title) {
-    };
-    GoogleMapsMarker.prototype.getTitle = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.setSnippet = function (snippet) {
-    };
-    GoogleMapsMarker.prototype.getSnippet = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.setRotation = function (rotation) {
-    };
-    GoogleMapsMarker.prototype.getRotation = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.showInfoWindow = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.hideInfoWindow = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.setPosition = function (latLng) {
-    };
-    GoogleMapsMarker.prototype.getPosition = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.getMap = function () {
-        return;
-    };
-    GoogleMapsMarker.prototype.setAnimation = function (animation) {
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "isVisible", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMapsMarker.prototype, "setVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "getHashCode", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "remove", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setOpacity", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "getOpacity", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setIconAnchor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setInfoWindowAnchor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setDraggable", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "isDraggable", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setFlat", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setIcon", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setTitle", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "getTitle", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setSnippet", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "getSnippet", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setRotation", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "getRotation", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "showInfoWindow", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "hideInfoWindow", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setPosition", null);
-    __decorate$47([
-        CordovaInstance()
-    ], GoogleMapsMarker.prototype, "getPosition", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "getMap", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsMarker.prototype, "setAnimation", null);
-    return GoogleMapsMarker;
-}());
-/**
- * @private
- */
-var GoogleMapsCircle = (function () {
-    function GoogleMapsCircle(_objectInstance) {
-        this._objectInstance = _objectInstance;
-    }
-    GoogleMapsCircle.prototype.addEventListener = function (event) {
-        var _this = this;
-        return new Observable_2(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
-        });
-    };
-    GoogleMapsCircle.prototype.getCenter = function () {
-        return;
-    };
-    GoogleMapsCircle.prototype.getRadius = function () {
-        return;
-    };
-    GoogleMapsCircle.prototype.getStrokeColor = function () {
-        return;
-    };
-    GoogleMapsCircle.prototype.getVisible = function () {
-        return;
-    };
-    GoogleMapsCircle.prototype.getZIndex = function () {
-        return;
-    };
-    GoogleMapsCircle.prototype.remove = function () {
-    };
-    GoogleMapsCircle.prototype.setCenter = function (latLng) {
-    };
-    GoogleMapsCircle.prototype.setFillColor = function (fillColor) {
-    };
-    GoogleMapsCircle.prototype.setStrokeColor = function (strokeColor) {
-    };
-    GoogleMapsCircle.prototype.setStrokeWidth = function (strokeWidth) {
-    };
-    GoogleMapsCircle.prototype.setVisible = function (visible) {
-    };
-    GoogleMapsCircle.prototype.setZIndex = function (zIndex) {
-    };
-    GoogleMapsCircle.prototype.setRadius = function (radius) {
-    };
-    GoogleMapsCircle.prototype.getMap = function () {
-        return;
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "getCenter", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "getRadius", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "getStrokeColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "getVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "getZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "remove", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "setCenter", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "setFillColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "setStrokeColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "setStrokeWidth", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "setVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "setZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "setRadius", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsCircle.prototype, "getMap", null);
-    return GoogleMapsCircle;
-}());
-/**
- * @private
- */
-var GoogleMapsPolyline = (function () {
-    function GoogleMapsPolyline(_objectInstance) {
-        this._objectInstance = _objectInstance;
-    }
-    GoogleMapsPolyline.prototype.addEventListener = function (event) {
-        var _this = this;
-        return new Observable_2(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
-        });
-    };
-    GoogleMapsPolyline.prototype.getPoints = function () {
-        return;
-    };
-    GoogleMapsPolyline.prototype.getCOlor = function () {
-        return;
-    };
-    GoogleMapsPolyline.prototype.getWidth = function () {
-        return;
-    };
-    GoogleMapsPolyline.prototype.getGeodesic = function () {
-        return;
-    };
-    GoogleMapsPolyline.prototype.getZIndex = function () {
-        return;
-    };
-    GoogleMapsPolyline.prototype.remove = function () {
-    };
-    GoogleMapsPolyline.prototype.setPoints = function (points) {
-    };
-    GoogleMapsPolyline.prototype.setColor = function (color) {
-    };
-    GoogleMapsPolyline.prototype.setWidth = function (width) {
-    };
-    GoogleMapsPolyline.prototype.setVisible = function (visible) {
-    };
-    GoogleMapsPolyline.prototype.setZIndex = function (zIndex) {
-    };
-    GoogleMapsPolyline.prototype.setGeoDesic = function (geoDesic) {
-    };
-    GoogleMapsPolyline.prototype.getMap = function () {
-        return;
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "getPoints", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "getCOlor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "getWidth", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "getGeodesic", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "getZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "remove", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "setPoints", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "setColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "setWidth", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "setVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "setZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "setGeoDesic", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolyline.prototype, "getMap", null);
-    return GoogleMapsPolyline;
-}());
-/**
- * @private
- */
-var GoogleMapsPolygon = (function () {
-    function GoogleMapsPolygon(_objectInstance) {
-        this._objectInstance = _objectInstance;
-    }
-    GoogleMapsPolygon.prototype.addEventListener = function (event) {
-        var _this = this;
-        return new Observable_2(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
-        });
-    };
-    GoogleMapsPolygon.prototype.getPoints = function () {
-        return;
-    };
-    GoogleMapsPolygon.prototype.getStrokeColor = function () {
-        return;
-    };
-    GoogleMapsPolygon.prototype.getFillColor = function () {
-        return;
-    };
-    GoogleMapsPolygon.prototype.getStrokeWidth = function () {
-        return;
-    };
-    GoogleMapsPolygon.prototype.getGeodesic = function () {
-        return;
-    };
-    GoogleMapsPolygon.prototype.getVisible = function () {
-        return;
-    };
-    GoogleMapsPolygon.prototype.getZIndex = function () {
-        return;
-    };
-    GoogleMapsPolygon.prototype.remove = function () {
-    };
-    GoogleMapsPolygon.prototype.setPoints = function (points) {
-    };
-    GoogleMapsPolygon.prototype.setStrokeColor = function (strokeColor) {
-    };
-    GoogleMapsPolygon.prototype.setFillColor = function (fillColor) {
-    };
-    GoogleMapsPolygon.prototype.setStrokeWidth = function (strokeWidth) {
-    };
-    GoogleMapsPolygon.prototype.setVisible = function (visible) {
-    };
-    GoogleMapsPolygon.prototype.setZIndex = function (zIndex) {
-    };
-    GoogleMapsPolygon.prototype.setGeodesic = function (geodesic) {
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "getPoints", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "getStrokeColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "getFillColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "getStrokeWidth", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "getGeodesic", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "getVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "getZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "remove", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "setPoints", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "setStrokeColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "setFillColor", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "setStrokeWidth", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "setVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "setZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsPolygon.prototype, "setGeodesic", null);
-    return GoogleMapsPolygon;
-}());
-/**
- * @private
- */
-var GoogleMapsTileOverlay = (function () {
-    function GoogleMapsTileOverlay(_objectInstance) {
-        this._objectInstance = _objectInstance;
-    }
-    GoogleMapsTileOverlay.prototype.getVisible = function () {
-        return;
-    };
-    GoogleMapsTileOverlay.prototype.setVisible = function (visible) {
-    };
-    GoogleMapsTileOverlay.prototype.getFadeIn = function () {
-        return;
-    };
-    GoogleMapsTileOverlay.prototype.setFadeIn = function (fadeIn) {
-    };
-    GoogleMapsTileOverlay.prototype.getZIndex = function () {
-        return;
-    };
-    GoogleMapsTileOverlay.prototype.setZIndex = function (zIndex) {
-    };
-    GoogleMapsTileOverlay.prototype.getOpacity = function () {
-        return;
-    };
-    GoogleMapsTileOverlay.prototype.setOpacity = function (opacity) {
-    };
-    GoogleMapsTileOverlay.prototype.clearTileCache = function () {
-    };
-    GoogleMapsTileOverlay.prototype.remove = function () {
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "getVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "setVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "getFadeIn", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "setFadeIn", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "getZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "setZIndex", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "getOpacity", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "setOpacity", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "clearTileCache", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsTileOverlay.prototype, "remove", null);
-    return GoogleMapsTileOverlay;
-}());
-/**
- * @private
- */
-var GoogleMapsGroundOverlay = (function () {
-    function GoogleMapsGroundOverlay(_objectInstance) {
-        this._objectInstance = _objectInstance;
-    }
-    GoogleMapsGroundOverlay.prototype.setBearing = function (bearing) {
-    };
-    GoogleMapsGroundOverlay.prototype.getBearing = function () {
-        return;
-    };
-    GoogleMapsGroundOverlay.prototype.setOpacity = function (opacity) {
-    };
-    GoogleMapsGroundOverlay.prototype.getOpacity = function () {
-        return;
-    };
-    GoogleMapsGroundOverlay.prototype.setVisible = function (visible) {
-    };
-    GoogleMapsGroundOverlay.prototype.getVisible = function () {
-        return;
-    };
-    GoogleMapsGroundOverlay.prototype.setImage = function (image) {
-    };
-    
-    GoogleMapsGroundOverlay.prototype.remove = function () {
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "setBearing", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "getBearing", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "setOpacity", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "getOpacity", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "setVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "getVisible", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "setImage", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsGroundOverlay.prototype, "remove", null);
-    return GoogleMapsGroundOverlay;
-}());
-/**
- * @private
- */
-var GoogleMapsKmlOverlay = (function () {
-    function GoogleMapsKmlOverlay(_objectInstance) {
-        this._objectInstance = _objectInstance;
-    }
-    GoogleMapsKmlOverlay.prototype.remove = function () {
-    };
-    GoogleMapsKmlOverlay.prototype.getOverlays = function () {
-        return;
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsKmlOverlay.prototype, "remove", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsKmlOverlay.prototype, "getOverlays", null);
-    return GoogleMapsKmlOverlay;
-}());
-/**
- * @private
- */
-var GoogleMapsLatLngBounds = (function () {
-    function GoogleMapsLatLngBounds(southwestOrArrayOfLatLng, northeast) {
-        this.southwestOrArrayOfLatLng = southwestOrArrayOfLatLng;
-        this.northeast = northeast;
-        var args = !!northeast ? [southwestOrArrayOfLatLng, northeast] : southwestOrArrayOfLatLng;
-        this._objectInstance = new plugin.google.maps.LatLngBounds(args);
-    }
-    GoogleMapsLatLngBounds.prototype.toString = function () {
-        return;
-    };
-    GoogleMapsLatLngBounds.prototype.toUrlValue = function (precision) {
-        return;
-    };
-    GoogleMapsLatLngBounds.prototype.extend = function (LatLng) {
-    };
-    GoogleMapsLatLngBounds.prototype.contains = function (LatLng) {
-        return;
-    };
-    GoogleMapsLatLngBounds.prototype.getCenter = function () {
-        return;
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsLatLngBounds.prototype, "toString", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsLatLngBounds.prototype, "toUrlValue", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsLatLngBounds.prototype, "extend", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsLatLngBounds.prototype, "contains", null);
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsLatLngBounds.prototype, "getCenter", null);
-    return GoogleMapsLatLngBounds;
-}());
-/**
- * @private
- */
-var GoogleMapsLatLng = (function () {
-    function GoogleMapsLatLng(lat, lng) {
-        this.lat = lat;
-        this.lng = lng;
-        this._objectInstance = new plugin.google.maps.LatLng(lat, lng);
-    }
-    GoogleMapsLatLng.prototype.equals = function (other) {
-        return this.lat === other.lat && this.lng === other.lng;
-    };
-    GoogleMapsLatLng.prototype.toString = function () {
-        return;
-    };
-    GoogleMapsLatLng.prototype.toUrlValue = function (precision) {
-        precision = precision || 6;
-        return this.lat.toFixed(precision) + ',' + this.lng.toFixed(precision);
-    };
-    __decorate$47([
-        CordovaInstance({ sync: true })
-    ], GoogleMapsLatLng.prototype, "toString", null);
-    return GoogleMapsLatLng;
-}());
-/**
- * @private
- */
-
-var __decorate$48 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var GoogleAnalytics = (function () {
-    function GoogleAnalytics() {
-    }
-    /**
-     * In your 'deviceready' handler, set up your Analytics tracker.
-     * https://developers.google.com/analytics/devguides/collection/analyticsjs/
-     * @param {string}  id  Your Google Analytics Mobile App property
-     */
-    GoogleAnalytics.startTrackerWithId = function (id) { return; };
-    /**
-     * Track a screen
-     * https://developers.google.com/analytics/devguides/collection/analyticsjs/screens
-     *
-     * @param {string}  title         Screen title
-     * @param {string}  campaignUrl   Campaign url for measuring referrals
-     */
-    GoogleAnalytics.trackView = function (title, campaignUrl) { return; };
-    /**
-     * Track an event
-     * https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-     * @param {string}  category
-     * @param {string}  action
-     * @param {string}  label
-     * @param {number}  value
-     */
-    GoogleAnalytics.trackEvent = function (category, action, label, value) { return; };
-    /**
-     * Track an exception
-     * @param {string}  description
-     * @param {boolean} fatal
-     */
-    GoogleAnalytics.trackException = function (description, fatal) { return; };
-    /**
-     * Track User Timing (App Speed)
-     * @param {string}  category
-     * @param {number}  intervalInMilliseconds
-     * @param {string}  variable
-     * @param {string}  label
-     */
-    GoogleAnalytics.trackTiming = function (category, intervalInMilliseconds, variable, label) { return; };
-    /**
-     * Add a Transaction (Ecommerce)
-     * https://developers.google.com/analytics/devguides/collection/analyticsjs/ecommerce#addTrans
-     * @param {string}  id
-     * @param {string}  affiliation
-     * @param {number}  revenue
-     * @param {number}  tax
-     * @param {number}  shipping
-     * @param {string}  currencyCode
-     */
-    GoogleAnalytics.addTransaction = function (id, affiliation, revenue, tax, shipping, currencyCode) { return; };
-    /**
-     * Add a Transaction Item (Ecommerce)
-     * https://developers.google.com/analytics/devguides/collection/analyticsjs/ecommerce#addItem
-     * @param {string}  id
-     * @param {string}  name
-     * @param {string}  sku
-     * @param {string}  category
-     * @param {number}  price
-     * @param {number}  quantity
-     * @param {string}  currencyCode
-     */
-    GoogleAnalytics.addTransactionItem = function (id, name, sku, category, price, quantity, currencyCode) { return; };
-    /**
-     * Add a Custom Dimension
-     * https://developers.google.com/analytics/devguides/platform/customdimsmets
-     * @param {string}  key
-     * @param {string}  value
-     */
-    GoogleAnalytics.addCustomDimension = function (key, value) { return; };
-    /**
-     * Set a UserId
-     * https://developers.google.com/analytics/devguides/collection/analyticsjs/user-id
-     * @param {string}  id
-     */
-    GoogleAnalytics.setUserId = function (id) { };
-    /**
-     * Sets the app version
-     * @param appVersion
-     */
-    GoogleAnalytics.setAppVersion = function (appVersion) { };
-    /**
-     * Set a anonymize Ip address
-     * @param anonymize
-     */
-    GoogleAnalytics.setAnonymizeIp = function (anonymize) { };
-    /**
-     * Enabling Advertising Features in Google Analytics allows you to take advantage of Remarketing, Demographics & Interests reports, and more
-     * @param allow
-     */
-    GoogleAnalytics.setAllowIDFACollection = function (allow) { };
-    /**
-     * Enable verbose logging
-     */
-    GoogleAnalytics.debugMode = function () { return; };
-    /**
-     * Enable/disable automatic reporting of uncaught exceptions
-     * @param {boolean} shouldEnable
-     */
-    GoogleAnalytics.enableUncaughtExceptionReporting = function (shouldEnable) { return; };
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "startTrackerWithId", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "trackView", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "trackEvent", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "trackException", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "trackTiming", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "addTransaction", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "addTransactionItem", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "addCustomDimension", null);
-    __decorate$48([
-        Cordova({ sync: true })
-    ], GoogleAnalytics, "setUserId", null);
-    __decorate$48([
-        Cordova({ sync: true })
-    ], GoogleAnalytics, "setAppVersion", null);
-    __decorate$48([
-        Cordova({ sync: true })
-    ], GoogleAnalytics, "setAnonymizeIp", null);
-    __decorate$48([
-        Cordova({ sync: true })
-    ], GoogleAnalytics, "setAllowIDFACollection", null);
-    __decorate$48([
-        Cordova({ sync: true })
-    ], GoogleAnalytics, "debugMode", null);
-    __decorate$48([
-        Cordova()
-    ], GoogleAnalytics, "enableUncaughtExceptionReporting", null);
-    GoogleAnalytics = __decorate$48([
-        Plugin({
-            plugin: 'cordova-plugin-google-analytics',
-            pluginRef: 'analytics',
-            repo: 'https://github.com/danwilson/google-analytics-plugin',
-            platforms: ['Android', 'iOS']
-        })
-    ], GoogleAnalytics);
-    return GoogleAnalytics;
-}());
-
-var __decorate$49 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Hotspot = (function () {
-    function Hotspot() {
-    }
-    Hotspot.isAvailable = function () { return; };
-    Hotspot.toggleWifi = function () { return; };
-    /**
-     * Configures and starts hotspot with SSID and Password
-     *
-     * @param {string}    SSID        - SSID of your new Access Point
-     * @param {string}    mode        - encryption mode (Open, WEP, WPA, WPA_PSK)
-     * @param {string}    password    - password for your new Access Point
-     *
-     * @return {Promise<void>}        - Promise to call once hotspot is started, or reject upon failure
-     */
-    Hotspot.createHotspot = function (ssid, mode, password) { return; };
-    /**
-     * Turns on Access Point
-     *
-     * @return {Promise<boolean>} - true if AP is started
-     */
-    Hotspot.startHotspot = function () { return; };
-    /**
-     * Configures hotspot with SSID and Password
-     *
-     * @param {string}    SSID        - SSID of your new Access Point
-     * @param {string}    mode        - encryption mode (Open, WEP, WPA, WPA_PSK)
-     * @param {string}    password    - password for your new Access Point
-     *
-     * @return {Promise<void>}        - Promise to call when hotspot is configured, or reject upon failure
-     */
-    Hotspot.configureHotspot = function (ssid, mode, password) { return; };
-    /**
-     * Turns off Access Point
-     *
-     * @return {Promise<boolean>} - Promise to turn off the hotspot, true on success, false on failure
-     */
-    Hotspot.stopHotspot = function () { return; };
-    /**
-     * Checks if hotspot is enabled
-     *
-     * @return {Promise<void>}    - Promise that hotspot is enabled, rejected if it is not enabled
-     */
-    Hotspot.isHotspotEnabled = function () { return; };
-    Hotspot.getAllHotspotDevices = function () { return; };
-    /**
-     * Connect to a WiFi network
-     *
-     * @param {string}    ssid
-     *      SSID to connect
-     * @param {string}    password
-     *      password to use
-     *
-     * @return {Promise<void>}
-     *      Promise that connection to the WiFi network was successfull, rejected if unsuccessful
-     */
-    Hotspot.connectToWifi = function (ssid, password) { return; };
-    /**
-     * Connect to a WiFi network
-     *
-     * @param {string}   ssid
-     *      SSID to connect
-     * @param {string}   password
-     *      Password to use
-     * @param {string}   authentication
-     *      Authentication modes to use (LEAP, SHARED, OPEN)
-     * @param {string[]} encryption
-     *      Encryption modes to use (CCMP, TKIP, WEP104, WEP40)
-     *
-     * @return {Promise<void>}
-     *      Promise that connection to the WiFi network was successfull, rejected if unsuccessful
-     */
-    Hotspot.connectToWifiAuthEncrypt = function (ssid, password, authentication, encryption) { return; };
-    /**
-     * Add a WiFi network
-     *
-     * @param {string}    ssid
-     *      SSID of network
-     * @param {string}    mode
-     *      Authentication mode of (Open, WEP, WPA, WPA_PSK)
-     * @param {string}    password
-     *      Password for network
-     *
-     * @return {Promise<void>}
-     *      Promise that adding the WiFi network was successfull, rejected if unsuccessful
-     */
-    Hotspot.addWifiNetwork = function (ssid, mode, password) { return; };
-    /**
-     * Remove a WiFi network
-     *
-     * @param {string}    ssid
-     *      SSID of network
-     *
-     * @return {Promise<void>}
-     *      Promise that removing the WiFi network was successfull, rejected if unsuccessful
-     */
-    Hotspot.removeWifiNetwork = function (ssid) { return; };
-    Hotspot.isConnectedToInternet = function () { return; };
-    Hotspot.isConnectedToInternetViaWifi = function () { return; };
-    Hotspot.isWifiOn = function () { return; };
-    Hotspot.isWifiSupported = function () { return; };
-    Hotspot.isWifiDirectSupported = function () { return; };
-    Hotspot.scanWifi = function () { return; };
-    Hotspot.scanWifiByLevel = function () { return; };
-    Hotspot.startWifiPeriodicallyScan = function (interval, duration) { return; };
-    Hotspot.stopWifiPeriodicallyScan = function () { return; };
-    Hotspot.getNetConfig = function () { return; };
-    Hotspot.getConnectionInfo = function () { return; };
-    Hotspot.pingHost = function (ip) { return; };
-    /**
-     * Gets MAC Address associated with IP Address from ARP File
-     *
-     * @param {string}        ip  - IP Address that you want the MAC Address of
-     *
-     * @return {Promise<string>}  - A Promise for the MAC Address
-     */
-    Hotspot.getMacAddressOfHost = function (ip) { return; };
-    /**
-     * Checks if IP is live using DNS
-     *
-     * @param {string}        ip  - IP Address you want to test
-     *
-     * @return {Promise<boolean>} - A Promise for whether the IP Address is reachable
-     */
-    Hotspot.isDnsLive = function (ip) { return; };
-    /**
-     * Checks if IP is live using socket And PORT
-     *
-     * @param {string}        ip  - IP Address you want to test
-     *
-     * @return {Promise<boolean>} - A Promise for whether the IP Address is reachable
-     */
-    Hotspot.isPortLive = function (ip) { return; };
-    /**
-     * Checks if device is rooted
-     *
-     * @return {Promise<boolean>} - A Promise for whether the device is rooted
-     */
-    Hotspot.isRooted = function () { return; };
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isAvailable", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "toggleWifi", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "createHotspot", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "startHotspot", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "configureHotspot", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "stopHotspot", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isHotspotEnabled", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "getAllHotspotDevices", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "connectToWifi", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "connectToWifiAuthEncrypt", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "addWifiNetwork", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "removeWifiNetwork", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isConnectedToInternet", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isConnectedToInternetViaWifi", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isWifiOn", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isWifiSupported", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isWifiDirectSupported", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "scanWifi", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "scanWifiByLevel", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "startWifiPeriodicallyScan", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "stopWifiPeriodicallyScan", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "getNetConfig", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "getConnectionInfo", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "pingHost", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "getMacAddressOfHost", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isDnsLive", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isPortLive", null);
-    __decorate$49([
-        Cordova()
-    ], Hotspot, "isRooted", null);
-    Hotspot = __decorate$49([
-        Plugin({
-            plugin: 'cordova-plugin-hotspot',
-            pluginRef: 'cordova.plugins.hotspot',
-            repo: 'https://github.com/hypery2k/cordova-hotspot-plugin',
-            platforms: ['Android']
-        })
-    ], Hotspot);
-    return Hotspot;
-}());
-
-var __decorate$50 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Httpd = (function () {
-    function Httpd() {
-    }
-    /**
-     * Starts a web server.
-     * @returns {Observable<string>} Returns an Observable. Subscribe to receive the URL for your web server (if succeeded). Unsubscribe to stop the server.
-     * @param options {HttpdOptions}
-     */
-    Httpd.startServer = function (options) { return; };
-    /**
-     * Gets the URL of the running server
-     * @returns {Promise<string>} Returns a promise that resolves with the URL of the web server.
-     */
-    Httpd.getUrl = function () { return; };
-    /**
-     * Get the local path of the running webserver
-     * @returns {Promise<string>} Returns a promise that resolves with the local path of the web server.
-      */
-    Httpd.getLocalPath = function () { return; };
-    __decorate$50([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopServer'
-        })
-    ], Httpd, "startServer", null);
-    __decorate$50([
-        Cordova()
-    ], Httpd, "getUrl", null);
-    __decorate$50([
-        Cordova()
-    ], Httpd, "getLocalPath", null);
-    Httpd = __decorate$50([
-        Plugin({
-            plugin: 'https://github.com/floatinghotpot/cordova-httpd.git',
-            pluginRef: 'cordova.plugins.CorHttpd',
-            repo: 'https://github.com/floatinghotpot/cordova-httpd',
-            platforms: ['iOS', 'Android']
-        })
-    ], Httpd);
-    return Httpd;
-}());
-
-var __decorate$51 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var IBeacon = (function () {
-    function IBeacon() {
-    }
-    /**
-     * Instances of this class are delegates between the {@link LocationManager} and
-     * the code that consumes the messages generated on in the native layer.
-     *
-     * @returns {Delegate} An instance of the type {@type Delegate}.
-     */
-    IBeacon.Delegate = function () {
-        var delegate = new cordova.plugins.locationManager.Delegate();
-        delegate.didChangeAuthorizationStatus = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didChangeAuthorizationStatus = cb;
-            });
-        };
-        delegate.didDetermineStateForRegion = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didDetermineStateForRegion = cb;
-            });
-        };
-        delegate.didEnterRegion = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didEnterRegion = cb;
-            });
-        };
-        delegate.didExitRegion = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didExitRegion = cb;
-            });
-        };
-        delegate.didRangeBeaconsInRegion = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didRangeBeaconsInRegion = cb;
-            });
-        };
-        delegate.didStartMonitoringForRegion = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didStartMonitoringForRegion = cb;
-            });
-        };
-        delegate.monitoringDidFailForRegionWithError = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.monitoringDidFailForRegionWithError = cb;
-            });
-        };
-        delegate.peripheralManagerDidStartAdvertising = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.peripheralManagerDidStartAdvertising = cb;
-            });
-        };
-        delegate.peripheralManagerDidUpdateState = function (pluginResult) {
-            return new Observable_2(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.peripheralManagerDidUpdateState = cb;
-            });
-        };
-        cordova.plugins.locationManager.setDelegate(delegate);
-        return delegate;
-    };
-    /**
-     * Creates a new BeaconRegion
-     *
-     * @param {String} identifier @see {CLRegion}
-     * @param {String} uuid The proximity ID of the beacon being targeted.
-     * This value must not be blank nor invalid as a UUID.
-     * @param {Number} major The major value that you use to identify one or more beacons.
-     * @param {Number} minor The minor value that you use to identify a specific beacon.
-     * @param {BOOL} notifyEntryStateOnDisplay
-     *
-     * @return Returns the BeaconRegion that was created
-     */
-    IBeacon.BeaconRegion = function (identifer, uuid, major, minor, notifyEntryStateOnDisplay) {
-        return new cordova.plugins.locationManager.BeaconRegion(identifer, uuid, major, minor, notifyEntryStateOnDisplay);
-    };
-    /**
-     * @return Returns the Delegate
-     */
-    IBeacon.getDelegate = function () { return; };
-    /**
-     * @param {Delegate} delegate An instance of a delegate to register with the native layer.
-     *
-     * @return Returns the Delegate
-     */
-    IBeacon.setDelegate = function (delegate) { return; };
-    /**
-     * Signals the native layer that the client side is ready to consume messages.
-     * Readiness here means that it has a {Delegate} set by the consumer javascript
-     * code.
-     *
-     * The {LocationManager.setDelegate()} will implicitly call this method as well,
-     * therefore the only case when you have to call this manually is if you don't
-     * wish to specify a {Delegate} of yours.
-     *
-     * The purpose of this signaling mechanism is to make the events work when the
-     * app is being woken up by the Operating System to give it a chance to handle
-     * region monitoring events for example.
-     *
-     * If you don't set a {Delegate} and don't call this method manually, an error
-     * message get emitted in the native runtime and the DOM as well after a certain
-     * period of time.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the request and started to send events.
-     */
-    IBeacon.onDomDelegateReady = function () { return; };
-    /**
-     * Determines if bluetooth is switched on, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether bluetooth is active.
-     */
-    IBeacon.isBluetoothEnabled = function () { return; };
-    /**
-     * Enables Bluetooth using the native Layer. (ANDROID ONLY)
-     *
-     * @returns Returns a promise which is resolved when Bluetooth
-     * could be enabled. If not, the promise will be rejected with an error.
-     */
-    IBeacon.enableBluetooth = function () { return; };
-    /**
-     * Disables Bluetooth using the native Layer. (ANDROID ONLY)
-     *
-     * @returns Returns a promise which is resolved when Bluetooth
-     * could be enabled. If not, the promise will be rejected with an error.
-     */
-    IBeacon.disableBluetooth = function () { return; };
-    /**
-     * Start monitoring the specified region.
-     *
-     * If a region of the same type with the same identifier is already being
-     * monitored for this application,
-     * it will be removed from monitoring. For circular regions, the region
-     * monitoring service will prioritize
-     * regions by their size, favoring smaller regions over larger regions.
-     *
-     * This is done asynchronously and may not be immediately reflected in monitoredRegions.
-     *
-     * @param {Region} region An instance of {Region} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the monitoring request.
-     */
-    IBeacon.startMonitoringForRegion = function (region) { return; };
-    /**
-     * Stop monitoring the specified region.  It is valid to call
-     * stopMonitoringForRegion: for a region that was registered for monitoring
-     * with a different location manager object, during this or previous
-     * launches of your application.
-     *
-     * This is done asynchronously and may not be immediately reflected in monitoredRegions.
-     *
-     * @param {Region} region An instance of {Region} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop monitoring.
-     */
-    IBeacon.stopMonitoringForRegion = function (region) { return; };
-    /**
-     * Request state the for specified region. When result is ready
-     * didDetermineStateForRegion is triggered. This can be any region,
-     * also those which is not currently monitored.
-     *
-     * This is done asynchronously and may not be immediately reflected in monitoredRegions.
-     *
-     * @param {Region} region An instance of {Region} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop monitoring.
-     */
-    IBeacon.requestStateForRegion = function (region) { return; };
-    /**
-     * Start ranging the specified beacon region.
-     *
-     * If a region of the same type with the same identifier is already being
-     * monitored for this application, it will be removed from monitoring.
-     *
-     * This is done asynchronously and may not be immediately reflected in rangedRegions.
-     *
-     * @param {Region} region An instance of {BeaconRegion} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the monitoring request.
-     */
-    IBeacon.startRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Stop ranging the specified region.  It is valid to call
-     * stopMonitoringForRegion: for a region that was registered for ranging
-     * with a different location manager object, during this or previous
-     * launches of your application.
-     *
-     * This is done asynchronously and may not be immediately reflected in rangedRegions.
-     *
-     * @param {Region} region An instance of {BeaconRegion} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop monitoring.
-     */
-    IBeacon.stopRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Queries the native layer to determine the current authorization in effect.
-     *
-     * @returns Returns a promise which is resolved with the
-     * requested authorization status.
-     */
-    IBeacon.getAuthorizationStatus = function () { return; };
-    /**
-     * For iOS 8 and above only. The permission model has changed by Apple in iOS 8, making it necessary for apps to
-     * explicitly request permissions via methods like these:
-     * <a href="https://developer.apple.com/library/prerelease/iOS/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/requestWhenInUseAuthorization">requestWhenInUseAuthorization</a>
-     * <a href="https://developer.apple.com/library/prerelease/iOS/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/requestAlwaysAuthorization">requestAlwaysAuthorization</a>
-     *
-     * If you are using this plugin on Android devices only, you will never have to use this, nor {@code requestAlwaysAuthorization}
-     * @returns Returns a promise that is resolved when the request dialog is shown.
-     */
-    IBeacon.requestWhenInUseAuthorization = function () { return; };
-    /**
-     * See the docuemntation of {@code requestWhenInUseAuthorization} for further details.
-     *
-     * @returns Returns a promise which is resolved when the native layer
-     * shows the request dialog.
-     */
-    IBeacon.requestAlwaysAuthorization = function () { return; };
-    /**
-     *
-     * @returns Returns a promise which is resolved with an {Array}
-     * of {Region} instances that are being monitored by the native layer.
-     */
-    IBeacon.getMonitoredRegions = function () { return; };
-    /**
-     *
-     * @returns Returns a promise which is resolved with an {Array}
-     * of {Region} instances that are being ranged by the native layer.
-     */
-    IBeacon.getRangedRegions = function () { return; };
-    /**
-     * Determines if ranging is available or not, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether ranging is available or not.
-     */
-    IBeacon.isRangingAvailable = function () { return; };
-    /**
-     * Determines if region type is supported or not, according to the native layer.
-     *
-     * @param {Region} region An instance of {Region} which will be checked
-     * by the operating system.
-     *
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether the region type is supported or not.
-     */
-    IBeacon.isMonitoringAvailableForClass = function (region) { return; };
-    /**
-     * Start advertising the specified region.
-     *
-     * If a region a different identifier is already being advertised for
-     * this application, it will be replaced with the new identifier.
-     *
-     * This call will accept a valid beacon even when no BlueTooth is available,
-     * and will start when BlueTooth is powered on. See {Delegate.}
-     *
-     * @param {Region} region An instance of {Region} which will be advertised
-     * by the operating system.
-     * @param {Integer} measuredPower: Optional parameter, if left empty, the device will
-     * use it's own default value.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the advertising request.
-     */
-    IBeacon.startAdvertising = function (region, measuredPower) { return; };
-    /**
-     * Stop advertising as a beacon.
-     *
-     * This is done asynchronously and may not be immediately reflected in isAdvertising.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop advertising.
-     */
-    IBeacon.stopAdvertising = function (region) { return; };
-    /**
-     * Determines if advertising is available or not, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether advertising is available or not.
-     */
-    IBeacon.isAdvertisingAvailable = function () { return; };
-    /**
-     * Determines if advertising is currently active, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether advertising is active.
-     */
-    IBeacon.isAdvertising = function () { return; };
-    /**
-     * Disables debug logging in the native layer. Use this method if you want
-     * to prevent this plugin from writing to the device logs.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the logging level accordingly.
-     */
-    IBeacon.disableDebugLogs = function () { return; };
-    /**
-     * Enables the posting of debug notifications in the native layer. Use this method if you want
-     * to allow the plugin the posting local notifications.
-     * This can be very helpful when debugging how to apps behave when launched into the background.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the flag to enabled.
-     */
-    IBeacon.enableDebugNotifications = function () { return; };
-    /**
-     * Disables the posting of debug notifications in the native layer. Use this method if you want
-     * to prevent the plugin from posting local notifications.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the flag to disabled.
-     */
-    IBeacon.disableDebugNotifications = function () { return; };
-    /**
-     * Enables debug logging in the native layer. Use this method if you want
-     * a debug the inner workings of this plugin.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the logging level accordingly.
-     */
-    IBeacon.enableDebugLogs = function () { return; };
-    /**
-     * Appends the provided [message] to the device logs.
-     * Note: If debug logging is turned off, this won't do anything.
-     *
-     * @param {String} message The message to append to the device logs.
-     *
-     * @returns Returns a promise which is resolved with the log
-     * message received by the native layer for appending. The returned message
-     * is expected to be equivalent to the one provided in the original call.
-     */
-    IBeacon.appendToDeviceLog = function (message) { return; };
-    __decorate$51([
-        Cordova()
-    ], IBeacon, "getDelegate", null);
-    __decorate$51([
-        Cordova()
-    ], IBeacon, "setDelegate", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "onDomDelegateReady", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "isBluetoothEnabled", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "enableBluetooth", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "disableBluetooth", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "startMonitoringForRegion", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "stopMonitoringForRegion", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "requestStateForRegion", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "startRangingBeaconsInRegion", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "stopRangingBeaconsInRegion", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "getAuthorizationStatus", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "requestWhenInUseAuthorization", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "requestAlwaysAuthorization", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "getMonitoredRegions", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "getRangedRegions", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "isRangingAvailable", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "isMonitoringAvailableForClass", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "startAdvertising", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "stopAdvertising", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "isAdvertisingAvailable", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "isAdvertising", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "disableDebugLogs", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "enableDebugNotifications", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "disableDebugNotifications", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "enableDebugLogs", null);
-    __decorate$51([
-        Cordova({ otherPromise: true })
-    ], IBeacon, "appendToDeviceLog", null);
-    IBeacon = __decorate$51([
-        Plugin({
-            plugin: 'cordova-plugin-ibeacon',
-            pluginRef: 'cordova.plugins.locationManager',
-            repo: 'https://github.com/petermetz/cordova-plugin-ibeacon',
-            platforms: ['Android', 'iOS']
-        })
-    ], IBeacon);
-    return IBeacon;
-}());
-
-var __decorate$52 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var ImagePicker = (function () {
-    function ImagePicker() {
-    }
-    /**
-     * Pick pictures from the library.
-     * @param {ImagePickerOptions} options
-     * @return Returns a Promise that resolves the image file URI
-     * otherwise rejects with an error.
-     */
-    ImagePicker.getPictures = function (options) { return; };
-    __decorate$52([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], ImagePicker, "getPictures", null);
-    ImagePicker = __decorate$52([
-        Plugin({
-            plugin: 'cordova-plugin-image-picker',
-            pluginRef: 'window.imagePicker',
-            repo: 'https://github.com/wymsee/cordova-imagePicker'
-        })
-    ], ImagePicker);
-    return ImagePicker;
-}());
-
-var __decorate$53 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var ImageResizer = (function () {
-    function ImageResizer() {
-    }
-    ImageResizer.resize = function (options) { return; };
-    __decorate$53([
-        Cordova()
-    ], ImageResizer, "resize", null);
-    ImageResizer = __decorate$53([
-        Plugin({
-            plugin: 'https://github.com/protonet/cordova-plugin-image-resizer.git',
-            pluginRef: 'ImageResizer',
-            repo: 'https://github.com/protonet/cordova-plugin-image-resizer'
-        })
-    ], ImageResizer);
-    return ImageResizer;
-}());
-
-var __decorate$54 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var InAppBrowser = (function () {
-    /**
-     * Opens a URL in a new InAppBrowser instance, the current browser instance, or the system browser.
-     * @param  url     The URL to load.
-     * @param  target  The target in which to load the URL, an optional parameter that defaults to _self.
-     * @param  options Options for the InAppBrowser. Optional, defaulting to: location=yes.
-     *                 The options string must not contain any blank space, and each feature's
-     *                 name/value pairs must be separated by a comma. Feature names are case insensitive.
-     */
-    function InAppBrowser(url, target, options) {
-        try {
-            this._objectInstance = cordova.InAppBrowser.open(url, target, options);
-        }
-        catch (e) {
-            window.open(url);
-            console.warn('Native: InAppBrowser is not installed or you are running on a browser. Falling back to window.open, all instance methods will NOT work.');
-        }
-    }
-    InAppBrowser.open = function (url, target, options) {
-        console.warn('Native: Your current usage of the InAppBrowser plugin is depreciated as of ionic-native@1.3.8. Please check the Ionic Native docs for the latest usage details.');
-    };
-    /**
-     * Displays an InAppBrowser window that was opened hidden. Calling this has no effect
-     * if the InAppBrowser was already visible.
-     */
-    InAppBrowser.prototype.show = function () { };
-    /**
-     * Closes the InAppBrowser window.
-     */
-    InAppBrowser.prototype.close = function () { };
-    /**
-     * Injects JavaScript code into the InAppBrowser window.
-     * @param script    Details of the script to run, specifying either a file or code key.
-     */
-    InAppBrowser.prototype.executeScript = function (script) { return; };
-    /**
-     * Injects CSS into the InAppBrowser window.
-     * @param css       Details of the script to run, specifying either a file or code key.
-     */
-    InAppBrowser.prototype.insertCss = function (css) { return; };
-    /**
-     * A method that allows you to listen to events happening in the browser.
-     * @param event Event name
-     * @returns {Observable<any>} Returns back an observable that will listen to the event on subscribe, and will stop listening to the event on unsubscribe.
-     */
-    InAppBrowser.prototype.on = function (event) {
-        var _this = this;
-        return new Observable_2(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
-        });
-    };
-    __decorate$54([
-        CordovaInstance({ sync: true })
-    ], InAppBrowser.prototype, "show", null);
-    __decorate$54([
-        CordovaInstance({ sync: true })
-    ], InAppBrowser.prototype, "close", null);
-    __decorate$54([
-        CordovaInstance()
-    ], InAppBrowser.prototype, "executeScript", null);
-    __decorate$54([
-        CordovaInstance()
-    ], InAppBrowser.prototype, "insertCss", null);
-    InAppBrowser = __decorate$54([
-        Plugin({
-            plugin: 'cordova-plugin-inappbrowser',
-            pluginRef: 'cordova.InAppBrowser',
-            repo: 'https://github.com/apache/cordova-plugin-inappbrowser'
-        })
-    ], InAppBrowser);
-    return InAppBrowser;
-}());
-
-var __decorate$55 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var InAppPurchase = (function () {
-    function InAppPurchase() {
-    }
-    /**
-     * Retrieves a list of full product data from Apple/Google. This method must be called before making purchases.
-     * @param {array<string>} productId an array of product ids.
-     * @returns {Promise} Returns a Promise that resolves with an array of objects.
-     */
-    InAppPurchase.getProducts = function (productId) { return; };
-    /**
-     * Buy a product that matches the productId.
-     * @param {string} productId A string that matches the product you want to buy.
-     * @returns {Promise} Returns a Promise that resolves with the transaction details.
-     */
-    InAppPurchase.buy = function (productId) { return; };
-    /**
-     * Same as buy, but for subscription based products.
-     * @param {string} productId A string that matches the product you want to subscribe to.
-     * @returns {Promise} Returns a Promise that resolves with the transaction details.
-     */
-    InAppPurchase.subscribe = function (productId) { return; };
-    /**
-     * Call this function after purchasing a "consumable" product to mark it as consumed. On Android, you must consume products that you want to let the user purchase multiple times. If you will not consume the product after a purchase, the next time you will attempt to purchase it you will get the error message:
-     * @param {string} productType
-     * @param {string} receipt
-     * @param {string} signature
-     */
-    InAppPurchase.consume = function (productType, receipt, signature) { return; };
-    /**
-     * Restore all purchases from the store
-     * @returns {Promise} Returns a promise with an array of purchases.
-     */
-    InAppPurchase.restorePurchases = function () { return; };
-    /**
-     * Get the receipt.
-     * @returns {Promise<string>} Returns a promise that contains the string for the receipt
-     */
-    InAppPurchase.getReceipt = function () { return; };
-    __decorate$55([
-        Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "getProducts", null);
-    __decorate$55([
-        Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "buy", null);
-    __decorate$55([
-        Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "subscribe", null);
-    __decorate$55([
-        Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "consume", null);
-    __decorate$55([
-        Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "restorePurchases", null);
-    __decorate$55([
-        Cordova({
-            otherPromise: true,
-            platforms: ['iOS']
-        })
-    ], InAppPurchase, "getReceipt", null);
-    InAppPurchase = __decorate$55([
-        Plugin({
-            plugin: 'cordova-plugin-inapppurchase',
-            pluginRef: 'inAppPurchase',
-            platforms: ['Android', 'iOS'],
-            repo: 'https://github.com/AlexDisler/cordova-plugin-inapppurchase'
-        })
-    ], InAppPurchase);
-    return InAppPurchase;
-}());
-
-var __decorate$56 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Insomnia = (function () {
-    function Insomnia() {
-    }
-    /**
-     * Keeps awake the application
-     * @returns {Promise}
-     */
-    Insomnia.keepAwake = function () { return; };
-    /**
-     * Allows the application to sleep again
-     * @returns {Promise}
-     */
-    Insomnia.allowSleepAgain = function () { return; };
-    __decorate$56([
-        Cordova()
-    ], Insomnia, "keepAwake", null);
-    __decorate$56([
-        Cordova()
-    ], Insomnia, "allowSleepAgain", null);
-    Insomnia = __decorate$56([
-        Plugin({
-            plugin: 'https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin.git',
-            pluginRef: 'plugins.insomnia',
-            repo: 'https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], Insomnia);
-    return Insomnia;
-}());
-
-var __decorate$57 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Instagram = (function () {
-    function Instagram() {
-    }
-    /**
-     * Detect if the Instagram application is installed on the device.
-     *
-     * @return {Promise<boolean|string>} Returns a promise that returns a boolean value if installed, or the app version on android
-     */
-    Instagram.isInstalled = function () { return; };
-    /**
-     * Share an image on Instagram
-     * Note: Instagram app stopped accepting pre-filled captions on both iOS and Android. As a work-around, the caption is copied to the clipboard. You have to inform your users to paste the caption.
-     *
-     * @param canvasIdOrDataUrl The canvas element id or the dataURL of the image to share
-     * @param caption The caption of the image
-     * @return {Promise<any>} Returns a promise that resolves if the image was shared
-     */
-    Instagram.share = function (canvasIdOrDataUrl, caption) { return; };
-    /**
-     * Share a library asset or video
-     * @param assetLocalIdentifier A local fileURI
-     * @return {Promise<any>} Returns a promise that resolves if the image was shared
-     */
-    Instagram.shareAsset = function (assetLocalIdentifier) { return; };
-    __decorate$57([
-        Cordova({
-            callbackStyle: 'node'
-        })
-    ], Instagram, "isInstalled", null);
-    __decorate$57([
-        Cordova({
-            callbackStyle: 'node'
-        })
-    ], Instagram, "share", null);
-    __decorate$57([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Instagram, "shareAsset", null);
-    Instagram = __decorate$57([
-        Plugin({
-            plugin: 'cordova-instagram-plugin',
-            pluginRef: 'Instagram',
-            repo: 'https://github.com/vstirbu/InstagramPlugin'
-        })
-    ], Instagram);
-    return Instagram;
-}());
-
-var __decorate$58 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var IsDebug = (function () {
-    function IsDebug() {
-    }
-    /**
-     * Determine if an app was installed via xcode / eclipse / the ionic CLI etc
-     * @return {Promise<boolean>} Returns a promise that resolves with true if the app was installed via xcode / eclipse / the ionic CLI etc. It will resolve to false if the app was downloaded from the app / play store by the end user.
-     */
-    IsDebug.getIsDebug = function () {
-        return;
-    };
-    __decorate$58([
-        Cordova()
-    ], IsDebug, "getIsDebug", null);
-    IsDebug = __decorate$58([
-        Plugin({
-            plugin: 'cordova-plugin-is-debug',
-            pluginRef: 'cordova.plugins.IsDebug',
-            repo: 'https://github.com/mattlewis92/cordova-plugin-is-debug'
-        })
-    ], IsDebug);
-    return IsDebug;
-}());
-
-var __decorate$59 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Keyboard$1 = (function () {
-    function Keyboard() {
-    }
-    /**
-     * Hide the keyboard accessory bar with the next, previous and done buttons.
-     * @param hide {boolean}
-     */
-    Keyboard.hideKeyboardAccessoryBar = function (hide) { };
-    /**
-     * Force keyboard to be shown.
-     */
-    Keyboard.show = function () { };
-    /**
-     * Close the keyboard if open.
-     */
-    Keyboard.close = function () { };
-    /**
-     * Prevents the native UIScrollView from moving when an input is focused.
-     * @param disable
-     */
-    Keyboard.disableScroll = function (disable) { };
-    /**
-     * Creates an observable that notifies you when the keyboard is shown. Unsubscribe to observable to cancel event watch.
-     */
-    Keyboard.onKeyboardShow = function () { return; };
-    /**
-     * Creates an observable that notifies you when the keyboard is hidden. Unsubscribe to observable to cancel event watch.
-     */
-    Keyboard.onKeyboardHide = function () { return; };
-    __decorate$59([
-        Cordova({ sync: true })
-    ], Keyboard, "hideKeyboardAccessoryBar", null);
-    __decorate$59([
-        Cordova({
-            sync: true,
-            platforms: ['Android', 'BlackBerry 10', 'Windows']
-        })
-    ], Keyboard, "show", null);
-    __decorate$59([
-        Cordova({
-            sync: true,
-            platforms: ['iOS', 'Android', 'BlackBerry 10', 'Windows']
-        })
-    ], Keyboard, "close", null);
-    __decorate$59([
-        Cordova({
-            sync: true,
-            platforms: ['iOS', 'Windows']
-        })
-    ], Keyboard, "disableScroll", null);
-    __decorate$59([
-        Cordova({
-            eventObservable: true,
-            event: 'native.keyboardshow',
-            platforms: ['iOS', 'Android', 'BlackBerry 10', 'Windows']
-        })
-    ], Keyboard, "onKeyboardShow", null);
-    __decorate$59([
-        Cordova({
-            eventObservable: true,
-            event: 'native.keyboardhide',
-            platforms: ['iOS', 'Android', 'BlackBerry 10', 'Windows']
-        })
-    ], Keyboard, "onKeyboardHide", null);
-    Keyboard = __decorate$59([
-        Plugin({
-            plugin: 'ionic-plugin-keyboard',
-            pluginRef: 'cordova.plugins.Keyboard',
-            repo: 'https://github.com/driftyco/ionic-plugin-keyboard'
-        })
-    ], Keyboard);
-    return Keyboard;
-}());
-
-var __decorate$60 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var LaunchNavigator = (function () {
-    function LaunchNavigator() {
-    }
-    /**
-     * Launches navigator app
-     * @param destination {string|number[]} Location name or coordinates (as string or array)
-     * @param options {LaunchNavigatorOptions}
-     * @returns {Promise<any>}
-     */
-    LaunchNavigator.navigate = function (destination, options) { return; };
-    /**
-     * Determines if the given app is installed and available on the current device.
-     * @param app {string}
-     */
-    LaunchNavigator.isAppAvailable = function (app) { return; };
-    /**
-     * Returns a list indicating which apps are installed and available on the current device.
-     */
-    LaunchNavigator.availableApps = function () { return; };
-    /**
-     * Returns the display name of the specified app.
-     * @param app {string}
-     */
-    LaunchNavigator.getAppDisplayName = function (app) { return; };
-    /**
-     * Returns list of supported apps on a given platform.
-     * @param platform {string}
-     */
-    LaunchNavigator.getAppsForPlatform = function (platform) { return; };
-    /**
-     * Indicates if an app on a given platform supports specification of transport mode.
-     * @param app {string} specified as a string, you can use one of the constants, e.g `LaunchNavigator.APP.GOOGLE_MAPS`
-     * @param platform {string}
-     */
-    LaunchNavigator.supportsTransportMode = function (app, platform) { return; };
-    /**
-     * Returns the list of transport modes supported by an app on a given platform.
-     * @param app {string}
-     * @param platform {string}
-     */
-    LaunchNavigator.getTransportModes = function (app, platform) { return; };
-    /**
-     * Indicates if an app on a given platform supports specification of launch mode.
-     * Note that currently only Google Maps on Android does.
-     * @param app {string}
-     * @param platform {string}
-     */
-    LaunchNavigator.supportsLaunchMode = function (app, platform) { return; };
-    /**
-     * Indicates if an app on a given platform supports specification of start location.
-     * @param app {string}
-     * @param platform {string}
-     */
-    LaunchNavigator.supportsStart = function (app, platform) { return; };
-    LaunchNavigator.supportsStartName = function (app, platform) { return; };
-    LaunchNavigator.supportsDestName = function (app, platform) { return; };
-    LaunchNavigator.userSelect = function (destination, options) { };
-    LaunchNavigator.APP = {
-        USER_SELECT: 'user_select',
-        APPLE_MAPS: 'apple_maps',
-        GOOGLE_MAPS: 'google_maps',
-        WAZE: 'waze',
-        CITYMAPPER: 'citymapper',
-        NAVIGON: 'navigon',
-        TRANSIT_APP: 'transit_app',
-        YANDEX: 'yandex',
-        UBER: 'uber',
-        TOMTOM: 'tomtom',
-        BING_MAPS: 'bing_maps',
-        SYGIC: 'sygic',
-        HERE_MAPS: 'here_maps',
-        MOOVIT: 'moovit'
-    };
-    LaunchNavigator.TRANSPORT_MODE = {
-        DRIVING: 'driving',
-        WALKING: 'walking',
-        BICYCLING: 'bicycling',
-        TRANSIT: 'transit'
-    };
-    __decorate$60([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], LaunchNavigator, "navigate", null);
-    __decorate$60([
-        Cordova()
-    ], LaunchNavigator, "isAppAvailable", null);
-    __decorate$60([
-        Cordova()
-    ], LaunchNavigator, "availableApps", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "getAppDisplayName", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "getAppsForPlatform", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "supportsTransportMode", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "getTransportModes", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "supportsLaunchMode", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "supportsStart", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "supportsStartName", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "supportsDestName", null);
-    __decorate$60([
-        Cordova({ sync: true })
-    ], LaunchNavigator, "userSelect", null);
-    LaunchNavigator = __decorate$60([
-        Plugin({
-            plugin: 'uk.co.workingedge.phonegap.plugin.launchnavigator',
-            pluginRef: 'launchnavigator',
-            repo: 'https://github.com/dpa99c/phonegap-launch-navigator.git'
-        })
-    ], LaunchNavigator);
-    return LaunchNavigator;
-}());
-
-var __decorate$61 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var LocalNotifications = (function () {
-    function LocalNotifications() {
-    }
-    /**
-     * Schedules a single or multiple notifications
-     * @param options
-     */
-    LocalNotifications.schedule = function (options) { };
-    /**
-     * Updates a previously scheduled notification. Must include the id in the options parameter.
-     * @param options
-     */
-    LocalNotifications.update = function (options) { };
-    /**
-     * Clears single or multiple notifications
-     * @param notificationId A single notification id, or an array of notification ids.
-     * @returns {Promise} Returns a promise when the notification had been cleared
-     */
-    LocalNotifications.clear = function (notificationId) { return; };
-    /**
-     * Clears all notifications
-     * @returns {Promise} Returns a promise when all notifications have cleared
-     */
-    LocalNotifications.clearAll = function () { return; };
-    /**
-     * Cancels single or multiple notifications
-     * @param notificationId A single notification id, or an array of notification ids.
-     * @returns {Promise} Returns a promise when the notification is canceled
-     */
-    LocalNotifications.cancel = function (notificationId) { return; };
-    /**
-     * Cancels all notifications
-     * @returns {Promise} Returns a promise when all notifications are canceled
-     */
-    LocalNotifications.cancelAll = function () { return; };
-    /**
-     * Checks presence of a notification
-     * @param notificationId
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.isPresent = function (notificationId) { return; };
-    /**
-     * Checks is a notification is scheduled
-     * @param notificationId
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.isScheduled = function (notificationId) { return; };
-    /**
-     * Checks if a notification is triggered
-     * @param notificationId
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.isTriggered = function (notificationId) { return; };
-    /**
-     * Get all the notification ids
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getAllIds = function () { return; };
-    /**
-     * Get the ids of triggered notifications
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getTriggeredIds = function () { return; };
-    /**
-     * Get the ids of scheduled notifications
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getScheduledIds = function () { return; };
-    /**
-     * Get a notification object
-     * @param notificationId The id of the notification to get
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.get = function (notificationId) { return; };
-    /**
-     * Get a scheduled notification object
-     * @param notificationId The id of the notification to get
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getScheduled = function (notificationId) { return; };
-    /**
-     * Get a triggered notification object
-     * @param notificationId The id of the notification to get
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getTriggered = function (notificationId) { return; };
-    /**
-     * Get all notification objects
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getAll = function () { return; };
-    /**
-     * Get all scheduled notification objects
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getAllScheduled = function () { return; };
-    /**
-     * Get all triggered notification objects
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.getAllTriggered = function () { return; };
-    /**
-     * Register permission to show notifications if not already granted.
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.registerPermission = function () { return; };
-    /**
-     * Informs if the app has the permission to show notifications.
-     * @returns {Promise} Returns a promise
-     */
-    LocalNotifications.hasPermission = function () { return; };
-    /**
-     * Sets a callback for a specific event
-     * @param eventName The name of the event. Available events: schedule, trigger, click, update, clear, clearall, cancel, cancelall
-     * @param callback Call back function. All events return notification and state parameter. clear and clearall return state parameter only.
-     */
-    LocalNotifications.on = function (eventName, callback) { };
-    __decorate$61([
-        Cordova({
-            sync: true
-        })
-    ], LocalNotifications, "schedule", null);
-    __decorate$61([
-        Cordova({
-            sync: true
-        })
-    ], LocalNotifications, "update", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "clear", null);
-    __decorate$61([
-        Cordova({
-            successIndex: 0,
-            errorIndex: 2
-        })
-    ], LocalNotifications, "clearAll", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "cancel", null);
-    __decorate$61([
-        Cordova({
-            successIndex: 0,
-            errorIndex: 2
-        })
-    ], LocalNotifications, "cancelAll", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "isPresent", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "isScheduled", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "isTriggered", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getAllIds", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getTriggeredIds", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getScheduledIds", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "get", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getScheduled", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getTriggered", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getAll", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getAllScheduled", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "getAllTriggered", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "registerPermission", null);
-    __decorate$61([
-        Cordova()
-    ], LocalNotifications, "hasPermission", null);
-    __decorate$61([
-        Cordova({
-            sync: true
-        })
-    ], LocalNotifications, "on", null);
-    LocalNotifications = __decorate$61([
-        Plugin({
-            plugin: 'de.appplant.cordova.plugin.local-notification',
-            pluginRef: 'cordova.plugins.notification.local',
-            repo: 'https://github.com/katzer/cordova-plugin-local-notifications'
-        })
-    ], LocalNotifications);
-    return LocalNotifications;
-}());
-
-var __decorate$62 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var MediaCapture = (function () {
-    function MediaCapture() {
-    }
-    Object.defineProperty(MediaCapture, "supportedImageModes", {
-        /**
-         * The audio recording formats supported by the device.
-         * @returns {ConfigurationData[]}
-         */
-        get: function () {
-            return navigator.device.capture.supportedImageModes;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MediaCapture, "supportedAudioModes", {
-        /**
-         * The recording image sizes and formats supported by the device.
-         * @returns {ConfigurationData[]}
-         */
-        get: function () {
-            return navigator.device.capture.supportedAudioModes;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MediaCapture, "supportedVideoModes", {
-        /**
-         * The recording video resolutions and formats supported by the device.
-         * @returns {ConfigurationData[]}
-         */
-        get: function () {
-            return navigator.device.capture.supportedVideoModes;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    /**
-     * Start the audio recorder application and return information about captured audio clip files.
-     * @param options
-     */
-    MediaCapture.captureAudio = function (options) { return; };
-    /**
-     * Start the camera application and return information about captured image files.
-     * @param options
-     */
-    MediaCapture.captureImage = function (options) { return; };
-    /**
-     * Start the video recorder application and return information about captured video clip files.
-     * @param options
-     */
-    MediaCapture.captureVideo = function (options) { return; };
-    /**
-     * is fired if the capture call is successful
-     */
-    MediaCapture.onPendingCaptureResult = function () { return; };
-    /**
-     * is fired if the capture call is unsuccessful
-     */
-    MediaCapture.onPendingCaptureError = function () { return; };
-    __decorate$62([
-        CordovaProperty
-    ], MediaCapture, "supportedImageModes", null);
-    __decorate$62([
-        CordovaProperty
-    ], MediaCapture, "supportedAudioModes", null);
-    __decorate$62([
-        CordovaProperty
-    ], MediaCapture, "supportedVideoModes", null);
-    __decorate$62([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], MediaCapture, "captureAudio", null);
-    __decorate$62([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], MediaCapture, "captureImage", null);
-    __decorate$62([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], MediaCapture, "captureVideo", null);
-    __decorate$62([
-        Cordova({
-            eventObservable: true,
-            event: 'pendingcaptureresult'
-        })
-    ], MediaCapture, "onPendingCaptureResult", null);
-    __decorate$62([
-        Cordova({
-            eventObservable: true,
-            event: 'pendingcaptureerror'
-        })
-    ], MediaCapture, "onPendingCaptureError", null);
-    MediaCapture = __decorate$62([
-        Plugin({
-            plugin: 'cordova-plugin-media-capture',
-            pluginRef: 'navigator.device.capture',
-            repo: 'https://github.com/apache/cordova-plugin-media-capture'
-        })
-    ], MediaCapture);
-    return MediaCapture;
-}());
-
-var __decorate$63 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var NativeAudio = (function () {
-    function NativeAudio() {
-    }
-    /**
-     * Loads an audio file into memory. Optimized for short clips / single shots (up to five seconds). Cannot be stopped / looped.
-     * @param id {string} unique ID for the audio file
-     * @param assetPath {string}  the relative path or absolute URL (inluding http://) to the audio asset.
-     * @returns {Promise<any>}
-     */
-    NativeAudio.preloadSimple = function (id, assetPath) { return; };
-    /**
-     * Loads an audio file into memory. Optimized for background music / ambient sound. Uses highlevel native APIs with a larger footprint. (iOS: AVAudioPlayer). Can be stopped / looped and used with multiple voices. Can be faded in and out using the delay parameter.
-     * @param id {string} unique ID for the audio file
-     * @param assetPath {string}  the relative path or absolute URL (inluding http://) to the audio asset.
-     * @param volume {number} the volume of the preloaded sound (0.1 to 1.0)
-     * @param voices {number} the number of multichannel voices available
-     * @param delay {number}
-     * @returns {Promise<any>}
-     */
-    NativeAudio.preloadComplex = function (id, assetPath, volume, voices, delay) { return; };
-    /**
-     * Plays an audio asset
-     * @param id {string} unique ID for the audio file
-     * @param completeCallback {Function} callback to be invoked when audio is done playing
-     */
-    NativeAudio.play = function (id, completeCallback) { return; };
-    /**
-     * Stops playing an audio
-     * @param id {string} unique ID for the audio file
-     */
-    NativeAudio.stop = function (id) { return; };
-    /**
-     * Loops an audio asset infinitely, this only works for complex assets
-     * @param id {string} unique ID for the audio file
-     * @return {Promise<any>}
-     */
-    NativeAudio.loop = function (id) { return; };
-    /**
-     * Unloads an audio file from memory
-     * @param id {string} unique ID for the audio file
-     */
-    NativeAudio.unload = function (id) { return; };
-    /**
-     * Changes the volume for preloaded complex assets.
-     * @param id {string} unique ID for the audio file
-     * @param volume {number} the volume of the audio asset (0.1 to 1.0)
-     */
-    NativeAudio.setVolumeForComplexAsset = function (id, volume) { return; };
-    __decorate$63([
-        Cordova()
-    ], NativeAudio, "preloadSimple", null);
-    __decorate$63([
-        Cordova()
-    ], NativeAudio, "preloadComplex", null);
-    __decorate$63([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], NativeAudio, "play", null);
-    __decorate$63([
-        Cordova()
-    ], NativeAudio, "stop", null);
-    __decorate$63([
-        Cordova()
-    ], NativeAudio, "loop", null);
-    __decorate$63([
-        Cordova()
-    ], NativeAudio, "unload", null);
-    __decorate$63([
-        Cordova()
-    ], NativeAudio, "setVolumeForComplexAsset", null);
-    NativeAudio = __decorate$63([
-        Plugin({
-            plugin: 'cordova-plugin-nativeaudio',
-            pluginRef: 'plugins.NativeAudio',
-            repo: 'https://github.com/floatinghotpot/cordova-plugin-nativeaudio'
-        })
-    ], NativeAudio);
-    return NativeAudio;
-}());
-
-var __decorate$64 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var NativePageTransitions = (function () {
-    function NativePageTransitions() {
-    }
-    /**
-     * Perform a slide animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.slide = function (options) { return; };
-    /**
-     * Perform a flip animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.flip = function (options) { return; };
-    /**
-     * Perform a fade animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.fade = function (options) { return; };
-    /**
-     * Perform a slide animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.drawer = function (options) { return; };
-    /**
-     * Perform a slide animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.curl = function (options) { return; };
-    __decorate$64([
-        Cordova()
-    ], NativePageTransitions, "slide", null);
-    __decorate$64([
-        Cordova()
-    ], NativePageTransitions, "flip", null);
-    __decorate$64([
-        Cordova({ platforms: ['iOS', 'Android'] })
-    ], NativePageTransitions, "fade", null);
-    __decorate$64([
-        Cordova({ platforms: ['iOS', 'Android'] })
-    ], NativePageTransitions, "drawer", null);
-    __decorate$64([
-        Cordova({ platforms: ['iOS'] })
-    ], NativePageTransitions, "curl", null);
-    NativePageTransitions = __decorate$64([
-        Plugin({
-            plugin: 'com.telerik.plugins.nativepagetransitions',
-            pluginRef: 'plugins.nativepagetransitions',
-            repo: 'https://github.com/Telerik-Verified-Plugins/NativePageTransitions',
-            platforms: ['iOS', 'Android', 'Windows Phone']
-        })
-    ], NativePageTransitions);
-    return NativePageTransitions;
-}());
-
-var __decorate$65 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var NativeStorage = (function () {
-    function NativeStorage() {
-    }
-    /**
-     * Stores a value
-     * @param reference {string}
-     * @param value
-     */
-    NativeStorage.setItem = function (reference, value) { return; };
-    /**
-     * Gets a stored item
-     * @param reference {string}
-     */
-    NativeStorage.getItem = function (reference) { return; };
-    /**
-     * Removes a single stored item
-     * @param reference {string}
-     */
-    NativeStorage.remove = function (reference) { return; };
-    /**
-     * Removes all stored values.
-     */
-    NativeStorage.clear = function () { return; };
-    __decorate$65([
-        Cordova()
-    ], NativeStorage, "setItem", null);
-    __decorate$65([
-        Cordova()
-    ], NativeStorage, "getItem", null);
-    __decorate$65([
-        Cordova()
-    ], NativeStorage, "remove", null);
-    __decorate$65([
-        Cordova()
-    ], NativeStorage, "clear", null);
-    NativeStorage = __decorate$65([
-        Plugin({
-            plugin: 'cordova-plugin-nativestorage',
-            pluginRef: 'NativeStorage',
-            repo: 'https://github.com/TheCocoaProject/cordova-plugin-nativestorage'
-        })
-    ], NativeStorage);
-    return NativeStorage;
-}());
-
-var __decorate$66 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Market = (function () {
-    function Market() {
-    }
-    /**
-     * Opens an app in Google Play / App Store
-     * @param appId {string} Package name
-     * @param callbacks {Object} Optional callbacks
-     */
-    Market.open = function (appId, callbacks) { };
-    __decorate$66([
-        Cordova({ sync: true })
-    ], Market, "open", null);
-    Market = __decorate$66([
-        Plugin({
-            plugin: 'cordova-plugin-market',
-            pluginRef: 'plugins.market',
-            repo: 'https://github.com/xmartlabs/cordova-plugin-market'
-        })
-    ], Market);
-    return Market;
-}());
-
-var __decorate$67 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var MediaPlugin = (function () {
-    // Methods
-    /**
-     * Open a media file
-     * @param src {string} A URI containing the audio content.
-     */
-    function MediaPlugin(src) {
-        var _this = this;
-        this.init = new Promise(function (resolve, reject) {
-            _this.status = new Observable_2(function (observer) {
-                _this._objectInstance = new Media(src, resolve, reject, observer.next.bind(observer));
-            });
-        });
-    }
-    /**
-     * Get the current amplitude of the current recording.
-     * @returns {Promise} Returns a promise with the amplitude of the current recording
-     */
-    MediaPlugin.prototype.getCurrentAmplitude = function () { return; };
-    /**
-     * Get the current position within an audio file. Also updates the Media object's position parameter.
-     * @returns {Promise} Returns a promise with the position of the current recording
-     */
-    MediaPlugin.prototype.getCurrentPosition = function () { return; };
-    /**
-     * Get the duration of an audio file in seconds. If the duration is unknown, it returns a value of -1.
-     * @returns {Promise} Returns a promise with the duration of the current recording
-     */
-    MediaPlugin.prototype.getDuration = function () { return; };
-    /**
-     * Starts or resumes playing an audio file.
-     */
-    MediaPlugin.prototype.play = function (iosOptions) { };
-    /**
-     * Pauses playing an audio file.
-     */
-    MediaPlugin.prototype.pause = function () { };
-    /**
-     * Releases the underlying operating system's audio resources. This is particularly important for Android, since there are a finite amount of OpenCore instances for media playback. Applications should call the release function for any Media resource that is no longer needed.
-     */
-    MediaPlugin.prototype.release = function () { };
-    /**
-     * Sets the current position within an audio file.
-     * @param {number} milliseconds The time position you want to set for the current audio file
-     */
-    MediaPlugin.prototype.seekTo = function (milliseconds) { };
-    /**
-     * Set the volume for an audio file.
-     * @param volume The volume to set for playback. The value must be within the range of 0.0 to 1.0.
-     */
-    MediaPlugin.prototype.setVolume = function (volume) { };
-    /**
-     * Starts recording an audio file.
-     */
-    MediaPlugin.prototype.startRecord = function () { };
-    /**
-     * Stops recording
-     */
-    MediaPlugin.prototype.stopRecord = function () { };
-    /**
-     * Stops playing an audio file.
-     */
-    MediaPlugin.prototype.stop = function () { };
-    // Constants
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_NONE = 0;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_STARTING = 1;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_RUNNING = 2;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_PAUSED = 3;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_STOPPED = 4;
-    // error codes
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_ABORTED = 1;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_NETWORK = 2;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_DECODE = 3;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_NONE_SUPPORTED = 4;
-    __decorate$67([
-        CordovaInstance()
-    ], MediaPlugin.prototype, "getCurrentAmplitude", null);
-    __decorate$67([
-        CordovaInstance()
-    ], MediaPlugin.prototype, "getCurrentPosition", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "getDuration", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "play", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "pause", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "release", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "seekTo", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "setVolume", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "startRecord", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "stopRecord", null);
-    __decorate$67([
-        CordovaInstance({
-            sync: true
-        })
-    ], MediaPlugin.prototype, "stop", null);
-    MediaPlugin = __decorate$67([
-        Plugin({
-            repo: 'https://github.com/apache/cordova-plugin-media',
-            plugin: 'cordova-plugin-media',
-            pluginRef: 'Media'
-        })
-    ], MediaPlugin);
-    return MediaPlugin;
-}());
-
-var __decorate$68 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Mixpanel = (function () {
-    function Mixpanel() {
-    }
-    /**
-     *
-     * @param aliasId {string}
-     * @param originalId {string}
-     * @returns {Promise<any>}
-     */
-    Mixpanel.alias = function (aliasId, originalId) { return; };
-    /**
-     *
-     * @returns {Promise<any>}
-     */
-    Mixpanel.distinctId = function () { return; };
-    /**
-     *
-     */
-    Mixpanel.flush = function () { return; };
-    /**
-     *
-     * @param distinctId {string}
-     * @returns {Promise<any>}
-     */
-    Mixpanel.identify = function (distinctId) { return; };
-    /**
-     *
-     * @param token {string}
-     * @returns {Promise<any>}
-     */
-    Mixpanel.init = function (token) { return; };
-    /**
-     *
-     * @param superProperties
-     * @returns {Promise<any>}
-     */
-    Mixpanel.registerSuperProperties = function (superProperties) { return; };
-    /**
-     *
-     * @returns {Promise<any>}
-     */
-    Mixpanel.reset = function () { return; };
-    /**
-     *
-     * @param eventName
-     * @param eventProperties
-     */
-    Mixpanel.track = function (eventName, eventProperties) { return; };
-    /**
-     *
-     * @returns {Promise<any>}
-     */
-    Mixpanel.showSurvey = function () { return; };
-    Object.defineProperty(Mixpanel, "people", {
-        /**
-         *
-         * @returns {MixpanelPeople}
-         */
-        get: function () { return mixpanel.people; },
-        enumerable: true,
-        configurable: true
-    });
-    
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "alias", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "distinctId", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "flush", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "identify", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "init", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "registerSuperProperties", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "reset", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "track", null);
-    __decorate$68([
-        Cordova()
-    ], Mixpanel, "showSurvey", null);
-    __decorate$68([
-        CordovaProperty
-    ], Mixpanel, "people", null);
-    Mixpanel = __decorate$68([
-        Plugin({
-            plugin: 'cordova-plugin-mixpanel',
-            pluginRef: 'mixpanel',
-            repo: 'https://github.com/samzilverberg/cordova-mixpanel-plugin'
-        })
-    ], Mixpanel);
-    return Mixpanel;
-}());
-
-var __decorate$69 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var MusicControls = (function () {
-    function MusicControls() {
-    }
-    /**
-     * Create the media controls
-     * @param options {MusicControlsOptions}
-     * @returns {Promise<any>}
-     */
-    MusicControls.create = function (options) { return; };
-    /**
-     * Destroy the media controller
-     * @returns {Promise<any>}
-     */
-    MusicControls.destroy = function () { return; };
-    /**
-     * Subscribe to the events of the media controller
-     * @returns {Observable<any>}
-     */
-    MusicControls.subscribe = function () { return; };
-    /**
-     * Start listening for events, this enables the Observable from the subscribe method
-     */
-    MusicControls.listen = function () { };
-    /**
-     * Toggle play/pause:
-     * @param isPlaying {boolean}
-     */
-    MusicControls.updateIsPlaying = function (isPlaying) { };
-    __decorate$69([
-        Cordova()
-    ], MusicControls, "create", null);
-    __decorate$69([
-        Cordova()
-    ], MusicControls, "destroy", null);
-    __decorate$69([
-        Cordova({
-            observable: true
-        })
-    ], MusicControls, "subscribe", null);
-    __decorate$69([
-        Cordova({ sync: true })
-    ], MusicControls, "listen", null);
-    __decorate$69([
-        Cordova({ sync: true })
-    ], MusicControls, "updateIsPlaying", null);
-    MusicControls = __decorate$69([
-        Plugin({
-            plugin: 'cordova-plugin-music-controls',
-            pluginRef: 'MusicControls',
-            repo: 'https://github.com/homerours/cordova-music-controls-plugin'
-        })
-    ], MusicControls);
-    return MusicControls;
-}());
-
-var __decorate$70 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Network = (function () {
-    function Network() {
-    }
-    Object.defineProperty(Network, "connection", {
-        /**
-         * Return the network connection type
-         */
-        get: function () { return navigator.connection.type; },
-        enumerable: true,
-        configurable: true
-    });
-    /**
-     * Get notified when the device goes offline
-     * @returns {Observable<any>} Returns an observable.
-     */
-    Network.onDisconnect = function () { return; };
-    /**
-     * Get notified when the device goes online
-     * @returns {Observable<any>} Returns an observable.
-     */
-    Network.onConnect = function () { return; };
-    __decorate$70([
-        CordovaProperty
-    ], Network, "connection", null);
-    __decorate$70([
-        Cordova({
-            eventObservable: true,
-            event: 'offline'
-        })
-    ], Network, "onDisconnect", null);
-    __decorate$70([
-        Cordova({
-            eventObservable: true,
-            event: 'online'
-        })
-    ], Network, "onConnect", null);
-    Network = __decorate$70([
-        Plugin({
-            plugin: 'cordova-plugin-network-information',
-            repo: 'https://github.com/apache/cordova-plugin-network-information',
-            platforms: ['Amazon Fire OS', 'iOS', 'Android', 'BlackBerry 10', 'Windows Phone 7', 'Windows Phone 8', 'Windows', 'Firefox OS', 'Browser'],
-            pluginRef: 'navigator.connection'
-        })
-    ], Network);
-    return Network;
-}());
-
-var __decorate$71 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var NFC = (function () {
-    function NFC() {
-    }
-    /**
-     * Registers an event listener for any NDEF tag.
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addNdefListener = function (onSuccess, onFailure) { return; };
-    /**
-     * Registers an event listener for tags matching any tag type.
-     * @param mimeType
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addTagDiscoveredListener = function (mimeType, onSuccess, onFailure) { return; };
-    /**
-     * Registers an event listener for NDEF tags matching a specified MIME type.
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addMimeTypeListener = function (onSuccess, onFailure) { return; };
-    /**
-     * Registers an event listener for formatable NDEF tags.
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addNdefFormatableListener = function (onSuccess, onFailure) { return; };
-    /**
-     * Qrites an NdefMessage to a NFC tag.
-     * @param message {any[]}
-     * @return {Promise<any>}
-     */
-    NFC.write = function (message) { return; };
-    /**
-     * Makes a NFC tag read only. **Warning** this is permanent.
-     * @return {Promise<any>}
-     */
-    NFC.makeReadyOnly = function () { return; };
-    /**
-     * Shares an NDEF Message via peer-to-peer.
-     * @param message An array of NDEF Records.
-     * @return {Promise<any>}
-     */
-    NFC.share = function (message) { return; };
-    /**
-     * Stop sharing NDEF data via peer-to-peer.
-     * @return {Promise<any>}
-     */
-    NFC.unshare = function () { return; };
-    /**
-     * Erase a NDEF tag
-     */
-    NFC.erase = function () { return; };
-    /**
-     * Send a file to another device via NFC handover.
-     * @param uris A URI as a String, or an array of URIs.
-     * @return {Promise<any>}
-     */
-    NFC.handover = function (uris) { return; };
-    /**
-     * Stop sharing NDEF data via NFC handover.
-     * @return {Promise<any>}
-     */
-    NFC.stopHandover = function () { return; };
-    /**
-     * Show the NFC settings on the device.
-     * @return {Promise<any>}
-     */
-    NFC.showSettings = function () { return; };
-    /**
-     * Check if NFC is available and enabled on this device.
-     * @return {Promise<any>}
-     */
-    NFC.enabled = function () { return; };
-    __decorate$71([
-        Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3,
-            clearFunction: 'removeNdefListener',
-            clearWithArgs: true
-        })
-    ], NFC, "addNdefListener", null);
-    __decorate$71([
-        Cordova({
-            observable: true,
-            successIndex: 1,
-            errorIndex: 4,
-            clearFunction: 'removeTagDiscoveredListener',
-            clearWithArgs: true
-        })
-    ], NFC, "addTagDiscoveredListener", null);
-    __decorate$71([
-        Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3,
-            clearFunction: 'removeMimeTypeListener',
-            clearWithArgs: true
-        })
-    ], NFC, "addMimeTypeListener", null);
-    __decorate$71([
-        Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3
-        })
-    ], NFC, "addNdefFormatableListener", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "write", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "makeReadyOnly", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "share", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "unshare", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "erase", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "handover", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "stopHandover", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "showSettings", null);
-    __decorate$71([
-        Cordova()
-    ], NFC, "enabled", null);
-    NFC = __decorate$71([
-        Plugin({
-            plugin: 'phonegap-nfc',
-            pluginRef: 'nfc',
-            repo: 'https://github.com/chariotsolutions/phonegap-nfc'
-        })
-    ], NFC);
-    return NFC;
-}());
-
-var __decorate$72 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var OneSignal = (function () {
-    function OneSignal() {
-    }
-    /**
-     * Only required method you need to call to setup OneSignal to receive push notifications. Call this from the `deviceready` event.
-     *
-     * @param {appId} Your AppId from your OneSignal app
-     * @param {options} The Google Project Number (which you can get from the Google Developer Potal) and the autoRegister option.
-     * @returns {Observable} when a notification is received. Handle your notification action here.
-     */
-    OneSignal.init = function (appId, options) { return; };
-    /**
-     * Call this when you would like to prompt an iOS user to accept push notifications with the default system prompt.
-     * Only use if you passed false to autoRegister when calling init.
-     */
-    OneSignal.registerForPushNotifications = function () { };
-    /**
-     * Tag a user based on an app event of your choosing so later you can create segments on [onesignal.com](https://onesignal.com/) to target these users.
-     * Recommend using sendTags over sendTag if you need to set more than one tag on a user at a time.
-     *
-     * @param {key} Key of your choosing to create or update.
-     * @param {value} Value to set on the key. NOTE: Passing in a blank String deletes the key, you can also call deleteTag.
-     */
-    OneSignal.sendTag = function (key, value) { };
-    /**
-   * Tag a user based on an app event of your choosing so later you can create segments on [onesignal.com](https://onesignal.com/) to target these users.
-   * Recommend using sendTags over sendTag if you need to set more than one tag on a user at a time.
-   *
-   * @param {json} Pass a json object with key/value pairs like: {key: "value", key2: "value2"}
-   */
-    OneSignal.sendTags = function (json) { };
-    /**
-    * Retrieve a list of tags that have been set on the user from the OneSignal server.
-    *
-    * @returns {Promise} Returns a Promise that resolves when tags are recieved.
-    */
-    OneSignal.getTags = function () { return; };
-    /**
-    * Deletes a tag that was previously set on a user with `sendTag` or `sendTags`. Use `deleteTags` if you need to delete more than one.
-    *
-    * @param {key} Key to remove.
-    */
-    OneSignal.deleteTag = function (key) { };
-    /**
-    * Deletes tags that were previously set on a user with `sendTag` or `sendTags`.
-    *
-    * @param {keys} Keys to remove.
-    */
-    OneSignal.deleteTags = function (keys) { };
-    /**
-    * Lets you retrieve the OneSignal user id and device token.
-    * Your handler is called after the device is successfully registered with OneSignal.
-    *
-    * @returns {Promise} Returns a Promise that reolves if the device was successfully registered.
-    * It returns a JSON with `userId`and `pushToken`.
-    */
-    OneSignal.getIds = function () { return; };
-    /**
-    * Warning:
-    * Only applies to Android and Amazon. You can call this from your UI from a button press for example to give your user's options for your notifications.
-    *
-    * By default OneSignal always vibrates the device when a notification is displayed unless the device is in a total silent mode.
-    * Passing false means that the device will only vibrate lightly when the device is in it's vibrate only mode.
-    *
-    * @param {enable} false to disable vibrate, true to re-enable it.
-    */
-    OneSignal.enableVibrate = function (enable) { };
-    /**
-    * Warning:
-    * Only applies to Android and Amazon. You can call this from your UI from a button press for example to give your user's options for your notifications.
-    *
-    * By default OneSignal plays the system's default notification sound when the device's notification system volume is turned on.
-    * Passing false means that the device will only vibrate unless the device is set to a total silent mode.
-    *
-    * @param {enable} false to disable sound, true to re-enable it.
-    */
-    OneSignal.enableSound = function (enable) { };
-    /**
-    * Warning:
-    * Only applies to Android and Amazon devices.
-    *
-    * By default this is false and notifications will not be shown when the user is in your app, instead the notificationOpenedCallback is fired.
-    * If set to true notifications will always show in the notification area and notificationOpenedCallback will not fire until the user taps on the notification.
-    *
-    * @param {enable} enable
-    */
-    OneSignal.enableNotificationsWhenActive = function (enable) { };
-    /**
-    * By default this is false and notifications will not be shown when the user is in your app, instead the notificationOpenedCallback is fired.
-    * If set to true notifications will be shown as native alert boxes if a notification is received when the user is in your app.
-    * The notificationOpenedCallback is then fired after the alert box is closed.
-    *
-    * @param {enable} enable
-    */
-    OneSignal.enableInAppAlertNotification = function (enable) { };
-    /**
-    * You can call this method with false to opt users out of receiving all notifications through OneSignal.
-    * You can pass true later to opt users back into notifications.
-    *
-    * @param {enable} enable
-    */
-    OneSignal.setSubscription = function (enable) { };
-    /**
-    *
-    * @param {notificationObj} Parameters see POST [documentation](https://documentation.onesignal.com/v2.0/docs/notifications-create-notification)
-    * @returns {Promise} Returns a Promise that resolves if the notification was send successfully.
-    */
-    OneSignal.postNotification = function (notificationObj) { return; };
-    /**
-    * Prompts the user for location permission to allow geotagging based on the "Location radius" filter on the OneSignal dashboard.
-    */
-    OneSignal.promptLocation = function () { };
-    /**
-    * Enable logging to help debug if you run into an issue setting up OneSignal.
-    * The logging levels are as follows: 0 = None, 1= Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose
-  
-    * The higher the value the more information is shown.
-    *
-    * @param {loglevel} contains two properties: logLevel (for console logging) and visualLevel (for dialog messages)
-    */
-    OneSignal.setLogLevel = function (logLevel) { };
-    __decorate$72([
-        Cordova({ observable: true })
-    ], OneSignal, "init", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "registerForPushNotifications", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "sendTag", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "sendTags", null);
-    __decorate$72([
-        Cordova()
-    ], OneSignal, "getTags", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "deleteTag", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "deleteTags", null);
-    __decorate$72([
-        Cordova()
-    ], OneSignal, "getIds", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "enableVibrate", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "enableSound", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "enableNotificationsWhenActive", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "enableInAppAlertNotification", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "setSubscription", null);
-    __decorate$72([
-        Cordova()
-    ], OneSignal, "postNotification", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "promptLocation", null);
-    __decorate$72([
-        Cordova({ sync: true })
-    ], OneSignal, "setLogLevel", null);
-    OneSignal = __decorate$72([
-        Plugin({
-            plugin: 'onesignal-cordova-plugin',
-            pluginRef: 'plugins.OneSignal',
-            repo: 'https://github.com/OneSignal/OneSignal-Cordova-SDK'
-        })
-    ], OneSignal);
-    return OneSignal;
-}());
-
-var __decorate$73 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var PhotoViewer = (function () {
-    function PhotoViewer() {
-    }
-    /**
-     * Shows an image in full screen
-     * @param url {string} URL or path to image
-     * @param title {string}
-     * @param options {any}
-     */
-    PhotoViewer.show = function (url, title, options) { };
-    __decorate$73([
-        Cordova({ sync: true })
-    ], PhotoViewer, "show", null);
-    PhotoViewer = __decorate$73([
-        Plugin({
-            plugin: 'com-sarriaroman-photoviewer',
-            pluginRef: 'PhotoViewer',
-            repo: 'https://github.com/sarriaroman/photoviewer'
-        })
-    ], PhotoViewer);
-    return PhotoViewer;
-}());
-
-var __decorate$74 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var ScreenOrientation = (function () {
-    function ScreenOrientation() {
-    }
-    /**
-     * Lock the orientation to the passed value.
-     * See below for accepted values
-     * @param {orientation} The orientation which should be locked. Accepted values see table below.
-     */
-    ScreenOrientation.lockOrientation = function (orientation) { };
-    /**
-     * Unlock and allow all orientations.
-     */
-    ScreenOrientation.unlockOrientation = function () { };
-    Object.defineProperty(ScreenOrientation, "orientation", {
-        /*
-         * Get the current orientation of the device.
-         */
-        get: function () {
-            return window.screen.orientation;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$74([
-        Cordova({ sync: true })
-    ], ScreenOrientation, "lockOrientation", null);
-    __decorate$74([
-        Cordova({ sync: true })
-    ], ScreenOrientation, "unlockOrientation", null);
-    __decorate$74([
-        CordovaProperty
-    ], ScreenOrientation, "orientation", null);
-    ScreenOrientation = __decorate$74([
-        Plugin({
-            plugin: 'cordova-plugin-screen-orientation',
-            pluginRef: 'window.screen',
-            repo: 'https://github.com/apache/cordova-plugin-screen-orientation',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], ScreenOrientation);
-    return ScreenOrientation;
-}());
-
-var __decorate$75 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var PayPal = (function () {
-    function PayPal() {
-    }
-    /**
-     * You must preconnect to PayPal to prepare the device for processing payments.
-     * This improves the user experience, by making the presentation of the
-     * UI faster. The preconnect is valid for a limited time, so
-     * the recommended time to preconnect is on page load.
-     *
-     * @param {String} environment: available options are "PayPalEnvironmentNoNetwork", "PayPalEnvironmentProduction" and "PayPalEnvironmentSandbox"
-     * @param {PayPalConfiguration} configuration: For Future Payments merchantName, merchantPrivacyPolicyURL and merchantUserAgreementURL must be set be set
-     */
-    PayPal.init = function (environment, configuration) { return; };
-    /**
-     * Retreive the version of PayPal iOS SDK Library.
-     */
-    PayPal.version = function () { return; };
-    /**
-     * Start PayPal UI to collect payment from the user.
-     * See https://developer.paypal.com/webapps/developer/docs/integration/mobile/ios-integration-guide/
-     * for more documentation of the params.
-     *
-     * @param {PayPalPayment} payment: PayPalPayment object
-     */
-    PayPal.renderSinglePaymentUI = function (payment) { return; };
-    /**
-     * Once a user has consented to future payments, when the user subsequently initiates a PayPal payment
-     * from their device to be completed by your server, PayPal uses a Correlation ID to verify that the
-     * payment is originating from a valid, user-consented device+application.
-     * This helps reduce fraud and decrease declines.
-     * This method MUST be called prior to initiating a pre-consented payment (a "future payment") from a mobile device.
-     * Pass the result to your server, to include in the payment request sent to PayPal.
-     * Do not otherwise cache or store this value.
-     */
-    PayPal.clientMetadataID = function () { return; };
-    /**
-     * Please Read Docs on Future Payments at https://github.com/paypal/PayPal-iOS-SDK#future-payments
-     */
-    PayPal.renderFuturePaymentUI = function () { return; };
-    /**
-     * Please Read Docs on Profile Sharing at https://github.com/paypal/PayPal-iOS-SDK#profile-sharing
-     *
-     * @param {Array<string>} scopes: scopes Set of requested scope-values. Accepted scopes are: openid, profile, address, email, phone, futurepayments and paypalattributes
-     * See https://developer.paypal.com/docs/integration/direct/identity/attributes/ for more details
-     **/
-    PayPal.renderProfileSharingUI = function (scopes) { return; };
-    __decorate$75([
-        Cordova()
-    ], PayPal, "init", null);
-    __decorate$75([
-        Cordova()
-    ], PayPal, "version", null);
-    __decorate$75([
-        Cordova()
-    ], PayPal, "renderSinglePaymentUI", null);
-    __decorate$75([
-        Cordova()
-    ], PayPal, "clientMetadataID", null);
-    __decorate$75([
-        Cordova()
-    ], PayPal, "renderFuturePaymentUI", null);
-    __decorate$75([
-        Cordova()
-    ], PayPal, "renderProfileSharingUI", null);
-    PayPal = __decorate$75([
-        Plugin({
-            plugin: 'com.paypal.cordova.mobilesdk',
-            pluginRef: 'PayPalMobile',
-            repo: 'https://github.com/paypal/PayPal-Cordova-Plugin'
-        })
-    ], PayPal);
-    return PayPal;
-}());
-
-var __decorate$76 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var PinDialog = (function () {
-    function PinDialog() {
-    }
-    /**
-     * Show pin dialog
-     * @param {string} message Message to show the user
-     * @param {string} title Title of the dialog
-     * @param {string[]} buttons Buttons to show
-     */
-    PinDialog.prompt = function (message, title, buttons) { return; };
-    __decorate$76([
-        Cordova({
-            successIndex: 1
-        })
-    ], PinDialog, "prompt", null);
-    PinDialog = __decorate$76([
-        Plugin({
-            plugin: 'cordova-plugin-pin-dialog',
-            pluginRef: 'plugins.pinDialog',
-            repo: 'https://github.com/Paldom/PinDialog'
-        })
-    ], PinDialog);
-    return PinDialog;
-}());
-
-var __decorate$77 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var PowerManagement = (function () {
-    function PowerManagement() {
-    }
-    /**
-     * Acquire a wakelock by calling this.
-     */
-    PowerManagement.acquire = function () { return; };
-    /**
-     * This acquires a partial wakelock, allowing the screen to be dimmed.
-     */
-    PowerManagement.dim = function () { return; };
-    /**
-     * Release the wakelock. It's important to do this when you're finished with the wakelock, to avoid unnecessary battery drain.
-     */
-    PowerManagement.release = function () { return; };
-    /**
-     * By default, the plugin will automatically release a wakelock when your app is paused (e.g. when the screen is turned off, or the user switches to another app).
-     * It will reacquire the wakelock upon app resume. If you would prefer to disable this behaviour, you can use this function.
-     * @param set {boolean}
-     */
-    PowerManagement.setReleaseOnPause = function (set) { return; };
-    __decorate$77([
-        Cordova()
-    ], PowerManagement, "acquire", null);
-    __decorate$77([
-        Cordova()
-    ], PowerManagement, "dim", null);
-    __decorate$77([
-        Cordova()
-    ], PowerManagement, "release", null);
-    __decorate$77([
-        Cordova()
-    ], PowerManagement, "setReleaseOnPause", null);
-    PowerManagement = __decorate$77([
-        Plugin({
-            plugin: 'cordova-plugin-powermanagement-orig',
-            pluginRef: 'https://github.com/Viras-/cordova-plugin-powermanagement',
-            repo: 'powerManagement'
-        })
-    ], PowerManagement);
-    return PowerManagement;
-}());
-
-var __decorate$78 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Printer = (function () {
-    function Printer() {
-    }
-    /**
-     * Checks whether to device is capable of printing.
-     */
-    Printer.isAvailable = function () { return; };
-    /**
-     * Sends content to the printer.
-     * @param {content} The content to print. Can be a URL or an HTML string. If a HTML DOM Object is provided, its innerHtml property value will be used.
-     * @param {options} The options to pass to the printer
-     */
-    Printer.print = function (content, options) { return; };
-    __decorate$78([
-        Cordova()
-    ], Printer, "isAvailable", null);
-    __decorate$78([
-        Cordova()
-    ], Printer, "print", null);
-    Printer = __decorate$78([
-        Plugin({
-            plugin: 'de.appplant.cordova.plugin.printer',
-            pluginRef: 'cordova.plugins.printer',
-            repo: 'https://github.com/katzer/cordova-plugin-printer.git',
-            platforms: ['Android', 'iOS']
-        })
-    ], Printer);
-    return Printer;
-}());
-
-var __decorate$79 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Push = (function () {
-    function Push() {
-    }
-    /**
-     * Initialize the plugin on the native side.
-     *
-     * ```
-     * var push = Push.init({
-     *    android: {
-     *        senderID: '12345679'
-     *    },
-     *    ios: {
-     *        alert: 'true',
-     *        badge: true,
-     *        sound: 'false'
-     *    },
-     *    windows: {}
-     * });
-     * ```
-     *
-     * @param {PushOptions} options  The Push [options](https://github.com/phonegap/phonegap-plugin-push/blob/master/docs/API.md#parameters).
-     * @return {PushNotification}  Returns a new [PushNotification](https://github.com/phonegap/phonegap-plugin-push/blob/master/docs/API.md#pushonevent-callback) object.
-     */
-    Push.init = function (options) { return; };
-    /**
-     * Check whether the push notification permission has been granted.
-     * @return {Promise} Returns a Promise that resolves with an object with one property: isEnabled, a boolean that indicates if permission has been granted.
-     */
-    Push.hasPermission = function () { return; };
-    __decorate$79([
-        Cordova({
-            sync: true
-        })
-    ], Push, "init", null);
-    __decorate$79([
-        Cordova()
-    ], Push, "hasPermission", null);
-    Push = __decorate$79([
-        Plugin({
-            plugin: 'phonegap-plugin-push',
-            pluginRef: 'PushNotification',
-            repo: 'https://github.com/phonegap/phonegap-plugin-push'
-        })
-    ], Push);
-    return Push;
-}());
-
-var __decorate$80 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var SafariViewController = (function () {
-    function SafariViewController() {
-    }
-    /**
-     * Checks if SafariViewController is available
-     */
-    SafariViewController.isAvailable = function () { return; };
-    /**
-     * Shows Safari View Controller
-     * @param options
-     */
-    SafariViewController.show = function (options) { return; };
-    /**
-     * Hides Safari View Controller
-     */
-    SafariViewController.hide = function () { };
-    /**
-     * Tries to connect to the  Chrome's custom tabs service. you must call this method before calling any of the other methods listed below.
-     */
-    SafariViewController.connectToService = function () { return; };
-    /**
-     * Call this method whenever there's a chance the user will open an external url.
-     */
-    SafariViewController.warmUp = function () { return; };
-    /**
-     * For even better performance optimization, call this methods if there's more than a 50% chance the user will open a certain URL.
-     * @param url
-     */
-    SafariViewController.mayLaunchUrl = function (url) { return; };
-    __decorate$80([
-        Cordova()
-    ], SafariViewController, "isAvailable", null);
-    __decorate$80([
-        Cordova()
-    ], SafariViewController, "show", null);
-    __decorate$80([
-        Cordova()
-    ], SafariViewController, "hide", null);
-    __decorate$80([
-        Cordova()
-    ], SafariViewController, "connectToService", null);
-    __decorate$80([
-        Cordova()
-    ], SafariViewController, "warmUp", null);
-    __decorate$80([
-        Cordova()
-    ], SafariViewController, "mayLaunchUrl", null);
-    SafariViewController = __decorate$80([
-        Plugin({
-            plugin: 'cordova-plugin-safariviewcontroller',
-            pluginRef: 'SafariViewController',
-            platforms: ['iOS', 'Android'],
-            repo: 'https://github.com/EddyVerbruggen/cordova-plugin-safariviewcontroller'
-        })
-    ], SafariViewController);
-    return SafariViewController;
-}());
-
-var __decorate$81 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Screenshot = (function () {
-    function Screenshot() {
-    }
-    /**
-     *  Takes screenshot and saves the image
-     *
-     * @param {string} format. Format can take the value of either 'jpg' or 'png'
-     * On ios, only 'jpg' format is supported
-     * @param {number} quality. Determines the quality of the screenshot.
-     *        Default quality is set to 100.
-     * @param {string} filename. Name of the file as stored on the storage
-     */
-    Screenshot.save = function (format, quality, filename) {
-        return new Promise(function (resolve, reject) {
-            navigator.screenshot.save(function (error, result) {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(result);
-                }
-            }, format, quality, filename);
-        });
-    };
-    /**
-     *  Takes screenshot and returns the image as an URI
-     *
-     * @param {number} quality. Determines the quality of the screenshot.
-     *        Default quality is set to 100.
-     */
-    Screenshot.URI = function (quality) {
-        return new Promise(function (resolve, reject) {
-            navigator.screenshot.URI(function (error, result) {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(result);
-                }
-            }, quality);
-        });
-    };
-    Screenshot = __decorate$81([
-        Plugin({
-            plugin: 'https://github.com/gitawego/cordova-screenshot.git',
-            pluginRef: 'navigator.screenshot',
-            repo: 'https://github.com/gitawego/cordova-screenshot.git'
-        })
-    ], Screenshot);
-    return Screenshot;
-}());
-
-var __decorate$82 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var SecureStorage = (function () {
-    function SecureStorage() {
-    }
-    /**
-     * Creates a namespaced storage.
-     * @param store {string}
-     */
-    SecureStorage.prototype.create = function (store) {
-        var _this = this;
-        return new Promise(function (res, rej) {
-            _this._objectInstance = new cordova.plugins.SecureStorage(res, rej, store);
-        });
-    };
-    /**
-     * Gets a stored item
-     * @param reference {string}
-     */
-    SecureStorage.prototype.get = function (reference) { return; };
-    /**
-     * Stores a value
-     * @param reference {string}
-     * @param value {string}
-     */
-    SecureStorage.prototype.set = function (reference, value) { return; };
-    /**
-     * Removes a single stored item
-     * @param reference {string}
-     */
-    SecureStorage.prototype.remove = function (reference) { return; };
-    __decorate$82([
-        CordovaInstance({
-            callbackOrder: 'reverse'
-        })
-    ], SecureStorage.prototype, "get", null);
-    __decorate$82([
-        CordovaInstance({
-            callbackOrder: 'reverse'
-        })
-    ], SecureStorage.prototype, "set", null);
-    __decorate$82([
-        CordovaInstance({
-            callbackOrder: 'reverse'
-        })
-    ], SecureStorage.prototype, "remove", null);
-    SecureStorage = __decorate$82([
-        Plugin({
-            plugin: 'cordova-plugin-secure-storage',
-            pluginRef: 'plugins.securestorage',
-            repo: 'https://github.com/Crypho/cordova-plugin-secure-storage',
-            platforms: ['Android', 'iOS', 'Windows Phone', 'Browser']
-        })
-    ], SecureStorage);
-    return SecureStorage;
-}());
-
-var __decorate$83 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Shake = (function () {
-    function Shake() {
-    }
-    /**
-     * Watch for shake gesture
-     * @param sensitivity {number} Optional sensitivity parameter. Defaults to 40
-     */
-    Shake.startWatch = function (sensitivity) { return; };
-    __decorate$83([
-        Cordova({
-            observable: true,
-            clearFunction: 'stopWatch',
-            successIndex: 0,
-            errorIndex: 2
-        })
-    ], Shake, "startWatch", null);
-    Shake = __decorate$83([
-        Plugin({
-            plugin: 'cordova-plugin-shake',
-            pluginRef: 'shake',
-            repo: 'https://github.com/leecrossley/cordova-plugin-shake'
-        })
-    ], Shake);
-    return Shake;
-}());
-
-var __decorate$84 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Sim = (function () {
-    function Sim() {
-    }
-    /**
-     * Returns info from the SIM card.
-     * @returns {Promise}
-     */
-    Sim.getSimInfo = function () { return; };
-    __decorate$84([
-        Cordova()
-    ], Sim, "getSimInfo", null);
-    Sim = __decorate$84([
-        Plugin({
-            plugin: 'cordova-plugin-sim',
-            pluginRef: 'plugins.sim',
-            repo: 'https://github.com/pbakondy/cordova-plugin-sim',
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], Sim);
-    return Sim;
-}());
-
-var __decorate$85 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var SMS = (function () {
-    function SMS() {
-    }
-    /**
-     * Sends sms to a number
-     * @param phoneNumber {string|Array<string>} Phone number
-     * @param message {string} Message
-     * @param options {SmsOptions} Options
-     * @returns {Promise<any>} Resolves promise when the SMS has been sent
-     */
-    SMS.send = function (phoneNumber, message, options) { return; };
-    __decorate$85([
-        Cordova()
-    ], SMS, "send", null);
-    SMS = __decorate$85([
-        Plugin({
-            plugin: 'cordova-sms-plugin',
-            pluginRef: 'sms',
-            repo: 'https://github.com/cordova-sms/cordova-sms-plugin',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], SMS);
-    return SMS;
-}());
-
-var __decorate$86 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var SocialSharing = (function () {
-    function SocialSharing() {
-    }
-    /**
-     * Shares using the share sheet
-     * @param message {string} The message you would like to share.
-     * @param subject {string} The subject
-     * @param file {string|string[]} URL(s) to file(s) or image(s), local path(s) to file(s) or image(s), or base64 data of an image. Only the first file/image will be used on Windows Phone.
-     * @param url {string} A URL to share
-     * @returns {Promise}
-     */
-    SocialSharing.share = function (message, subject, file, url) { return; };
-    /**
-     * Shares using the share sheet with additional options and returns a result object or an error message (requires plugin version 5.1.0+)
-     * @param options {object} The options object with the message, subject, files, url and chooserTitle properties.
-     * @returns {Promise}
-     */
-    SocialSharing.shareWithOptions = function (options) { return; };
-    /**
-     * Checks if you can share via a specific app.
-     * @param appName {string} App name or package name. Examples: instagram or com.apple.social.facebook
-     * @param message {string}
-     * @param subject {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
-     */
-    SocialSharing.canShareVia = function (appName, message, subject, image, url) { return; };
-    /**
-     * Shares directly to Twitter
-     * @param message {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaTwitter = function (message, image, url) { return; };
-    /**
-     * Shares directly to Facebook
-     * @param message {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaFacebook = function (message, image, url) { return; };
-    /**
-     * Shares directly to Facebook with a paste message hint
-     * @param message {string}
-     * @param image {string}
-     * @param url {string}
-     * @param pasteMessageHint {string}
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaFacebookWithPasteMessageHint = function (message, image, url, pasteMessageHint) { return; };
-    /**
-     * Shares directly to Instagram
-     * @param message {string}
-     * @param image {string}
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaInstagram = function (message, image) { return; };
-    /**
-     * Shares directly to WhatsApp
-     * @param message {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaWhatsApp = function (message, image, url) { return; };
-    /**
-     * Shares directly to a WhatsApp Contact
-     * @param receiver {string} Pass phone number on Android, and Addressbook ID (abid) on iOS
-     * @param message {string} Message to send
-     * @param image {string} Image to send (does not work on iOS
-     * @param url {string} Link to send
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaWhatsAppToReceiver = function (receiver, message, image, url) { return; };
-    /**
-     * Share via SMS
-     * @param messge {string} message to send
-     * @param phoneNumber {string} Number or multiple numbers seperated by commas
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaSMS = function (messge, phoneNumber) { return; };
-    /**
-     * Checks if you can share via email
-     * @returns {Promise}
-     */
-    SocialSharing.canShareViaEmail = function () { return; };
-    /**
-     * Share via Email
-     * @param message {string}
-     * @param subject {string}
-     * @param to {string[]}
-     * @param cc {string[]} Optional
-     * @param bcc {string[]} Optional
-     * @param files {string|string[]} Optional URL or local path to file(s) to attach
-     * @returns {Promise}
-     */
-    SocialSharing.shareViaEmail = function (message, subject, to, cc, bcc, files) { return; };
-    /**
-     * Share via AppName
-     * @param appName {string} App name or package name. Examples: instagram or com.apple.social.facebook
-     * @param message {string}
-     * @param subject {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
-     */
-    SocialSharing.shareVia = function (appName, message, subject, image, url) { return; };
-    __decorate$86([
-        Cordova()
-    ], SocialSharing, "share", null);
-    __decorate$86([
-        Cordova({
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareWithOptions", null);
-    __decorate$86([
-        Cordova({
-            successIndex: 5,
-            errorIndex: 6,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "canShareVia", null);
-    __decorate$86([
-        Cordova({
-            successIndex: 3,
-            errorIndex: 4,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareViaTwitter", null);
-    __decorate$86([
-        Cordova({
-            successIndex: 3,
-            errorIndex: 4,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareViaFacebook", null);
-    __decorate$86([
-        Cordova({
-            successIndex: 4,
-            errorIndex: 5,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareViaFacebookWithPasteMessageHint", null);
-    __decorate$86([
-        Cordova({
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareViaInstagram", null);
-    __decorate$86([
-        Cordova({
-            successIndex: 3,
-            errorIndex: 4,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareViaWhatsApp", null);
-    __decorate$86([
-        Cordova({
-            successIndex: 4,
-            errorIndex: 5,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareViaWhatsAppToReceiver", null);
-    __decorate$86([
-        Cordova({
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareViaSMS", null);
-    __decorate$86([
-        Cordova({
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "canShareViaEmail", null);
-    __decorate$86([
-        Cordova({
-            platforms: ['iOS', 'Android'],
-            successIndex: 6,
-            errorIndex: 7
-        })
-    ], SocialSharing, "shareViaEmail", null);
-    __decorate$86([
-        Cordova({
-            successIndex: 5,
-            errorIndex: 6,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareVia", null);
-    SocialSharing = __decorate$86([
-        Plugin({
-            plugin: 'cordova-plugin-x-socialsharing',
-            pluginRef: 'plugins.socialsharing',
-            repo: 'https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin',
-            platforms: ['iOS', 'Android', 'Windows Phone']
-        })
-    ], SocialSharing);
-    return SocialSharing;
-}());
-
-var __decorate$87 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var SpinnerDialog = (function () {
-    function SpinnerDialog() {
-    }
-    /**
-     * Shows the spinner dialog
-     * @param title {string} Spinner title (shows on Android only)
-     * @param message {string} Spinner message
-     * @param cancelCallback {boolean|function} Set to true to set spinner not cancelable. Or provide a function to call when the user cancels the spinner.
-     * @param iOSOptions {object} Options for iOS only
-     */
-    SpinnerDialog.show = function (title, message, cancelCallback, iOSOptions) { };
-    /**
-     * Hides the spinner dialog if visible
-     */
-    SpinnerDialog.hide = function () { };
-    __decorate$87([
-        Cordova({
-            sync: true
-        })
-    ], SpinnerDialog, "show", null);
-    __decorate$87([
-        Cordova({
-            sync: true
-        })
-    ], SpinnerDialog, "hide", null);
-    SpinnerDialog = __decorate$87([
-        Plugin({
-            plugin: 'cordova-plugin-spinner-dialog',
-            pluginRef: 'window.plugins.spinnerDialog',
-            repo: 'https://github.com/Paldom/SpinnerDialog',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], SpinnerDialog);
-    return SpinnerDialog;
-}());
-
-var __decorate$88 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Splashscreen = (function () {
-    function Splashscreen() {
-    }
-    /**
-     * Shows the splashscreen
-     */
-    Splashscreen.show = function () { };
-    /**
-     * Hides the splashscreen
-     */
-    Splashscreen.hide = function () { };
-    __decorate$88([
-        Cordova({
-            sync: true
-        })
-    ], Splashscreen, "show", null);
-    __decorate$88([
-        Cordova({
-            sync: true
-        })
-    ], Splashscreen, "hide", null);
-    Splashscreen = __decorate$88([
-        Plugin({
-            plugin: 'cordova-plugin-splashscreen',
-            pluginRef: 'navigator.splashscreen',
-            repo: 'https://github.com/apache/cordova-plugin-splashscreen'
-        })
-    ], Splashscreen);
-    return Splashscreen;
-}());
-
-var __decorate$89 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var SQLite = (function () {
-    function SQLite() {
-    }
-    Object.defineProperty(SQLite.prototype, "databaseFeatures", {
-        get: function () {
-            return this._objectInstance.databaseFeatures;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    /**
-     * Open or create a SQLite database file.
-     *
-     * See the plugin docs for an explanation of all options: https://github.com/litehelpers/Cordova-sqlite-storage#opening-a-database
-     *
-     * @param config the config for opening the database.
-     * @usage
-     *
-     * ```typescript
-     * import { SQLite } from 'ionic-native';
-     *
-     * let db = new SQLite();
-     * db.openDatabase({
-     *   name: 'data.db',
-     *   location: 'default' // the location field is required
-     * }).then(() => {
-     *   db.executeSql('create table danceMoves(name VARCHAR(32))', {}).then(() => {
-     *
-     *   }, (err) => {
-     *     console.error('Unable to execute sql', err);
-     *   })
-     * }, (err) => {
-     *   console.error('Unable to open database', err);
-     * });
-     * ```
-     */
-    SQLite.prototype.openDatabase = function (config) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            sqlitePlugin.openDatabase(config, function (db) {
-                _this._objectInstance = db;
-                resolve(db);
-            }, function (error) {
-                console.warn(error);
-                reject(error);
-            });
-        });
-    };
-    SQLite.prototype.addTransaction = function (transaction) { };
-    SQLite.prototype.transaction = function (fn) { return; };
-    SQLite.prototype.readTransaction = function (fn) { return; };
-    SQLite.prototype.startNextTransaction = function () { };
-    SQLite.prototype.close = function () { return; };
-    SQLite.prototype.start = function () { };
-    /**
-     * Execute SQL on the opened database. Note, you must call `openDatabase` first, and
-     * ensure it resolved and successfully opened the database.
-     *
-     * @usage
-     *
-     * ```typescript
-     * db.executeSql('SELECT FROM puppies WHERE type = ?', ['cavalier']).then((resultSet) => {
-     *   // Access the items through resultSet.rows
-     *   // resultSet.rows.item(i)
-     * }, (err) => {})
-     * ```
-     */
-    SQLite.prototype.executeSql = function (statement, params) { return; };
-    SQLite.prototype.addStatement = function (sql, values) { return; };
-    SQLite.prototype.sqlBatch = function (sqlStatements) { return; };
-    SQLite.prototype.abortallPendingTransactions = function () { };
-    SQLite.prototype.handleStatementSuccess = function (handler, response) { };
-    SQLite.prototype.handleStatementFailure = function (handler, response) { };
-    SQLite.prototype.run = function () { };
-    SQLite.prototype.abort = function (txFailure) { };
-    SQLite.prototype.finish = function () { };
-    SQLite.prototype.abortFromQ = function (sqlerror) { };
-    SQLite.echoTest = function () { return; };
-    SQLite.deleteDatabase = function (first) { return; };
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "addTransaction", null);
-    __decorate$89([
-        CordovaInstance()
-    ], SQLite.prototype, "transaction", null);
-    __decorate$89([
-        CordovaInstance()
-    ], SQLite.prototype, "readTransaction", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "startNextTransaction", null);
-    __decorate$89([
-        CordovaInstance()
-    ], SQLite.prototype, "close", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "start", null);
-    __decorate$89([
-        CordovaInstance()
-    ], SQLite.prototype, "executeSql", null);
-    __decorate$89([
-        CordovaInstance()
-    ], SQLite.prototype, "addStatement", null);
-    __decorate$89([
-        CordovaInstance()
-    ], SQLite.prototype, "sqlBatch", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "abortallPendingTransactions", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "handleStatementSuccess", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "handleStatementFailure", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "run", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "abort", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "finish", null);
-    __decorate$89([
-        CordovaInstance({
-            sync: true
-        })
-    ], SQLite.prototype, "abortFromQ", null);
-    __decorate$89([
-        Cordova()
-    ], SQLite, "echoTest", null);
-    __decorate$89([
-        Cordova()
-    ], SQLite, "deleteDatabase", null);
-    SQLite = __decorate$89([
-        Plugin({
-            pluginRef: 'sqlitePlugin',
-            plugin: 'cordova-sqlite-storage',
-            repo: 'https://github.com/litehelpers/Cordova-sqlite-storage'
-        })
-    ], SQLite);
-    return SQLite;
-}());
-
-var __decorate$90 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var StatusBar = (function () {
-    function StatusBar() {
-    }
-    /**
-     * Set whether the status bar overlays the main app view. The default
-     * is true.
-     *
-     * @param {boolean} doesOverlay  Whether the status bar overlays the main app view.
-     */
-    StatusBar.overlaysWebView = function (doesOverlay) { };
-    
-    /**
-     * Use the default statusbar (dark text, for light backgrounds).
-     */
-    StatusBar.styleDefault = function () { };
-    
-    /**
-     * Use the lightContent statusbar (light text, for dark backgrounds).
-     */
-    StatusBar.styleLightContent = function () { };
-    
-    /**
-     * Use the blackTranslucent statusbar (light text, for dark backgrounds).
-     */
-    StatusBar.styleBlackTranslucent = function () { };
-    
-    /**
-     * Use the blackOpaque statusbar (light text, for dark backgrounds).
-     */
-    StatusBar.styleBlackOpaque = function () { };
-    
-    /**
-     * Set the status bar to a specific named color. Valid options:
-     * black, darkGray, lightGray, white, gray, red, green, blue, cyan, yellow, magenta, orange, purple, brown.
-     *
-     * iOS note: you must call StatusBar.overlaysWebView(false) to enable color changing.
-     *
-     * @param {string} colorName  The name of the color (from above)
-     */
-    StatusBar.backgroundColorByName = function (colorName) { };
-    
-    /**
-     * Set the status bar to a specific hex color (CSS shorthand supported!).
-     *
-     * iOS note: you must call StatusBar.overlaysWebView(false) to enable color changing.
-     *
-     * @param {string} hexString  The hex value of the color.
-     */
-    StatusBar.backgroundColorByHexString = function (hexString) { };
-    
-    /**
-     * Hide the StatusBar
-     */
-    StatusBar.hide = function () { };
-    
-    /**
-    * Show the StatusBar
-    */
-    StatusBar.show = function () { };
-    
-    Object.defineProperty(StatusBar, "isVisible", {
-        /**
-         * Whether the StatusBar is currently visible or not.
-         */
-        get: function () { return window.StatusBar.isVisible; },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "overlaysWebView", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "styleDefault", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "styleLightContent", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "styleBlackTranslucent", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "styleBlackOpaque", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "backgroundColorByName", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "backgroundColorByHexString", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "hide", null);
-    __decorate$90([
-        Cordova({
-            sync: true
-        })
-    ], StatusBar, "show", null);
-    __decorate$90([
-        CordovaProperty
-    ], StatusBar, "isVisible", null);
-    StatusBar = __decorate$90([
-        Plugin({
-            plugin: 'cordova-plugin-statusbar',
-            pluginRef: 'StatusBar',
-            repo: 'https://github.com/apache/cordova-plugin-statusbar',
-            platforms: ['iOS', 'Android', 'Windows Phone 8', 'Windows 8', 'Windows 10']
-        })
-    ], StatusBar);
-    return StatusBar;
-}());
-
-var __decorate$91 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var StreamingMedia = (function () {
-    function StreamingMedia() {
-    }
-    /**
-     * Streams a video
-     * @param videoUrl {string} The URL of the video
-     * @param options {StreamingVideoOptions} Options
-     */
-    StreamingMedia.playVideo = function (videoUrl, options) { };
-    /**
-     * Streams an audio
-     * @param audioUrl {string} The URL of the audio stream
-     * @param options {StreamingAudioOptions} Options
-     */
-    StreamingMedia.playAudio = function (audioUrl, options) { };
-    /**
-     * Stops streaming audio
-     */
-    StreamingMedia.stopAudio = function () { };
-    /**
-     * Pauses streaming audio
-     */
-    StreamingMedia.pauseAudio = function () { };
-    /**
-     * Resumes streaming audio
-     */
-    StreamingMedia.resumeAudio = function () { };
-    __decorate$91([
-        Cordova({ sync: true })
-    ], StreamingMedia, "playVideo", null);
-    __decorate$91([
-        Cordova({ sync: true })
-    ], StreamingMedia, "playAudio", null);
-    __decorate$91([
-        Cordova({ sync: true })
-    ], StreamingMedia, "stopAudio", null);
-    __decorate$91([
-        Cordova({ sync: true, platforms: ['iOS'] })
-    ], StreamingMedia, "pauseAudio", null);
-    __decorate$91([
-        Cordova({ sync: true, platforms: ['iOS'] })
-    ], StreamingMedia, "resumeAudio", null);
-    StreamingMedia = __decorate$91([
-        Plugin({
-            plugin: 'cordova-plugin-streaming-media',
-            pluginRef: 'plugins.streamingMedia',
-            repo: 'https://github.com/nchutchind/cordova-plugin-streaming-media',
-            platforms: ['Android', 'iOS']
-        })
-    ], StreamingMedia);
-    return StreamingMedia;
-}());
-
-var __decorate$92 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var ThreeDeeTouch = (function () {
-    function ThreeDeeTouch() {
-    }
-    /**
-     * You need an iPhone 6S or some future tech to use the features of this plugin, so you can check at runtime if the user's device is supported.
-     * @returns {Promise<boolean>} returns a promise that resolves with a boolean that indicates whether the plugin is available or not
-     */
-    ThreeDeeTouch.isAvailable = function () { return; };
-    /**
-     * You can get a notification when the user force touches the webview. The plugin defines a Force Touch when at least 75% of the maximum force is applied to the screen. Your app will receive the x and y coordinates, so you have to figure out which UI element was touched.
-     * @returns {Observable<ThreeDeeTouchForceTouch>} Returns an observable that sends a `ThreeDeeTouchForceTouch` object
-     */
-    ThreeDeeTouch.watchForceTouches = function () { return; };
-    /**
-     * setup the 3D-touch actions, takes an array of objects with the following
-     * @param {string} type (optional) A type that can be used `onHomeIconPressed` callback
-     * @param {string} title Title for your action
-     * @param {string} subtitle (optional) A short description for your action
-     * @param {string} iconType (optional) Choose between Prohibit, Contact, Home, MarkLocation, Favorite, Love, Cloud, Invitation, Confirmation, Mail, Message, Date, Time, CapturePhoto, CaptureVideo, Task, TaskCompleted, Alarm, Bookmark, Shuffle, Audio, Update
-     */
-    ThreeDeeTouch.configureQuickActions = function (quickActions) { };
-    /**
-     * When a home icon is pressed, your app launches and this JS callback is invoked.
-     * @returns {Observable<any>} returns an observable that notifies you when he user presses on the home screen icon
-     */
-    ThreeDeeTouch.onHomeIconPressed = function () {
-        return new Observable_2(function (observer) {
-            if (window.ThreeDeeTouch && window.ThreeDeeTouch.onHomeIconPressed) {
-                window.ThreeDeeTouch.onHomeIconPressed = observer.next.bind(observer);
-            }
-            else {
-                observer.error('3dTouch plugin is not available.');
-                observer.complete();
-            }
-        });
-    };
-    /**
-     * Enable Link Preview.
-     * UIWebView and WKWebView (the webviews powering Cordova apps) don't allow the fancy new link preview feature of iOS9.
-     */
-    ThreeDeeTouch.enableLinkPreview = function () { };
-    /**
-     * Disabled the link preview feature, if enabled.
-     */
-    ThreeDeeTouch.disableLinkPreview = function () { };
-    __decorate$92([
-        Cordova()
-    ], ThreeDeeTouch, "isAvailable", null);
-    __decorate$92([
-        Cordova({
-            observable: true
-        })
-    ], ThreeDeeTouch, "watchForceTouches", null);
-    __decorate$92([
-        Cordova({
-            sync: true
-        })
-    ], ThreeDeeTouch, "configureQuickActions", null);
-    __decorate$92([
-        Cordova({
-            sync: true
-        })
-    ], ThreeDeeTouch, "enableLinkPreview", null);
-    __decorate$92([
-        Cordova({
-            sync: true
-        })
-    ], ThreeDeeTouch, "disableLinkPreview", null);
-    ThreeDeeTouch = __decorate$92([
-        Plugin({
-            plugin: 'cordova-plugin-3dtouch',
-            pluginRef: 'ThreeDeeTouch',
-            repo: 'https://github.com/EddyVerbruggen/cordova-plugin-3dtouch',
-            platforms: ['iOS']
-        })
-    ], ThreeDeeTouch);
-    return ThreeDeeTouch;
-}());
-
-var __decorate$93 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Toast$1 = (function () {
-    function Toast() {
-    }
-    /**
-     * Show a native toast for the given duration at the specified position.
-     *
-     * @param {string} message  The message to display.
-     * @param {string} duration  Duration to show the toast, either 'short', 'long' or any number of milliseconds: '1500'.
-     * @param {string} position  Where to position the toast, either 'top', 'center', or 'bottom'.
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.show = function (message, duration, position) { return; };
-    /**
-     * Manually hide any currently visible toast.
-     * @return {Promise} Returns a Promise that resolves on success.
-     */
-    Toast.hide = function () { return; };
-    /**
-     * Show a native toast with the given options.
-     *
-     * @param {Object} options  Options for showing a toast. Available options:
-     *   message  The message to display.
-     *   duration  Duration to show the toast, either 'short', 'long' or any number of milliseconds: '1500'.
-     *   position  Where to position the toast, either 'top', 'center', or 'bottom'.
-     *   addPixelsY  Offset in pixels to move the toast up or down from its specified position.
-     *
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.showWithOptions = function (options) { return; };
-    /**
-     * Shorthand for `show(message, 'short', 'top')`.
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.showShortTop = function (message) { return; };
-    /**
-     * Shorthand for `show(message, 'short', 'center')`.
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.showShortCenter = function (message) { return; };
-    /**
-     * Shorthand for `show(message, 'short', 'bottom')`.
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.showShortBottom = function (message) { return; };
-    /**
-     * Shorthand for `show(message, 'long', 'top')`.
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.showLongTop = function (message) { return; };
-    /**
-     * Shorthand for `show(message, 'long', 'center')`.
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.showLongCenter = function (message) { return; };
-    /**
-     * Shorthand for `show(message, 'long', 'bottom')`.
-     * @return {Observable}  Returns an Observable that notifies first on success and then when tapped, rejects on error.
-     */
-    Toast.showLongBottom = function (message) { return; };
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "show", null);
-    __decorate$93([
-        Cordova()
-    ], Toast, "hide", null);
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "showWithOptions", null);
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "showShortTop", null);
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "showShortCenter", null);
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "showShortBottom", null);
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "showLongTop", null);
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "showLongCenter", null);
-    __decorate$93([
-        Cordova({
-            observable: true,
-            clearFunction: 'hide'
-        })
-    ], Toast, "showLongBottom", null);
-    Toast = __decorate$93([
-        Plugin({
-            plugin: 'cordova-plugin-x-toast',
-            pluginRef: 'plugins.toast',
-            repo: 'https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], Toast);
-    return Toast;
-}());
-
-var __decorate$94 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var TouchID = (function () {
-    function TouchID() {
-    }
-    /**
-     * Checks Whether TouchID is available or not.
-     *
-     * @return {Promise} Returns a Promise that resolves if yes, rejects if no.
-     */
-    TouchID.isAvailable = function () { return; };
-    /**
-     * Show TouchID dialog and wait for a fingerprint scan. If user taps 'Enter Password' button, brings up standard system passcode screen.
-     *
-     * @param {string} message  The message to display
-     * @return {Promise} Returns a Promise the resolves if the fingerprint scan was successful, rejects with an error code (see above).
-     */
-    TouchID.verifyFingerprint = function (message) { return; };
-    /**
-     * Show TouchID dialog and wait for a fingerprint scan. If user taps 'Enter Password' button, rejects with code '-3' (see above).
-     *
-     * @param {string} message  The message to display
-     * @return {Promise} Returns a Promise the resolves if the fingerprint scan was successful, rejects with an error code (see above).
-     */
-    TouchID.verifyFingerprintWithCustomPasswordFallback = function (message) { return; };
-    /**
-     * Show TouchID dialog with custom 'Enter Password' message and wait for a fingerprint scan. If user taps 'Enter Password' button, rejects with code '-3' (see above).
-     *
-     * @param {string} message  The message to display
-     * @param {string} enterPasswordLabel  Custom text for the 'Enter Password' button
-     * @return {Promise} Returns a Promise the resolves if the fingerprint scan was successful, rejects with an error code (see above).
-     */
-    TouchID.verifyFingerprintWithCustomPasswordFallbackAndEnterPasswordLabel = function (message, enterPasswordLabel) { return; };
-    __decorate$94([
-        Cordova()
-    ], TouchID, "isAvailable", null);
-    __decorate$94([
-        Cordova()
-    ], TouchID, "verifyFingerprint", null);
-    __decorate$94([
-        Cordova()
-    ], TouchID, "verifyFingerprintWithCustomPasswordFallback", null);
-    __decorate$94([
-        Cordova()
-    ], TouchID, "verifyFingerprintWithCustomPasswordFallbackAndEnterPasswordLabel", null);
-    TouchID = __decorate$94([
-        Plugin({
-            plugin: 'cordova-plugin-touch-id',
-            pluginRef: 'plugins.touchid',
-            repo: 'https://github.com/EddyVerbruggen/cordova-plugin-touch-id',
-            platforms: ['iOS']
-        })
-    ], TouchID);
-    return TouchID;
-}());
-
-var __decorate$95 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var TextToSpeech = (function () {
-    function TextToSpeech() {
-    }
-    /**
-     * This function speaks
-     * @param options {string | TTSOptions} Text to speak or TTSOptions
-     * @return {Promise<any>} Returns a promise that resolves when the speaking finishes
-     */
-    TextToSpeech.speak = function (options) {
-        return;
-    };
-    __decorate$95([
-        Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], TextToSpeech, "speak", null);
-    TextToSpeech = __decorate$95([
-        Plugin({
-            plugin: 'cordova-plugin-tts',
-            pluginRef: 'TTS',
-            repo: 'https://github.com/vilic/cordova-plugin-tts'
-        })
-    ], TextToSpeech);
-    return TextToSpeech;
-}());
-
-var __decorate$96 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var TwitterConnect = (function () {
-    function TwitterConnect() {
-    }
-    /**
-     * Logs in
-     * @return {Promise<TwitterConnectResponse>} returns a promise that resolves if logged in and rejects if failed to login
-     */
-    TwitterConnect.login = function () { return; };
-    /**
-     * Logs out
-     * @return {Promise<any>} returns a promise that resolves if logged out and rejects if failed to logout
-     */
-    TwitterConnect.logout = function () { return; };
-    /**
-     * Returns user's profile information
-     * @return {Promise<any>} returns a promise that resolves if user profile is successfully retrieved and rejects if request fails
-     */
-    TwitterConnect.showUser = function () { return; };
-    __decorate$96([
-        Cordova()
-    ], TwitterConnect, "login", null);
-    __decorate$96([
-        Cordova()
-    ], TwitterConnect, "logout", null);
-    __decorate$96([
-        Cordova()
-    ], TwitterConnect, "showUser", null);
-    TwitterConnect = __decorate$96([
-        Plugin({
-            plugin: 'twitter-connect-plugin',
-            pluginRef: 'TwitterConnect',
-            repo: 'https://github.com/ManifestWebDesign/twitter-connect-plugin',
-            install: 'ionic plugin add twitter-connect-plugin --variable FABRIC_KEY=fabric_API_key'
-        })
-    ], TwitterConnect);
-    return TwitterConnect;
-}());
-
-var __decorate$97 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Vibration = (function () {
-    function Vibration() {
-    }
-    /**
-     * Vibrates the device for given amount of time.
-     * @param time {number|Array<number>} Milliseconds to vibrate the device. If passed an array of numbers, it will define a vibration pattern. Pass 0 to stop any vibration immediately.
-     */
-    Vibration.vibrate = function (time) { };
-    __decorate$97([
-        Cordova({
-            sync: true
-        })
-    ], Vibration, "vibrate", null);
-    Vibration = __decorate$97([
-        Plugin({
-            plugin: 'cordova-plugin-vibration',
-            pluginRef: 'navigator',
-            repo: 'https://github.com/apache/cordova-plugin-vibration',
-            platforms: ['Android', 'iOS', 'Windows 8.1 Phone', 'Windows 8.1', 'Windows 10']
-        })
-    ], Vibration);
-    return Vibration;
-}());
-
-var __decorate$98 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var VideoEditor = (function () {
-    function VideoEditor() {
-    }
-    /**
-     * Transcode a video
-     * @param options {TranscodeOptions} Options
-     * @return {Promise<string>} Returns a promise that resolves to the path of the transcoded video
-     */
-    VideoEditor.transcodeVideo = function (options) { return; };
-    /**
-     * Trim a video
-     * @param options {TrimOptions} Options
-     * @return {Promise<string>} Returns a promise that resolves to the path of the trimmed video
-     */
-    VideoEditor.trim = function (options) { return; };
-    /**
-     * Create a JPEG thumbnail from a video
-     * @param options {CreateThumbnailOptions} Options
-     * @return {Promise<string>} Returns a promise that resolves to the path to the jpeg image on the device
-     */
-    VideoEditor.createThumbnail = function (options) { return; };
-    /**
-     * Get info on a video (width, height, orientation, duration, size, & bitrate)
-     * @param options {GetVideoInfoOptions} Options
-     * @return {Promise<VideoInfo>} Returns a promise that resolves to an object containing info on the video
-     */
-    VideoEditor.getVideoInfo = function (options) { return; };
-    VideoEditor.OptimizeForNetworkUse = {
-        NO: 0,
-        YES: 1
-    };
-    VideoEditor.OutputFileType = {
-        M4V: 0,
-        MPEG4: 1,
-        M4A: 2,
-        QUICK_TIME: 3
-    };
-    __decorate$98([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], VideoEditor, "transcodeVideo", null);
-    __decorate$98([
-        Cordova({
-            callbackOrder: 'reverse',
-            platforms: ['iOS']
-        })
-    ], VideoEditor, "trim", null);
-    __decorate$98([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], VideoEditor, "createThumbnail", null);
-    __decorate$98([
-        Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], VideoEditor, "getVideoInfo", null);
-    VideoEditor = __decorate$98([
-        Plugin({
-            plugin: 'cordova-plugin-video-editor',
-            pluginRef: 'VideoEditor',
-            repo: 'https://github.com/jbavari/cordova-plugin-video-editor',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], VideoEditor);
-    return VideoEditor;
-}());
-
-var __decorate$99 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var VideoPlayer = (function () {
-    function VideoPlayer() {
-    }
-    /**
-     * Plays the video from the passed url.
-     * @param fileUrl {string} File url to the video.
-     * @param options {VideoOptions?} Optional video playback settings. See options above.
-     * @returns {Promise<any>} Resolves promise when the video was played successfully.
-     */
-    VideoPlayer.play = function (fileUrl, options) { return; };
-    /**
-     * Stops the video playback immediatly.
-     */
-    VideoPlayer.close = function () { };
-    __decorate$99([
-        Cordova()
-    ], VideoPlayer, "play", null);
-    __decorate$99([
-        Cordova({ sync: true })
-    ], VideoPlayer, "close", null);
-    VideoPlayer = __decorate$99([
-        Plugin({
-            plugin: 'cordova-plugin-videoplayer',
-            pluginRef: 'VideoPlayer',
-            repo: 'https://github.com/moust/cordova-plugin-videoplayer',
-            platforms: ['Android']
-        })
-    ], VideoPlayer);
-    return VideoPlayer;
-}());
-
-var __decorate$100 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var WebIntent = (function () {
-    function WebIntent() {
-    }
-    Object.defineProperty(WebIntent, "ACTION_VIEW", {
-        get: function () {
-            return window.plugins.webintent.ACTION_VIEW;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(WebIntent, "EXTRA_TEXT", {
-        get: function () {
-            return window.plugins.webintent.EXTRA_TEXT;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    WebIntent.startActivity = function (options) { return; };
-    WebIntent.hasExtra = function (extra) { return; };
-    WebIntent.getExtra = function (extra) { return; };
-    WebIntent.getUri = function () { return; };
-    
-    WebIntent.onNewIntent = function () { return; };
-    
-    WebIntent.sendBroadcast = function (options) { return; };
-    __decorate$100([
-        CordovaProperty
-    ], WebIntent, "ACTION_VIEW", null);
-    __decorate$100([
-        CordovaProperty
-    ], WebIntent, "EXTRA_TEXT", null);
-    __decorate$100([
-        Cordova()
-    ], WebIntent, "startActivity", null);
-    __decorate$100([
-        Cordova()
-    ], WebIntent, "hasExtra", null);
-    __decorate$100([
-        Cordova()
-    ], WebIntent, "getExtra", null);
-    __decorate$100([
-        Cordova()
-    ], WebIntent, "getUri", null);
-    __decorate$100([
-        Cordova()
-    ], WebIntent, "onNewIntent", null);
-    __decorate$100([
-        Cordova()
-    ], WebIntent, "sendBroadcast", null);
-    WebIntent = __decorate$100([
-        Plugin({
-            plugin: 'https://github.com/Initsogar/cordova-webintent.git',
-            pluginRef: 'window.plugins.webintent',
-            repo: 'https://github.com/Initsogar/cordova-webintent.git',
-            platforms: ['Android']
-        })
-    ], WebIntent);
-    return WebIntent;
-}());
-
-var __decorate$101 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var YoutubeVideoPlayer = (function () {
-    function YoutubeVideoPlayer() {
-    }
-    /**
-     * Plays a YouTube video
-     * @param videoId {string} Video ID
-     */
-    YoutubeVideoPlayer.openVideo = function (videoId) { };
-    __decorate$101([
-        Cordova({ sync: true })
-    ], YoutubeVideoPlayer, "openVideo", null);
-    YoutubeVideoPlayer = __decorate$101([
-        Plugin({
-            plugin: 'https://github.com/Glitchbone/CordovaYoutubeVideoPlayer.git',
-            pluginRef: 'YoutubeVideoPlayer',
-            repo: 'https://github.com/Glitchbone/CordovaYoutubeVideoPlayer',
-            platforms: ['Android', 'iOS']
-        })
-    ], YoutubeVideoPlayer);
-    return YoutubeVideoPlayer;
-}());
-
-var __decorate$102 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var Zip = (function () {
-    function Zip() {
-    }
-    /**
-     * Extracts files from a ZIP archive
-     * @param sourceZip {string} Source ZIP file
-     * @param destUrl {string} Destination folder
-     * @param onProgress {Function} optional callback to be called on progress update
-     * @return  {Promise<number>} returns a promise that resolves with a number. 0 is success, -1 is error
-     */
-    Zip.unzip = function (sourceZip, destUrl, onProgress) { return; };
-    __decorate$102([
-        Cordova({
-            successIndex: 2,
-            errorIndex: 4
-        })
-    ], Zip, "unzip", null);
-    Zip = __decorate$102([
-        Plugin({
-            plugin: 'cordova-plugin-zip',
-            pluginRef: 'zip',
-            repo: 'https://github.com/MobileChromeApps/cordova-plugin-zip',
-        })
-    ], Zip);
-    return Zip;
-}());
-
-var DEVICE_READY_TIMEOUT = 2000;
-window['IonicNative'] = {
-    ActionSheet: ActionSheet$1,
-    AdMob: AdMob,
-    AndroidFingerprintAuth: AndroidFingerprintAuth,
-    AppAvailability: AppAvailability,
-    AppRate: AppRate,
-    AppVersion: AppVersion,
-    Badge: Badge$1,
-    BackgroundGeolocation: BackgroundGeolocation,
-    BackgroundMode: BackgroundMode,
-    BarcodeScanner: BarcodeScanner,
-    Base64ToGallery: Base64ToGallery,
-    BatteryStatus: BatteryStatus,
-    Brightness: Brightness,
-    BLE: BLE,
-    BluetoothSerial: BluetoothSerial,
-    Calendar: Calendar,
-    CallNumber: CallNumber,
-    Camera: Camera,
-    CameraPreview: CameraPreview,
-    CardIO: CardIO,
-    Clipboard: Clipboard,
-    CodePush: CodePush,
-    Contacts: Contacts,
-    Crop: Crop,
-    DatePicker: DatePicker,
-    DBMeter: DBMeter,
-    Deeplinks: Deeplinks,
-    Device: Device,
-    DeviceAccounts: DeviceAccounts,
-    DeviceMotion: DeviceMotion,
-    DeviceOrientation: DeviceOrientation,
-    Dialogs: Dialogs,
-    Diagnostic: Diagnostic,
-    EmailComposer: EmailComposer,
-    EstimoteBeacons: EstimoteBeacons,
-    Facebook: Facebook,
-    File: File,
-    FileChooser: FileChooser,
-    FileOpener: FileOpener,
-    Flashlight: Flashlight,
-    Geofence: Geofence,
-    Geolocation: Geolocation,
-    Globalization: Globalization,
-    GooglePlus: GooglePlus,
-    GoogleMap: GoogleMap,
-    GoogleAnalytics: GoogleAnalytics,
-    Hotspot: Hotspot,
-    Httpd: Httpd,
-    IBeacon: IBeacon,
-    ImagePicker: ImagePicker,
-    ImageResizer: ImageResizer,
-    InAppBrowser: InAppBrowser,
-    InAppPurchase: InAppPurchase,
-    Instagram: Instagram,
-    IsDebug: IsDebug,
-    Keyboard: Keyboard$1,
-    LaunchNavigator: LaunchNavigator,
-    LocalNotifications: LocalNotifications,
-    Market: Market,
-    MediaCapture: MediaCapture,
-    MediaPlugin: MediaPlugin,
-    Mixpanel: Mixpanel,
-    MusicControls: MusicControls,
-    NativeAudio: NativeAudio,
-    NativePageTransitions: NativePageTransitions,
-    NativeStorage: NativeStorage,
-    Network: Network,
-    PayPal: PayPal,
-    NFC: NFC,
-    Printer: Printer,
-    Push: Push,
-    OneSignal: OneSignal,
-    PhotoViewer: PhotoViewer,
-    ScreenOrientation: ScreenOrientation,
-    PinDialog: PinDialog,
-    PowerManagement: PowerManagement,
-    SafariViewController: SafariViewController,
-    Screenshot: Screenshot,
-    SecureStorage: SecureStorage,
-    Shake: Shake,
-    Sim: Sim,
-    SMS: SMS,
-    SocialSharing: SocialSharing,
-    SpinnerDialog: SpinnerDialog,
-    Splashscreen: Splashscreen,
-    SQLite: SQLite,
-    StatusBar: StatusBar,
-    StreamingMedia: StreamingMedia,
-    ThreeDeeTouch: ThreeDeeTouch,
-    Toast: Toast$1,
-    TouchID: TouchID,
-    Transfer: Transfer,
-    TextToSpeech: TextToSpeech,
-    TwitterConnect: TwitterConnect,
-    VideoEditor: VideoEditor,
-    VideoPlayer: VideoPlayer,
-    Vibration: Vibration,
-    WebIntent: WebIntent,
-    YoutubeVideoPlayer: YoutubeVideoPlayer,
-    Zip: Zip
-};
-initAngular1(window['IonicNative']);
-// To help developers using cordova, we listen for the device ready event and
-// log an error if it didn't fire in a reasonable amount of time. Generally,
-// when this happens, developers should remove and reinstall plugins, since
-// an inconsistent plugin is often the culprit.
-var before = Date.now();
-var didFireReady = false;
-document.addEventListener('deviceready', function () {
-    console.log('DEVICE READY FIRED AFTER', (Date.now() - before), 'ms');
-    didFireReady = true;
-});
-setTimeout(function () {
-    if (!didFireReady && window.cordova) {
-        console.warn("Native: deviceready did not fire within " + DEVICE_READY_TIMEOUT + "ms. This can happen when plugins are in an inconsistent state. Try removing plugins from plugins/ and reinstalling them.");
-    }
-}, DEVICE_READY_TIMEOUT);
-
-var __decorate$104 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -76034,7 +65532,7 @@ var GamePage = (function () {
             return true;
         }
     };
-    GamePage = __decorate$104([
+    GamePage = __decorate$3([
         Component({
             selector: 'page-home',
              template: '<ion-header>\n\n  <ion-navbar>\n\n    <ion-title>\n\n      Celebrating Rakib\'s BirthDay\n\n    </ion-title>\n\n  </ion-navbar>\n\n</ion-header>\n\n\n\n<ion-content>\n\n  <ion-grid [hidden]="gameOver">\n\n      <ion-row *ngFor=\'let x of a; let i=index\'>\n\n          <ion-col *ngFor=\'let y of a; let j=index\' width-10>\n\n              <img src="{{call(i,j)}}" (click)="onClick(i,j)"> \n\n          </ion-col>\n\n      </ion-row>\n\n  </ion-grid>\n\n\n\n  <div [hidden]="!gameOver">\n\n    <img src="assets/img/main_pic.jpg">\n\n    To show your love for Rakib, take screen shot of this and share it in his timeline.\n\n    Don\'t forget to share this game with others.\n\n  </div>\n\n\n\n  <div>\n\n    <p style="align=left;">@math10</p>\n\n  </div>\n\n\n\n</ion-content>\n\n'
@@ -76044,7 +65542,7 @@ var GamePage = (function () {
     return GamePage;
 }());
 
-var __decorate$103 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+var __decorate$2 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -76061,7 +65559,7 @@ var HomePage = (function () {
         console.log("sanim");
         this.navCtrl.setRoot(GamePage);
     };
-    HomePage = __decorate$103([
+    HomePage = __decorate$2([
         Component({
             selector: 'page-home',
              template: '<ion-header>\n  <ion-navbar>\n    <ion-title>Celebrating Rakib\'s BirthDay</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content padding>\n  <div>\n    Today is Rakib\'s birthday. Let\'s celebrate this by solving this puzzle.<br>\n    <button ion-button color="dark" round (click)="goGame()">Let\'s Play</button>\n  </div>\n</ion-content>\n'
@@ -76085,9 +65583,6 @@ var MyApp = (function () {
     function MyApp(platform) {
         this.rootPage = HomePage;
         platform.ready().then(function () {
-            // Okay, so the platform is ready and our plugins are available.
-            // Here you can do any higher level native things you might need.
-            StatusBar.styleDefault();
         });
     }
     MyApp = __decorate$1([
@@ -76097,78 +65592,6 @@ var MyApp = (function () {
         __metadata$1('design:paramtypes', [Platform])
     ], MyApp);
     return MyApp;
-}());
-
-var __decorate$105 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$4 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var AboutPage = (function () {
-    function AboutPage(navCtrl) {
-        this.navCtrl = navCtrl;
-    }
-    AboutPage = __decorate$105([
-        Component({
-            selector: 'page-about',
-             template: '<ion-header>\n  <ion-navbar>\n    <ion-title>\n      About\n    </ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content padding>\n\n</ion-content>\n'
-        }), 
-        __metadata$4('design:paramtypes', [NavController])
-    ], AboutPage);
-    return AboutPage;
-}());
-
-var __decorate$106 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$5 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var ContactPage = (function () {
-    function ContactPage(navCtrl) {
-        this.navCtrl = navCtrl;
-    }
-    ContactPage = __decorate$106([
-        Component({
-            selector: 'page-contact',
-             template: '<ion-header>\n  <ion-navbar>\n    <ion-title>\n      Contact\n    </ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content>\n  <ion-list>\n    <ion-list-header>Follow us on Twitter</ion-list-header>\n    <ion-item>\n      <ion-icon name="ionic" item-left></ion-icon>\n      @ionicframework\n    </ion-item>\n  </ion-list>\n</ion-content>\n'
-        }), 
-        __metadata$5('design:paramtypes', [NavController])
-    ], ContactPage);
-    return ContactPage;
-}());
-
-var __decorate$107 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$6 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var TabsPage = (function () {
-    function TabsPage() {
-        // this tells the tabs component which Pages
-        // should be each tab's root Page
-        this.tab1Root = HomePage;
-        this.tab2Root = AboutPage;
-        this.tab3Root = ContactPage;
-    }
-    TabsPage = __decorate$107([
-        Component({
-             template: '<ion-tabs>\n  <ion-tab [root]="tab1Root" tabTitle="Home" tabIcon="home"></ion-tab>\n  <ion-tab [root]="tab2Root" tabTitle="About" tabIcon="information-circle"></ion-tab>\n  <ion-tab [root]="tab3Root" tabTitle="Contact" tabIcon="contacts"></ion-tab>\n</ion-tabs>\n'
-        }), 
-        __metadata$6('design:paramtypes', [])
-    ], TabsPage);
-    return TabsPage;
 }());
 
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
@@ -76187,10 +65610,7 @@ var AppModule = (function () {
         NgModule({
             declarations: [
                 MyApp,
-                AboutPage,
-                ContactPage,
                 HomePage,
-                TabsPage,
                 GamePage
             ],
             imports: [
@@ -76199,10 +65619,7 @@ var AppModule = (function () {
             bootstrap: [IonicApp],
             entryComponents: [
                 MyApp,
-                AboutPage,
-                ContactPage,
                 HomePage,
-                TabsPage,
                 GamePage
             ],
             providers: []
