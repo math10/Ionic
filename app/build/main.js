@@ -76037,7 +76037,7 @@ var GamePage = (function () {
     GamePage = __decorate$104([
         Component({
             selector: 'page-home',
-             template: '<ion-header>\n\n  <ion-navbar>\n\n    <ion-title>\n\n      Celebrating Rakib\'s BirthDay\n\n    </ion-title>\n\n  </ion-navbar>\n\n</ion-header>\n\n\n\n<ion-content>\n\n  <ion-grid [hidden]="gameOver">\n\n      <ion-row *ngFor=\'let x of a; let i=index\'>\n\n          <ion-col *ngFor=\'let y of a; let j=index\' width-10>\n\n              <img src="{{call(i,j)}}" (click)="onClick(i,j)"> \n\n          </ion-col>\n\n      </ion-row>\n\n  </ion-grid>\n\n\n\n  <div [hidden]="!gameOver">\n\n    <img src="assets/img/main_pic.jpg">\n\n    To show your love for Rakib, take screen shot of this and share it in his timeline.\n\n    Don\'t forget to share this game with others.\n\n  </div>\n\n\n\n</ion-content>\n\n'
+             template: '<ion-header>\n\n  <ion-navbar>\n\n    <ion-title>\n\n      Celebrating Rakib\'s BirthDay\n\n    </ion-title>\n\n  </ion-navbar>\n\n</ion-header>\n\n\n\n<ion-content>\n\n  <ion-grid [hidden]="gameOver">\n\n      <ion-row *ngFor=\'let x of a; let i=index\'>\n\n          <ion-col *ngFor=\'let y of a; let j=index\' width-10>\n\n              <img src="{{call(i,j)}}" (click)="onClick(i,j)"> \n\n          </ion-col>\n\n      </ion-row>\n\n  </ion-grid>\n\n\n\n  <div [hidden]="!gameOver">\n\n    <img src="assets/img/main_pic.jpg">\n\n    To show your love for Rakib, take screen shot of this and share it in his timeline.\n\n    Don\'t forget to share this game with others.\n\n  </div>\n\n\n\n  <div>\n\n    <p style="align=left;">@math10</p>\n\n  </div>\n\n\n\n</ion-content>\n\n'
         }), 
         __metadata$3('design:paramtypes', [NavController])
     ], GamePage);
